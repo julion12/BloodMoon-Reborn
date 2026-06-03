@@ -1,0 +1,49 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+
+    maven {
+        url = 'https://maven.enginehub.org/repo/'
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.9'
+
+    implementation 'org.yaml:snakeyaml:1.23'
+    implementation 'org.jetbrains:annotations:18.0.0'
+
+    implementation(files('libs/SQLAccess.jar'))
+}
+
+jar {
+    from {
+        configurations.runtimeClasspath.findAll {
+            it.name.endsWith('jar')
+        }.collect {
+            zipTree(it)
+        }
+    }
+
+    destinationDirectory.set(file("exes/server/plugins"))
+}
+
+task runSpigot(type: Exec) {
+    standardInput = System.in
+
+    workingDir 'exes/server'
+    commandLine 'cmd', '/c', 'java', '-jar', file('exes/paper.jar'), 'nogui'
+}
