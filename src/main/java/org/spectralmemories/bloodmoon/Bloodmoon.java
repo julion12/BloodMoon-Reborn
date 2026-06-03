@@ -254,6 +254,9 @@ public final class Bloodmoon extends JavaPlugin
     @Override
     public void onEnable()
     {
+		getLogger().info("BloodMoon-Reborn v1.0.1");
+		getLogger().info("Original author: SpectralMemories");
+		getLogger().info("Maintained by: JulioN12");
         instance = this;
 
         CreateFolder();
@@ -384,7 +387,7 @@ public final class Bloodmoon extends JavaPlugin
 
     private void CheckOlderConfigs ()
     {
-        getLogger().log(Level.INFO,"This plugin is still in its infancy. If you encounter a bug, please report it to https://www.spigotmc.org/threads/bloodmoon.412741/");
+        getLogger().log(Level.INFO,"BloodMoon-Reborn v1.0.1 - Modernized for Minecraft 1.21+");
 
         File oldConfig = new File (getDataFolder() + SLASH + CONFIG_FILE);
         if (oldConfig.exists()) getLogger().log(Level.WARNING,"[Deprecated] BloodMoon/config.yml is no longer used. Use per-world configuration instead");
