@@ -7,13 +7,17 @@ Validation date: 2026-07-19. `PASSED` means the check was executed in an isolate
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 19 tests, 0 failures |
-| Reproducible JAR task | PASSED | JDK 21 and JDK 25 produced the same 449,774-byte JAR; SHA-256 `5636435d39d3a9bce27ce69e82be53030e13f0a715c67b2f504c47324d477bee` |
+| JUnit suite | PASSED | 37 tests, 0 failures, including the original 19 |
+| Reproducible JAR task | PASSED | JDK 21 and JDK 25 produced the same 477,833-byte JAR; SHA-256 `a5739e10e07979ffa7c031d9325d7c6ea15ef58ba6757c97667984c95ed4f47e` |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, and two-world isolation | PASSED | Unit tests |
 | Vanilla boss killer, no-killer, and duplicate death handling | PASSED | Unit tests |
 | MythicMobs absent, fallback, and default reward policy | PASSED | Unit tests |
+| Contextual vanilla/Mythic boss names and `$b`/modern placeholders | PASSED | Unit tests cover display order, InternalName fallback, nulls, legacy and modern tokens |
+| Vanilla BossBar lifecycle and health values | PASSED | Unit tests cover creation policy, Mythic exclusion, reload idempotency, cleanup state, health rendering, and 0.0–1.0 clamping |
+| English, Spanish, fallback, legacy override, and locale migration | PASSED | Complete YAML catalogs parsed; backup, custom `ZombieBossName`, missing-key merge, and idempotency tested |
+| Documented YAML examples | PASSED | Config migration output and Mythic mob example parsed by SnakeYAML |
 
 ## Real server startup and command smoke tests
 
@@ -50,10 +54,24 @@ The tested official `Mythic-Dist-5.12.1.jar` was 20,242,096 bytes with SHA-256 `
 
 | Platform | Result | Evidence |
 | --- | --- | --- |
-| Paper 1.21.8 + MythicMobs 5.12.1 | PARTIAL PASS | MythicMobs enabled; BloodMoon logged `MythicMobs integration enabled`; reload, status, and shutdown passed without class/link errors |
+| Paper 1.21.8 + MythicMobs 5.12.1 | PARTIAL PASS | MythicMobs enabled; BloodMoon logged `MythicMobs integration enabled`; the documented `BloodMoonBoss` YAML loaded as the ninth mob; reload, status, and shutdown passed without class/link errors |
 | Paper 26.2 + MythicMobs 5.12.1 | UPSTREAM BLOCKED | MythicMobs failed its own enable with an internal `ServerVersion.getNMS()` null result before BloodMoon could activate the bridge; BloodMoon core still enabled and stopped cleanly |
 | BloodMoon without MythicMobs | PASSED | All six core server rows loaded without optional-dependency class errors |
 | Actual Mythic boss spawn/death/reward isolation | MANUAL REQUIRED | The production spawn policy correctly requires a real player in the world; no player was available in the isolated console-only server |
+
+## 1.1.0 boss-name, BossBar, and locale follow-up smoke
+
+Paper 1.21.8 build 60 with Temurin 21.0.8+9 was rerun using the new 477,833-byte artifact.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| New English installation | PASSED | Plugin enabled, created `locales/en.yml` and `locales/es.yml`, added `Boss.VanillaBossBar`, reloaded, returned English status, and stopped cleanly |
+| Spanish selection | PASSED | `Language: es` loaded after reload; status/session messages were Spanish and UTF-8 accents were verified in `latest.log` |
+| Legacy customized `locales.yml` | PASSED | Real server migration created one backup, retained `ZombieBossName: "el duro"` and a customized status string, appended missing 1.1 keys, and produced no second backup after restart |
+| MythicMobs documented example | PASSED | MythicMobs 5.12.1 accepted the exact documented boss YAML and reported nine loaded mobs |
+| Vanilla boss message/bar/damage/removal/reward | MANUAL REQUIRED | No real Minecraft player was connected; the production boss intentionally does not spawn without one |
+| Mythic display/death/no-vanilla-bar/reward isolation | MANUAL REQUIRED | Bridge and schema loaded, but the live boss lifecycle requires a real connected player |
+| Reload without duplicate visible bars | MANUAL REQUIRED | Lifecycle state is unit-tested; visual confirmation requires a player observing an active boss |
 
 ## Release gate
 
