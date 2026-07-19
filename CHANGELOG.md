@@ -13,12 +13,16 @@
 - Session crash markers and safe incomplete-session discard.
 - Console-safe reload, status/survivor views, and tab completion.
 - JUnit coverage for command parsing, placeholders, sessions, migration, boss rewards, and Mythic fallback.
+- A configurable Bukkit BossBar for the vanilla boss with health and scoped audience updates.
+- Complete English and Spanish locale catalogs, English fallback, and non-destructive legacy locale migration.
+- Boss health placeholders and contextual `$b`, `%boss_name%`, and `%boss_type%` resolution.
 
 ### Changed
 
 - Release version is 1.1.0; artifact is reproducible and named `BloodMoon-Reborn-1.1.0.jar`.
 - Build remains against Paper API 1.21.4 and emits Java 21 bytecode for one cross-version JAR.
 - Vanilla bosses now carry a PersistentDataContainer identity marker; legacy named bosses remain recognized during cleanup.
+- Mythic boss messages now use the active/configured Mythic display name while UUID tracking remains unchanged.
 
 ### Fixed
 
@@ -27,5 +31,6 @@
 - Concurrent modification while removing a defeated boss.
 - Null death-message handling.
 - Misspelled `Multiverse-Core` soft dependency.
+- Mythic arrival/death text incorrectly reusing the vanilla `ZombieBossName`.
 
 No existing configuration key or vanilla boss default was removed or renamed.

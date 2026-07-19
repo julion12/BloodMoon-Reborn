@@ -13,6 +13,9 @@ Modernization and maintenance: **JulioN12**
 - Optional survivor command rewards with UUID-based death disqualification and once-per-session protection.
 - Optional command rewards for the existing vanilla boss killer.
 - Optional MythicMobs boss mode through its public API; vanilla remains the default and fallback.
+- Contextual Mythic boss names without reusing the vanilla `ZombieBossName`.
+- Configurable vanilla-only BossBar with nearby/world/all audiences and health placeholders.
+- Complete English and Spanish catalogs with English fallback and legacy `locales.yml` overrides.
 - Timestamped, idempotent per-world configuration migration from 1.0.1.
 - Crash markers discard incomplete sessions without granting uncertain rewards.
 
@@ -26,7 +29,7 @@ All new rewards default to disabled. MythicMobs, WorldGuard, and Multiverse-Core
 4. Start the server. Existing per-world `config.yml` files receive only missing 1.1 sections; a timestamped backup is created first.
 5. Leave rewards disabled until their commands have been reviewed.
 
-See [migration](docs/MIGRATION.md), [configuration](docs/CONFIGURATION.md), and [compatibility](docs/COMPATIBILITY.md).
+Select `Language: en` or `Language: es` in `plugins/BloodMoon/locales.yml`. See [migration](docs/MIGRATION.md), [configuration](docs/CONFIGURATION.md), and [compatibility](docs/COMPATIBILITY.md).
 
 ## Commands
 
@@ -52,6 +55,7 @@ Console commands require a world argument except `reload`. Tab completion is inc
 - [Migration](docs/MIGRATION.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Test matrix](docs/TEST_MATRIX.md)
+- [Manual release checklist](docs/MANUAL_TEST_CHECKLIST.md)
 - [Changelog](CHANGELOG.md)
 
 ## License

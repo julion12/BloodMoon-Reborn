@@ -2,6 +2,8 @@
 
 MythicMobs is optional (`softdepend`). The core plugin does not load Mythic classes unless MythicMobs is enabled. Integration uses the public 5.12.1 API to resolve an internal mob name, spawn it, track the exact entity UUID, and receive `MythicMobDeathEvent`.
 
+Boss identity remains UUID-based. The visible name is display-only and resolves in this order: active entity display, configured Mythic `Display`, BloodMoon `InternalName`, then the localized `MythicBossFallbackName`. Legacy/MiniMessage formatting codes are removed from the inserted name so raw markup is never shown. `ZombieBossName` is never used for a successfully spawned Mythic boss.
+
 Live validation on 2026-07-19 confirmed that MythicMobs 5.12.1 and the BloodMoon bridge enable on Paper 1.21.8. The same MythicMobs build fails during its own NMS/server-version initialization on Paper 26.2 build 62, before BloodMoon can activate the bridge. BloodMoon core continues safely without it. Treat 26.2 + MythicMobs 5.12.1 as unsupported and test a future 26.2-compatible MythicMobs build before deployment.
 
 ```yaml
@@ -26,16 +28,23 @@ Example MythicMobs file (place manually in MythicMobs; BloodMoon-Reborn never ov
 ```yaml
 BloodMoonBoss:
   Type: ZOMBIE
-  Display: '&4Blood Moon Herald'
-  Health: 500
-  Damage: 12
-  Options:
-    PreventOtherDrops: true
+  Display: '&4&lRey de la Luna Carmesí'
+  Health: 800
+  Damage: 18
+  BossBar:
+    Enabled: true
+    Title: '<mob.name>'
+    Range: 40
+    Color: RED
+    Style: SEGMENTED_10
   Drops:
-    - diamond 1-3 1
-  Skills:
-    - message{m="&cThe herald has fallen!"} @PlayersInWorld ~onDeath
+    - diamond 3 1
+    - exp 250 1
 ```
+
+The example is also stored as [`docs/examples/MythicMobs-BloodMoonBoss.yml`](examples/MythicMobs-BloodMoonBoss.yml) and parsed by the automated test suite. MythicMobs documents drop entries as `<drop> <amount> <chance>` and BossBar styles such as `SEGMENTED_10`; the final `1` above means a 100% chance. See the official [Drops](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/drops/Drops) and [BossBar](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Mobs/BossBar) documentation.
+
+BloodMoon does not create its vanilla BossBar in `MYTHICMOBS` mode. The `BossBar` block above belongs to MythicMobs, avoiding duplicate bars.
 
 If MythicMobs is absent, incompatible, or the name is unknown, a warning is logged. `FallbackToVanilla: true` uses the existing `ZombieIBoss`; otherwise no boss is spawned. Despawn/event-end/disable cleanup removes the exact tracked entity.
 

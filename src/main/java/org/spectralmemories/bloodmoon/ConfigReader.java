@@ -122,7 +122,7 @@ public class ConfigReader implements Closeable
             writer.write("#Plugin version. Please do not tamper\n");
             writer.write(CONFIG_VERSION + ": " + Bloodmoon.GetInstance().getDescription().getVersion() + "\n\n");
             writer.write("#Config file for world " + world.getName() + " (UUID: " + world.getUID().toString() + ")\n\n");
-            writer.write("#Wether or not a BloodMoon happens in this world\n#Requires a server restart upon changes\n");
+            writer.write("#Whether or not a BloodMoon happens in this world\n#Requires a server restart upon changes\n");
             writer.write(IS_BLACKLISTED + ": " + String.valueOf(IS_BLACKLISTED_DEFAULT) + "\n");
             writer.write("#Sets a permanent BloodMoon in this world\n#Obviously the interval option is ignored when this is on\n");
             writer.write(PERMANENT_BLOOD_MOON + ": " + String.valueOf(PERMANENT_BLOODMOON_DEFAULT) + "\n");
@@ -205,7 +205,7 @@ public class ConfigReader implements Closeable
             writer.write("  - \"WITHER,12,20,5,1\"\n");
             writer.write("#Mob effects on hit. Format (with no spaces in between):\n");
             writer.write("#[Effect],[Duration in seconds],[Effect amplifier. Use 1 if you're unsure]\n");
-            writer.write("#For a complete list of effects, refert to https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html\n");
+            writer.write("#For a complete list of effects, refer to https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html\n");
             writer.write("#Additional effects include: 'LIGHTNING'\n");
             writer.write(ZOMBIEEFFECTS + ":\n");
             writer.write("  - \"WITHER,7,1\"\n");
@@ -236,10 +236,15 @@ public class ConfigReader implements Closeable
             writer.write("#For all options, $w will be replaced by the world name\n");
             writer.write("#Note that these commands will be the very first and very last operations\n#ran when starting and ending a BloodMoon\n");
             writer.write(COMMANDS_ON_START + ":\n");
-            writer.write("#  - \"some command;s\"\n");
-            writer.write("#Commands ran at the end of the BloodMoon\n");
+            writer.write("#  - \"say [BloodMoon] Started in %world%;s\"\n");
+            writer.write("#  - \"effect give %player% minecraft:night_vision 10 0 true;f\"\n");
+            writer.write("#  - \"playsound minecraft:entity.wither.spawn master %player%;f\"\n");
+            writer.write("#  - \"me hears the Blood Moon rising;p\"\n");
+            writer.write("#Commands run at the end of the BloodMoon. ;s runs once; ;f and ;p run per player.\n");
             writer.write(COMMANDS_ON_END + ":\n");
-            writer.write("#  - \"command on player $p on world $w;p\"\n");
+            writer.write("#  - \"say [BloodMoon] Ended in %world%;s\"\n");
+            writer.write("#  - \"weather clear;s\"\n");
+            writer.write("#  - \"effect clear $p minecraft:night_vision;f\"\n");
             writer.write("\n#Hordes parameter\n");
             writer.write("#Are hordes even enabled in this world?\n");
             writer.write(HORDES_ENABLED + ": " + String.valueOf(HORDES_ENABLED_DEFAULT) + "\n");

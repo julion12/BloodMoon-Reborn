@@ -1,42 +1,87 @@
 # Configuration
 
-Configuration remains per world at `plugins/BloodMoon/<world>/config.yml`. All 1.0.1 keys remain valid. The lifecycle lists keep their original top-level names and suffixes:
+World settings remain in `plugins/BloodMoon/<world>/config.yml`. All 1.0.1 keys remain valid. New rewards are disabled by default.
+
+## Language
+
+New installations receive `locales/en.yml` and `locales/es.yml`. Select a language in the compatibility file `plugins/BloodMoon/locales.yml`:
+
+```yaml
+LocalesVersion: 1.1.0
+Language: en # Use es for Spanish.
+UseBundledLocales: true
+```
+
+The bundled [`en.yml`](../src/main/resources/locales/en.yml) and [`es.yml`](../src/main/resources/locales/es.yml) files are complete English and Spanish examples. They are copied once and never overwritten. Keys placed directly in an old `locales.yml` remain higher-priority custom overrides. Missing selected-language keys fall back to English.
+
+## Lifecycle commands
 
 ```yaml
 CommandsOnStart:
-  - "broadcast Blood Moon in %world%;s"
+  - "say [BloodMoon] The Blood Moon started in %world%;s"
+  - "effect give %player% minecraft:night_vision 10 0 true;f"
+  - "playsound minecraft:entity.wither.spawn master %player%;f"
+  - "me hears the Blood Moon rising;p"
 CommandsOnEnd:
-  - "broadcast Blood Moon ended in %world%;s"
+  - "say [BloodMoon] The Blood Moon ended in %world%;s"
+  - "weather clear;s"
+  - "effect clear $p minecraft:night_vision;f"
 ```
 
-- `;s`: console once.
-- `;f`: console once for each player in the affected world; player placeholders are available.
-- `;p`: each affected player executes the command.
-- With no suffix, lifecycle commands default to console once. Survivor and boss reward commands default to console per target.
-- A leading `/` is removed. Empty entries are ignored and logged. One failure does not stop later commands.
+- `;s`: console once. It has world/session placeholders but no per-player `%player%` value.
+- `;f`: console once for every target player. `$p` and player placeholders are available.
+- `;p`: every target player executes the command. `$p` and player placeholders are available.
+- `$w` and `$p` are the legacy world/player placeholders. `%world%` and `%player%` are their modern equivalents.
+- With no suffix, lifecycle commands default to console once. Survivor and boss rewards default to console per target.
+- OnStart and OnEnd `;s` commands run once per completed session, not once per player. A crash-recovered incomplete session does not run OnEnd.
+- A leading `/` is removed. Empty entries are ignored and one failed command does not stop later commands.
 
-New defaults added during migration:
+Commands can invoke effects, sounds, economy, permissions, or other plugins. Those plugins remain optional; for example, `eco` works only when a compatible economy command is installed.
+
+## Survivor rewards
 
 ```yaml
 SurvivorRewards:
   Enabled: false
   RequireOnlineAtEnd: true
   IncludeLateJoiners: true
-  MinimumParticipationSeconds: 0
+  MinimumParticipationSeconds: 60
   DisqualifyOnDeath: true
   DisqualifyOnWorldLeave: false
   DisqualifyOnDisconnect: false
   RewardOncePerSession: true
-  Messages: []
-  Commands: []
+  Messages:
+    - "&aYou survived the Blood Moon."
+  Commands:
+    - "give %player% minecraft:diamond 1;f"
+    - "experience add %player% 100 points;f"
+    - "eco give %player% 500;f"
+```
+
+These commands run from the console for each eligible player because they use `;f`. Players who die are disqualified when `DisqualifyOnDeath` is true. UUID tracking prevents reconnects, world changes, reloads, or name changes from duplicating a reward.
+
+## Boss selection, vanilla bar, and rewards
+
+```yaml
 Boss:
-  Mode: VANILLA
+  Mode: VANILLA # VANILLA, MYTHICMOBS, or NONE
+  VanillaBossBar:
+    Enabled: true
+    Title: "%boss_name% &c%boss_health%&7/&c%boss_max_health%"
+    Color: RED
+    Style: SEGMENTED_10
+    Audience: NEARBY # NEARBY, WORLD, or ALL
+    ViewDistance: 64
+    ShowHealthNumbers: true
   Rewards:
     Enabled: false
     Mode: KILLER
     RequirePlayerKiller: true
     RewardOnce: true
-    Commands: []
+    Commands:
+      - "give %boss_killer% minecraft:diamond 3;s"
+      - "experience add %boss_killer% 250 points;s"
+      - "say %boss_killer% defeated %boss_name%;s"
   MythicMobs:
     Enabled: false
     InternalName: BloodMoonBoss
@@ -45,25 +90,14 @@ Boss:
     FallbackToVanilla: true
 ```
 
-`Boss.Mode` accepts `VANILLA`, `MYTHICMOBS`, or `NONE`. `VANILLA` preserves `EnableZombieBoss`; a Mythic fallback explicitly spawns the existing vanilla boss. `Boss.Rewards.Mode` currently implements the documented initial `KILLER` mode.
+The vanilla bar is created only for the built-in zombie boss. It follows effective health, refreshes its audience every 10 ticks, and is removed on death, administrative removal, event end, world unload, plugin disable, or session cleanup. Reload updates the existing bar and never creates a second one. `ShowHealthNumbers: false` reduces the title to `%boss_name%`.
 
-Example rewards:
+Audience modes:
 
-```yaml
-SurvivorRewards:
-  Enabled: true
-  RequireOnlineAtEnd: true
-  MinimumParticipationSeconds: 300
-  Commands:
-    - "give %player% emerald 3"
-    - "xp add %player% 250 points"
-Boss:
-  Mode: VANILLA
-  Rewards:
-    Enabled: true
-    RequirePlayerKiller: true
-    Commands:
-      - "give %boss_killer% diamond 3"
-```
+- `NEARBY`: same-world players within `ViewDistance` blocks.
+- `WORLD`: every player in the boss world.
+- `ALL`: every online player.
 
-Commands can integrate economy or permissions plugins without adding hard dependencies.
+Vanilla reward commands are additional to the boss's legacy item/experience drops. Rewards remain off until `Boss.Rewards.Enabled` is explicitly set to `true`.
+
+For MythicMobs, `InternalName` must exactly match the mob ID. The Mythic entity's resolved `Display` is used in arrival/death messages; `ZombieBossName` remains exclusive to the vanilla boss. `UseMythicMobsRewards` retains Mythic drops, while `RunBloodMoonRewardCommands` adds the commands above. Enabling both can intentionally duplicate value. `FallbackToVanilla` uses the old boss when MythicMobs or the configured mob is unavailable.

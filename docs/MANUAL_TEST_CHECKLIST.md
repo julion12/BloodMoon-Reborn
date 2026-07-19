@@ -31,6 +31,9 @@ Set `Boss.Mode: VANILLA`, enable a uniquely identifiable boss reward command, an
 2. Repeat with environmental/no-player final damage; confirm the configured no-killer behavior and no console exception.
 3. Exercise cleanup (`bloodmoon killbosses`, event end, and plugin disable) and confirm no reward is issued for administrative removal.
 4. Inspect the log for duplicate death processing and verify the reward cannot run twice for the same boss UUID.
+5. With `VanillaBossBar.Enabled: true`, confirm one bar appears using `ZombieBossName`, follows damage, and disappears after death.
+6. Test `NEARBY`, `WORLD`, and `ALL`; for `NEARBY`, cross the configured radius and confirm the audience refreshes without creating another bar.
+7. Reload repeatedly, disable/re-enable the bar through config plus reload, end the event, unload the disposable world, and stop the plugin. Confirm no duplicate or orphan bar remains.
 
 ## 4. MythicMobs rewards and fallback
 
@@ -42,6 +45,16 @@ Use a MythicMobs build that officially supports the exact server version. Mythic
 4. End an event and disable the plugin while a tracked Mythic boss exists; confirm only that entity is removed and no reward is granted.
 5. Test an unknown `InternalName`: with `FallbackToVanilla: true`, confirm one vanilla boss; with it `false`, confirm no boss and one clear warning.
 6. Remove MythicMobs completely and restart. Confirm BloodMoon enables, reloads, runs the vanilla/default path, and stops without `NoClassDefFoundError` or linkage errors.
+7. Confirm the arrival and death messages show the Mythic `Display`, never the customized vanilla `ZombieBossName`, and that no BloodMoon vanilla BossBar appears.
+
+## 5. Languages and legacy locales
+
+1. On a new disposable installation, select `Language: en`, reload, and exercise status, warnings, boss, survivor, and migration messages.
+2. Select `Language: es`, reload, and repeat. Confirm accents, opening punctuation, color codes, and placeholders render correctly.
+3. Remove one noncritical key from a copy of `locales/es.yml`; confirm the English value is used and no exception occurs.
+4. Install an old customized `locales.yml` containing `ZombieBossName: "el duro"`. Start once and confirm a timestamped backup, preserved custom value, and appended missing keys.
+5. Restart and reload twice; confirm no second migration write or backup.
+6. Spawn vanilla and Mythic bosses in turn. Confirm vanilla uses `el duro`, while Mythic uses its own `Display`.
 
 ## Sign-off
 

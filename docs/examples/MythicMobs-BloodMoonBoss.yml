@@ -1,0 +1,14 @@
+BloodMoonBoss:
+  Type: ZOMBIE
+  Display: '&4&lRey de la Luna Carmesí'
+  Health: 800
+  Damage: 18
+  BossBar:
+    Enabled: true
+    Title: '<mob.name>'
+    Range: 40
+    Color: RED
+    Style: SEGMENTED_10
+  Drops:
+    - diamond 3 1
+    - exp 250 1

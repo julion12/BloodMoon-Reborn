@@ -30,11 +30,17 @@ SurvivorRewards:
   DisqualifyOnDisconnect: false
   RewardOncePerSession: true
   Messages: []
+  # Example: "&aYou survived the Blood Moon."
   Commands: []
+  # Console-per-player examples (require Enabled: true):
+  # - "give %player% minecraft:diamond 1;f"
+  # - "experience add %player% 100 points;f"
+  # - "eco give %player% 500;f" # Requires a compatible economy plugin.
 """;
     private static final String BOSS_SETTINGS = """
 Boss:
   Mode: VANILLA
+  # This bar is created only for the built-in vanilla zombie boss, never for MythicMobs.
   VanillaBossBar:
     Enabled: true
     Title: "%boss_name% &c%boss_health%&7/&c%boss_max_health%"
@@ -49,12 +55,17 @@ Boss:
     RequirePlayerKiller: true
     RewardOnce: true
     Commands: []
+    # - "give %boss_killer% minecraft:diamond 3;s"
+    # - "experience add %boss_killer% 250 points;s"
+    # - "say %boss_killer% defeated %boss_name%;s"
   MythicMobs:
     Enabled: false
     InternalName: BloodMoonBoss
     UseMythicMobsRewards: true
     RunBloodMoonRewardCommands: false
     FallbackToVanilla: true
+    # InternalName is the exact MythicMobs mob ID. Its Display is used in messages.
+    # Enabling Mythic and BloodMoon rewards together can intentionally duplicate value.
 """;
     private static final String VANILLA_BOSS_BAR_SETTINGS = """
   VanillaBossBar:

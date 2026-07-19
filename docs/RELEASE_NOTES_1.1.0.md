@@ -1,6 +1,6 @@
 # BloodMoon-Reborn 1.1.0 release notes
 
-This incremental release adds configurable lifecycle and reward commands, UUID-based survivor eligibility, command rewards for the existing vanilla boss, and an optional MythicMobs boss mode. All reward features are disabled by default, old per-world keys remain valid, and MythicMobs remains optional.
+This incremental release adds configurable lifecycle and reward commands, UUID-based survivor eligibility, command rewards for the existing vanilla boss, an optional MythicMobs boss mode, a vanilla-only health bar, and complete English/Spanish catalogs. Mythic messages now use the Mythic mob's visible display instead of `ZombieBossName`. All reward features are disabled by default, old per-world and locale keys remain valid, and MythicMobs remains optional.
 
 Upgrade by stopping the server, backing up `plugins/BloodMoon/`, replacing the JAR, and starting with Java 21 (Minecraft 1.21.x) or Java 25 (Minecraft 26.1+). Review the automatically appended sections before enabling rewards.
 
