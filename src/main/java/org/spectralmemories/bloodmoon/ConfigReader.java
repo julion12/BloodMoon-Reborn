@@ -346,6 +346,13 @@ public class ConfigReader implements Closeable
     public boolean GetUseMythicMobsRewards() { return GetNestedBoolean(true, "Boss", "MythicMobs", "UseMythicMobsRewards"); }
     public boolean GetRunBloodMoonRewardCommandsForMythic() { return GetNestedBoolean(false, "Boss", "MythicMobs", "RunBloodMoonRewardCommands"); }
     public boolean GetMythicFallbackToVanilla() { return GetNestedBoolean(true, "Boss", "MythicMobs", "FallbackToVanilla"); }
+    public boolean GetVanillaBossBarEnabled() { return GetNestedBoolean(true, "Boss", "VanillaBossBar", "Enabled"); }
+    public String GetVanillaBossBarTitle() { return GetNestedString("%boss_name% &c%boss_health%&7/&c%boss_max_health%", "Boss", "VanillaBossBar", "Title"); }
+    public String GetVanillaBossBarColor() { return GetNestedString("RED", "Boss", "VanillaBossBar", "Color"); }
+    public String GetVanillaBossBarStyle() { return GetNestedString("SEGMENTED_10", "Boss", "VanillaBossBar", "Style"); }
+    public String GetVanillaBossBarAudience() { return GetNestedString("NEARBY", "Boss", "VanillaBossBar", "Audience"); }
+    public int GetVanillaBossBarViewDistance() { return GetNestedInt(64, "Boss", "VanillaBossBar", "ViewDistance"); }
+    public boolean GetVanillaBossBarShowHealthNumbers() { return GetNestedBoolean(true, "Boss", "VanillaBossBar", "ShowHealthNumbers"); }
 
     private Object GetNested(Object fallback, String... path) {
         try {

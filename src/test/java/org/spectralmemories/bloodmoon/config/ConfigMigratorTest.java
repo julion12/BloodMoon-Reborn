@@ -12,6 +12,16 @@ class ConfigMigratorTest {
         assertTrue(migrated.contains("say custom;s"));
         assertTrue(migrated.contains("SurvivorRewards:"));
         assertTrue(migrated.contains("Boss:"));
+        assertTrue(migrated.contains("VanillaBossBar:"));
+    }
+
+    @Test void addsBossBarToExistingBossSectionWithoutChangingRewards() {
+        String current = "ConfigVersion: 1.1.0\nBoss:\n  Mode: MYTHICMOBS\n  Rewards:\n    Enabled: true\n";
+        String migrated = ConfigMigrator.migrateContent(current);
+        assertTrue(migrated.contains("  VanillaBossBar:"));
+        assertTrue(migrated.contains("  Mode: MYTHICMOBS"));
+        assertTrue(migrated.contains("    Enabled: true"));
+        assertEquals(migrated, ConfigMigrator.migrateContent(migrated));
     }
 
     @Test void migrationIsIdempotent() {

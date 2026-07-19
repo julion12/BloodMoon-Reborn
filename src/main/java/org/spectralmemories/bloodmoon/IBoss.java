@@ -17,4 +17,6 @@ public interface IBoss {
     Monster GetHost();
 
     String GetName();
+
+    default void RefreshDisplay() { }
 }

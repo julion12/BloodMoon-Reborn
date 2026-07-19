@@ -14,11 +14,14 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -39,6 +42,7 @@ import org.spectralmemories.bloodmoon.session.BloodMoonSession;
 import org.spectralmemories.bloodmoon.boss.BossModeResolver;
 import org.spectralmemories.bloodmoon.boss.BossNameResolver;
 import org.spectralmemories.bloodmoon.boss.BossRewardPolicy;
+import org.spectralmemories.bloodmoon.boss.VanillaBossBarValues;
 import org.spectralmemories.bloodmoon.integration.SpawnedMythicMob;
 import org.bukkit.util.Vector;
 
@@ -99,6 +103,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         {
         }
         return null;
+    }
+
+    public static void RefreshAllBossBars() {
+        if (actuators == null) return;
+        for (BloodmoonActuator actuator : actuators.values()) {
+            for (IBoss boss : actuator.bosses) boss.RefreshDisplay();
+        }
     }
 
 
@@ -913,6 +924,17 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBossDamage(EntityDamageEvent event) {
+        if (event.getEntity().getWorld() != world) return;
+        for (IBoss boss : bosses) {
+            if (boss.GetHost() == event.getEntity()) {
+                Bloodmoon.GetInstance().GetScheduler().runTaskLater(Bloodmoon.GetInstance(), boss::RefreshDisplay, 1L);
+                return;
+            }
+        }
+    }
+
     /**
      * Runs the actuator's checkup routine. Called internally, you don't need to call it yourself
      */
@@ -962,8 +984,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 killer != null, config.GetBossRewardOnce(), firstReward)) return;
         Location location = bossHost.getLocation();
         Map<String, Object> values = new HashMap<>();
-        values.put("boss_name", bossName);
-        values.put("boss_type", bossType == null ? "NONE" : bossType);
+        double health = Math.max(0.0, bossHost.getHealth()) + Math.max(0.0, bossHost.getAbsorptionAmount());
+        double maximumHealth = bossHost.getAttribute(Attribute.MAX_HEALTH) == null
+                ? Math.max(health, 1.0) : bossHost.getAttribute(Attribute.MAX_HEALTH).getValue();
+        if ("VANILLA".equalsIgnoreCase(bossType)) {
+            maximumHealth += 4.0 * (config.GetZombieBossHealth() + 1);
+        }
+        values.putAll(VanillaBossBarValues.placeholders(bossName, bossType, health, maximumHealth));
         values.put("boss_uuid", bossId);
         values.put("boss_killer", killer == null ? "" : killer.getName());
         values.put("boss_killer_uuid", killer == null ? "" : killer.getUniqueId());

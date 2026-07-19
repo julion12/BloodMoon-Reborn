@@ -352,6 +352,7 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
         {
             if (!configReader.TryRefreshConfigs()) valid = false;
         }
+        BloodmoonActuator.RefreshAllBossBars();
         if (!valid) sender.sendMessage("At least one config.yml is invalid; its previous values remain active.");
         return valid;
     }

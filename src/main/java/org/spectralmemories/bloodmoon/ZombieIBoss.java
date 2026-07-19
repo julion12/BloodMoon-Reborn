@@ -24,9 +24,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.persistence.PersistentDataType;
+import org.spectralmemories.bloodmoon.boss.VanillaBossBarController;
 
 public final class ZombieIBoss extends Boss {
     Zombie zombieHost;
+    private VanillaBossBarController bossBar;
 
     public ZombieIBoss(Location location) {
         host = (Monster) location.getWorld().spawnEntity(location, EntityType.ZOMBIE);
@@ -45,6 +47,8 @@ public final class ZombieIBoss extends Boss {
         host.setCustomName(locales.GetLocaleString("ZombieBossName"));
         host.setCustomNameVisible(true);
         zombieHost.setBaby(false);
+        bossBar = new VanillaBossBarController(host, reader, GetName());
+        bossBar.refresh();
         Announce();
         tasks.add(scheduler.scheduleSyncRepeatingTask(Bloodmoon.GetInstance(), new Runnable() {
             public void run() {
@@ -73,6 +77,7 @@ public final class ZombieIBoss extends Boss {
     @Override
     public void Kill(boolean reward, boolean effects, boolean respawn)
     {
+        if (bossBar != null) bossBar.close();
         Iterator taskIterator = tasks.iterator();
 
         while(taskIterator.hasNext()) {
@@ -134,6 +139,11 @@ public final class ZombieIBoss extends Boss {
 
     public String GetName() {
         return locales.GetLocaleString("ZombieBossName");
+    }
+
+    @Override
+    public void RefreshDisplay() {
+        if (bossBar != null) bossBar.refresh();
     }
 
     public void Reward() {

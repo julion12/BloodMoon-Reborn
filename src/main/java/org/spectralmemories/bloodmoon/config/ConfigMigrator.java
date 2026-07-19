@@ -35,6 +35,14 @@ SurvivorRewards:
     private static final String BOSS_SETTINGS = """
 Boss:
   Mode: VANILLA
+  VanillaBossBar:
+    Enabled: true
+    Title: "%boss_name% &c%boss_health%&7/&c%boss_max_health%"
+    Color: RED
+    Style: SEGMENTED_10
+    Audience: NEARBY
+    ViewDistance: 64
+    ShowHealthNumbers: true
   Rewards:
     Enabled: false
     Mode: KILLER
@@ -47,6 +55,16 @@ Boss:
     UseMythicMobsRewards: true
     RunBloodMoonRewardCommands: false
     FallbackToVanilla: true
+""";
+    private static final String VANILLA_BOSS_BAR_SETTINGS = """
+  VanillaBossBar:
+    Enabled: true
+    Title: "%boss_name% &c%boss_health%&7/&c%boss_max_health%"
+    Color: RED
+    Style: SEGMENTED_10
+    Audience: NEARBY
+    ViewDistance: 64
+    ShowHealthNumbers: true
 """;
 
     private ConfigMigrator() { }
@@ -73,7 +91,9 @@ Boss:
         boolean needsVersion = SemanticVersion.parse(current).compareTo(SemanticVersion.parse(TARGET_VERSION)) < 0;
         boolean needsSurvivor = !Pattern.compile("(?m)^SurvivorRewards\\s*:").matcher(source).find();
         boolean needsBoss = !Pattern.compile("(?m)^Boss\\s*:").matcher(source).find();
-        if (!needsVersion && !needsSurvivor && !needsBoss) return source;
+        boolean needsVanillaBossBar = !needsBoss
+                && !Pattern.compile("(?m)^\\s{2}VanillaBossBar\\s*:").matcher(source).find();
+        if (!needsVersion && !needsSurvivor && !needsBoss && !needsVanillaBossBar) return source;
 
         String result = source;
         if (needsVersion) {
@@ -84,6 +104,13 @@ Boss:
         }
         if (needsSurvivor) result = result.stripTrailing() + System.lineSeparator() + SURVIVOR_SETTINGS;
         if (needsBoss) result = result.stripTrailing() + System.lineSeparator() + BOSS_SETTINGS;
+        else if (needsVanillaBossBar) {
+            Pattern bossHeader = Pattern.compile("(?m)^(Boss\\s*:\\s*(?:#.*)?\\R)");
+            Matcher bossMatcher = bossHeader.matcher(result);
+            if (bossMatcher.find()) {
+                result = bossMatcher.replaceFirst(Matcher.quoteReplacement(bossMatcher.group(1) + VANILLA_BOSS_BAR_SETTINGS));
+            }
+        }
         return result;
     }
 
