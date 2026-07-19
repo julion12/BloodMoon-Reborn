@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 public class ConfigReader implements Closeable
 {
@@ -102,6 +104,7 @@ public class ConfigReader implements Closeable
     private File configFile;
     private Map <String, Object> cache;
     private World world;
+    private boolean validConfig = true;
 
 
     public ConfigReader (File file, World world)
@@ -296,7 +299,83 @@ public class ConfigReader implements Closeable
 
     public void RefreshConfigs ()
     {
-        cache = null;
+        TryRefreshConfigs();
+    }
+
+    public boolean TryRefreshConfigs ()
+    {
+        try (InputStream inputStream = new FileInputStream(configFile)) {
+            Object loaded = new Yaml().load(inputStream);
+            Map<String, Object> candidate = loaded instanceof Map<?, ?> map
+                    ? new HashMap<>((Map<String, Object>) map) : new HashMap<>();
+            cache = candidate;
+            validConfig = true;
+            return true;
+        } catch (IOException | RuntimeException exception) {
+            if (cache == null) {
+                cache = new HashMap<>();
+                validConfig = false;
+            }
+            return false;
+        }
+    }
+
+    public boolean GetSurvivorRewardsEnabled() { return GetNestedBoolean(false, "SurvivorRewards", "Enabled"); }
+    public boolean GetSurvivorRequireOnlineAtEnd() { return GetNestedBoolean(true, "SurvivorRewards", "RequireOnlineAtEnd"); }
+    public boolean GetSurvivorIncludeLateJoiners() { return GetNestedBoolean(true, "SurvivorRewards", "IncludeLateJoiners"); }
+    public int GetSurvivorMinimumParticipationSeconds() { return GetNestedInt(0, "SurvivorRewards", "MinimumParticipationSeconds"); }
+    public boolean GetSurvivorDisqualifyOnDeath() { return GetNestedBoolean(true, "SurvivorRewards", "DisqualifyOnDeath"); }
+    public boolean GetSurvivorDisqualifyOnWorldLeave() { return GetNestedBoolean(false, "SurvivorRewards", "DisqualifyOnWorldLeave"); }
+    public boolean GetSurvivorDisqualifyOnDisconnect() { return GetNestedBoolean(false, "SurvivorRewards", "DisqualifyOnDisconnect"); }
+    public boolean GetSurvivorRewardOnce() { return GetNestedBoolean(true, "SurvivorRewards", "RewardOncePerSession"); }
+    public String[] GetSurvivorCommands() { return GetNestedStringList("SurvivorRewards", "Commands"); }
+    public String[] GetSurvivorMessages() { return GetNestedStringList("SurvivorRewards", "Messages"); }
+
+    public String GetBossMode() { return GetNestedString("VANILLA", "Boss", "Mode"); }
+    public boolean GetBossRewardsEnabled() { return GetNestedBoolean(false, "Boss", "Rewards", "Enabled"); }
+    public boolean GetBossRequirePlayerKiller() { return GetNestedBoolean(true, "Boss", "Rewards", "RequirePlayerKiller"); }
+    public boolean GetBossRewardOnce() { return GetNestedBoolean(true, "Boss", "Rewards", "RewardOnce"); }
+    public String[] GetBossRewardCommands() { return GetNestedStringList("Boss", "Rewards", "Commands"); }
+    public boolean GetMythicMobsEnabled() { return GetNestedBoolean(false, "Boss", "MythicMobs", "Enabled"); }
+    public String GetMythicMobInternalName() { return GetNestedString("BloodMoonBoss", "Boss", "MythicMobs", "InternalName"); }
+    public boolean GetUseMythicMobsRewards() { return GetNestedBoolean(true, "Boss", "MythicMobs", "UseMythicMobsRewards"); }
+    public boolean GetRunBloodMoonRewardCommandsForMythic() { return GetNestedBoolean(false, "Boss", "MythicMobs", "RunBloodMoonRewardCommands"); }
+    public boolean GetMythicFallbackToVanilla() { return GetNestedBoolean(true, "Boss", "MythicMobs", "FallbackToVanilla"); }
+
+    private Object GetNested(Object fallback, String... path) {
+        try {
+            Object current = GetConfig(path[0]);
+            for (int i = 1; i < path.length; i++) {
+                if (!(current instanceof Map<?, ?> map)) return fallback;
+                current = map.get(path[i]);
+            }
+            return current == null ? fallback : current;
+        } catch (FileNotFoundException ignored) {
+            return fallback;
+        }
+    }
+
+    private boolean GetNestedBoolean(boolean fallback, String... path) {
+        Object value = GetNested(fallback, path);
+        return value instanceof Boolean bool ? bool : Boolean.parseBoolean(String.valueOf(value));
+    }
+
+    private int GetNestedInt(int fallback, String... path) {
+        Object value = GetNested(fallback, path);
+        if (value instanceof Number number) return number.intValue();
+        try { return Integer.parseInt(String.valueOf(value)); }
+        catch (NumberFormatException ignored) { return fallback; }
+    }
+
+    private String GetNestedString(String fallback, String... path) {
+        Object value = GetNested(fallback, path);
+        return value == null ? fallback : String.valueOf(value);
+    }
+
+    private String[] GetNestedStringList(String... path) {
+        Object value = GetNested(Collections.emptyList(), path);
+        if (!(value instanceof List<?> list)) return new String[0];
+        return list.stream().filter(item -> item != null).map(String::valueOf).toArray(String[]::new);
     }
 
     //============================================================================================================
@@ -1032,6 +1111,7 @@ public class ConfigReader implements Closeable
 
     private void CreateConfig (String config, String value) throws FileNotFoundException
     {
+        if (!validConfig) return;
         String finalString = config + ": " + value + "\n";
 
         try
@@ -1053,18 +1133,7 @@ public class ConfigReader implements Closeable
     {
         if (cache == null)
         {
-            Yaml yaml = new Yaml();
-            InputStream inputStream = new FileInputStream (configFile);
-
-            cache = yaml.load(inputStream);
-            try
-            {
-                inputStream.close();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+            TryRefreshConfigs();
         }
 
         return cache.get(config);
