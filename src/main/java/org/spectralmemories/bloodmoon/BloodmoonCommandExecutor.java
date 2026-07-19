@@ -4,11 +4,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * This class is the only class capable of interpreting commands
  */
-public class BloodmoonCommandExecutor implements CommandExecutor
+public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
 {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
@@ -40,6 +44,14 @@ public class BloodmoonCommandExecutor implements CommandExecutor
             else if (arg0.equalsIgnoreCase("show"))
             {
                 return ExecuteShow(player, playerWorld);
+            }
+            else if (arg0.equalsIgnoreCase("status"))
+            {
+                return ExecuteShow(player, playerWorld);
+            }
+            else if (arg0.equalsIgnoreCase("survivors"))
+            {
+                return ExecuteSurvivors(player, playerWorld);
             }
             else if (arg0.equalsIgnoreCase("spawnzombieboss"))
             {
@@ -77,15 +89,15 @@ public class BloodmoonCommandExecutor implements CommandExecutor
                 return false;
             }
             String arg0 = args[0];
-            if (args.length < 2 && !arg0.equals("reload")){
+            if (args.length < 2 && !arg0.equalsIgnoreCase("reload")){
                 sender.sendMessage("Please suffix your command with the world name");
                 return false;
             }
 
             World chosenWorld = null;
-            if(!arg0.equals("reload")) chosenWorld = Bukkit.getWorld(args[1]);
+            if(!arg0.equalsIgnoreCase("reload")) chosenWorld = Bukkit.getWorld(args[1]);
 
-            if(chosenWorld == null && !arg0.equals("reload")){
+            if(chosenWorld == null && !arg0.equalsIgnoreCase("reload")){
                 sender.sendMessage("[Error] No world named " + args[1] + " could be found!");
                 return false;
             }
@@ -101,12 +113,21 @@ public class BloodmoonCommandExecutor implements CommandExecutor
             }
             else if (arg0.equalsIgnoreCase("reload"))
             {
-                if (chosenWorld == null) { sender.sendMessage("World not found."); return true; }
-                return ConfirmToConsole(sender,ExecuteReload(sender), arg0, chosenWorld.getName());
+                boolean success = ExecuteReload(sender);
+                sender.sendMessage(success ? "BloodMoon configuration reloaded" : "Reload rejected; previous in-memory configuration retained");
+                return success;
             }
             else if (arg0.equalsIgnoreCase("show"))
             {
                 return ExecuteShow(sender, chosenWorld);
+            }
+            else if (arg0.equalsIgnoreCase("status"))
+            {
+                return ExecuteShow(sender, chosenWorld);
+            }
+            else if (arg0.equalsIgnoreCase("survivors"))
+            {
+                return ExecuteSurvivors(sender, chosenWorld);
             }
             else if (arg0.equalsIgnoreCase("spawnzombieboss"))
             {
@@ -326,12 +347,47 @@ public class BloodmoonCommandExecutor implements CommandExecutor
         localeReader.RefreshLocales();
 
         ConfigReader[] configReaders = Bloodmoon.GetInstance().getAllConfigReaders();
+        boolean valid = true;
         for (ConfigReader configReader : configReaders)
         {
-            configReader.RefreshConfigs();
+            if (!configReader.TryRefreshConfigs()) valid = false;
         }
+        if (!valid) sender.sendMessage("At least one config.yml is invalid; its previous values remain active.");
+        return valid;
+    }
 
+    private boolean ExecuteSurvivors(CommandSender sender, World world)
+    {
+        if (!CheckPermission(sender, "show")) {
+            LocaleReader.MessageLocale("NoPermission", null, null, sender);
+            return false;
+        }
+        var session = Bloodmoon.GetInstance().getSessionCoordinator().current(world);
+        if (session.isEmpty()) {
+            sender.sendMessage("No active Blood Moon session in " + world.getName());
+            return true;
+        }
+        long alive = session.get().participants().stream().filter(p -> !p.died() && !p.disqualified()).count();
+        sender.sendMessage("Session " + session.get().sessionId() + ": " + alive + "/"
+                + session.get().participants().size() + " participants currently eligible");
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+    {
+        if (args.length == 1) {
+            List<String> commands = Arrays.asList("show", "status", "start", "stop", "reload", "survivors",
+                    "spawnzombieboss", "spawnhorde", "killbosses");
+            String prefix = args[0].toLowerCase(Locale.ROOT);
+            return commands.stream().filter(value -> value.startsWith(prefix)).toList();
+        }
+        if (args.length == 2 && !(sender instanceof Player) && !args[0].equalsIgnoreCase("reload")) {
+            String prefix = args[1].toLowerCase(Locale.ROOT);
+            return Bukkit.getWorlds().stream().map(World::getName)
+                    .filter(value -> value.toLowerCase(Locale.ROOT).startsWith(prefix)).toList();
+        }
+        return new ArrayList<>();
     }
 
     private boolean CheckPermission (CommandSender sender, String node)
