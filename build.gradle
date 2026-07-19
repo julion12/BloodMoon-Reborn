@@ -67,6 +67,35 @@ test {
     useJUnitPlatform()
 }
 
+tasks.register('jarContentsReport') {
+    dependsOn jar
+    def output = layout.buildDirectory.file('reports/jar-contents.txt')
+    outputs.file(output)
+    doLast {
+        def entries = []
+        new java.util.zip.ZipFile(jar.archiveFile.get().asFile).withCloseable { zip ->
+            zip.entries().each { entry -> entries << "${entry.name}\t${entry.size}" }
+        }
+        output.get().asFile.parentFile.mkdirs()
+        output.get().asFile.text = entries.sort().join(System.lineSeparator()) + System.lineSeparator()
+    }
+}
+
+tasks.register('releaseChecksum') {
+    dependsOn jar
+    def output = layout.buildDirectory.file("libs/BloodMoon-Reborn-${project.version}.jar.sha256")
+    outputs.file(output)
+    doLast {
+        def artifact = jar.archiveFile.get().asFile
+        def digest = java.security.MessageDigest.getInstance('SHA-256').digest(artifact.bytes)
+        output.get().asFile.text = digest.encodeHex().toString() + "  " + artifact.name + System.lineSeparator()
+    }
+}
+
+tasks.register('releaseArtifacts') {
+    dependsOn test, jarContentsReport, releaseChecksum
+}
+
 task runSpigot(type: Exec) {
     standardInput = System.in
 
