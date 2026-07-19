@@ -23,6 +23,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.persistence.PersistentDataType;
 
 public final class ZombieIBoss extends Boss {
     Zombie zombieHost;
@@ -38,6 +39,7 @@ public final class ZombieIBoss extends Boss {
     }
 
     public void Start() {
+        host.getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(), PersistentDataType.STRING, "VANILLA_ZOMBIE");
         host.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, reader.GetZombieBossHealth()));
         host.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, reader.GetZombieBossDamage()));
         host.setCustomName(locales.GetLocaleString("ZombieBossName"));

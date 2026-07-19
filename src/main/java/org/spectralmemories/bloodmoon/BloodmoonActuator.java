@@ -24,6 +24,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +32,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.entity.Tameable;
+import org.bukkit.entity.AnimalTamer;
+import org.spectralmemories.bloodmoon.command.CommandExecutionMode;
+import org.spectralmemories.bloodmoon.session.BloodMoonSession;
+import org.spectralmemories.bloodmoon.boss.BossModeResolver;
+import org.spectralmemories.bloodmoon.boss.BossRewardPolicy;
 import org.bukkit.util.Vector;
 
 import java.io.Closeable;
@@ -68,6 +75,10 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     private List<LivingEntity> blacklistedMobs;
     private List<IBoss> bosses;
+    private final Set<UUID> rewardedBosses = new HashSet<>();
+    private final Map<UUID, UUID> bossDamagers = new HashMap<>();
+    private BloodMoonSession session;
+    private UUID mythicBossId;
 
     private void AddActuator (BloodmoonActuator instance)
     {
@@ -105,7 +116,9 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     public void StartBloodMoon ()
     {
+        if (inProgress) return;
         inProgress = true;
+        session = Bloodmoon.GetInstance().getSessionCoordinator().start(world);
         RunPreCommand();
 
         ShowNightBar();
@@ -129,17 +142,35 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         {
             return;
         }
+        stopBloodMoon(true);
+    }
+
+    public void AbortBloodMoon ()
+    {
+        stopBloodMoon(false);
+    }
+
+    private void stopBloodMoon(boolean complete)
+    {
+        if (!inProgress && !Bloodmoon.GetInstance().getConfigReader(world).GetPermanentBloodMoonConfig()) return;
         inProgress = false;
 
         StopStorm();
         HideNightBar();
 
-        actuatorPeriodic.close();
+        if (actuatorPeriodic != null) actuatorPeriodic.close();
         actuatorPeriodic = null;
         blacklistedMobs.clear();
         KillBosses();
+        if (mythicBossId != null) {
+            Bloodmoon.GetInstance().getMythicMobs().remove(mythicBossId);
+            mythicBossId = null;
+        }
         world.setMonsterSpawnLimit(originalMaxSpawn);
-        RunPostCommand();
+        BloodMoonSession finished = Bloodmoon.GetInstance().getSessionCoordinator().finish(world, complete);
+        session = finished;
+        if (complete) RunPostCommand();
+        session = null;
     }
 
     public void KillBosses ()
@@ -245,97 +276,16 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     private void RunPreCommand ()
     {
-        String[] commands = Bloodmoon.GetInstance().getConfigReader(world).GetPreBloodMoonCommands();
-        String[] var2 = commands;
-        int var3 = commands.length;
-
-        for (int var4 = 0; var4 < var3; ++var4)
-        {
-            String command = var2[var4];
-            String[] components = command.split(";");
-            if (components[1].equalsIgnoreCase("s"))
-            {
-                String finalCommand = components[0].replace("$w", world.getName());
-                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), finalCommand);
-            } else
-            {
-                Iterator var7;
-                Player player;
-                String finalCommand;
-                if (components[1].equalsIgnoreCase("p"))
-                {
-                    var7 = world.getPlayers().iterator();
-
-                    while (var7.hasNext())
-                    {
-                        player = (Player) var7.next();
-                        finalCommand = components[0].replace("$w", world.getName()).replace("$p", player.getName());
-                        player.performCommand(finalCommand);
-                    }
-                } else if (components[1].equalsIgnoreCase("f"))
-                {
-                    var7 = world.getPlayers().iterator();
-
-                    while (var7.hasNext())
-                    {
-                        player = (Player) var7.next();
-                        finalCommand = components[0].replace("$w", world.getName()).replace("$p", player.getName());
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), finalCommand);
-                    }
-                } else
-                {
-                    System.out.println("[Warning] Could not interpret command '" + command + "'");
-                }
-            }
-        }
-
+        Bloodmoon.GetInstance().getSessionCoordinator().commandRunner().run(
+                Bloodmoon.GetInstance().getConfigReader(world).GetPreBloodMoonCommands(),
+                CommandExecutionMode.SERVER_ONCE, world, session, world.getPlayers(), Map.of());
     }
 
     private void RunPostCommand ()
     {
-        String[] commands = Bloodmoon.GetInstance().getConfigReader(world).GetPostBloodMoonCommands();
-        String[] var2 = commands;
-        int var3 = commands.length;
-
-        for (int var4 = 0; var4 < var3; ++var4)
-        {
-            String command = var2[var4];
-            String[] components = command.split(";");
-            if (components[1].equalsIgnoreCase("s"))
-            {
-                String finalCommand = components[0].replace("$w", world.getName());
-                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), finalCommand);
-            } else
-            {
-                Iterator var7;
-                Player player;
-                String finalCommand;
-                if (components[1].equalsIgnoreCase("p"))
-                {
-                    var7 = world.getPlayers().iterator();
-
-                    while (var7.hasNext())
-                    {
-                        player = (Player) var7.next();
-                        finalCommand = components[0].replace("$w", world.getName()).replace("$p", player.getName());
-                        player.performCommand(finalCommand);
-                    }
-                } else if (components[1].equalsIgnoreCase("f"))
-                {
-                    var7 = world.getPlayers().iterator();
-
-                    while (var7.hasNext())
-                    {
-                        player = (Player) var7.next();
-                        finalCommand = components[0].replace("$w", world.getName()).replace("$p", player.getName());
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), finalCommand);
-                    }
-                } else
-                {
-                    System.out.println("[Warning] Could not interpret command '" + command + "'");
-                }
-            }
-        }
+        Bloodmoon.GetInstance().getSessionCoordinator().commandRunner().run(
+                Bloodmoon.GetInstance().getConfigReader(world).GetPostBloodMoonCommands(),
+                CommandExecutionMode.SERVER_ONCE, world, session, world.getPlayers(), Map.of());
     }
 
     public void SpawnBosses ()
@@ -345,7 +295,19 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         {
             public void run ()
             {
-                if (reader.GetEnableZombieBossConfig()) SpawnZombieBoss();
+                BossModeResolver.Mode mode = BossModeResolver.resolve(reader.GetBossMode(), reader.GetMythicMobsEnabled(),
+                        Bloodmoon.GetInstance().getMythicMobs().available(), reader.GetMythicFallbackToVanilla());
+                if (mode == BossModeResolver.Mode.NONE) return;
+                if (mode == BossModeResolver.Mode.MYTHICMOBS) {
+                    if (SpawnMythicBoss()) return;
+                    Bloodmoon.GetInstance().getLogger().warning("Could not spawn configured MythicMob '"
+                            + reader.GetMythicMobInternalName() + "' in " + world.getName());
+                    if (!reader.GetMythicFallbackToVanilla()) return;
+                    Bloodmoon.GetInstance().getLogger().warning("Falling back to the existing vanilla Blood Moon boss");
+                    SpawnZombieBoss();
+                    return;
+                }
+                if (reader.GetBossMode().equalsIgnoreCase("MYTHICMOBS") || reader.GetEnableZombieBossConfig()) SpawnZombieBoss();
             }
         }, (long) ((new Random()).nextInt(2000) + 400));
     }
@@ -365,6 +327,38 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
             ZombieIBoss zombieBoss = new ZombieIBoss(newLocation);
             zombieBoss.Start();
             bosses.add(zombieBoss);
+        }
+    }
+
+    public boolean SpawnMythicBoss()
+    {
+        ConfigReader reader = Bloodmoon.GetInstance().getConfigReader(world);
+        if (!Bloodmoon.GetInstance().getMythicMobs().available()) {
+            Bloodmoon.GetInstance().getLogger().warning("Boss mode MYTHICMOBS requested in " + world.getName()
+                    + " but MythicMobs is not installed or compatible");
+            return false;
+        }
+        if (world.getPlayers().isEmpty()) return false;
+        Player target = world.getPlayers().get(new Random().nextInt(world.getPlayers().size()));
+        Location location = target.getLocation().clone().add(10, 0, 10);
+        location.setY(world.getHighestBlockYAt(location));
+        Optional<LivingEntity> spawned = Bloodmoon.GetInstance().getMythicMobs().spawn(
+                reader.GetMythicMobInternalName(), location, this::HandleMythicBossDeath);
+        if (spawned.isEmpty()) return false;
+        mythicBossId = spawned.get().getUniqueId();
+        spawned.get().getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),
+                org.bukkit.persistence.PersistentDataType.STRING, "MYTHICMOBS");
+        if (session != null) session.bossId(mythicBossId);
+        return true;
+    }
+
+    private void HandleMythicBossDeath(LivingEntity entity, Player killer)
+    {
+        if (mythicBossId == null || !mythicBossId.equals(entity.getUniqueId())) return;
+        mythicBossId = null;
+        ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
+        if (config.GetRunBloodMoonRewardCommandsForMythic()) {
+            runBossRewardCommands(config.GetMythicMobInternalName(), entity, killer);
         }
     }
 
@@ -631,8 +625,15 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         if (isInProgress() && event.getPlayer().getWorld() == world)
         {
+            Bloodmoon.GetInstance().getSessionCoordinator().join(world, event.getPlayer());
             HandleReconnectingPlayer(event.getPlayer());
         }
+    }
+
+    @EventHandler
+    public void onPlayerDisconnect(PlayerQuitEvent event)
+    {
+        if (isInProgress()) Bloodmoon.GetInstance().getSessionCoordinator().disconnect(event.getPlayer());
     }
 
     @EventHandler
@@ -647,11 +648,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
             if (to == world && isInProgress())
             {
                 //Someone entered our bm world
+                Bloodmoon.GetInstance().getSessionCoordinator().join(world, event.getPlayer());
                 HandleReconnectingPlayer(event.getPlayer());
             }
             if (from == world && isInProgress())
             {
                 //Someone left our bm world
+                Bloodmoon.GetInstance().getSessionCoordinator().leave(world, event.getPlayer());
                 HideNightBarPlayer(event.getPlayer());
             }
         }
@@ -690,11 +693,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         Player deadplayer = event.getEntity();
         if (deadplayer.getWorld() != world) return; //Wrong world
 
+        Bloodmoon.GetInstance().getSessionCoordinator().death(world, deadplayer);
+
         if (configReader.GetLightningEffectConfig()) world.strikeLightningEffect(deadplayer.getLocation());
 
         String deathMessage = event.getDeathMessage();
 
-        if (!deathMessage.contains(localeReader.GetLocaleString("DeathSuffix")))
+        if (deathMessage != null && !deathMessage.contains(localeReader.GetLocaleString("DeathSuffix")))
         {
             deathMessage += " " + localeReader.GetLocaleString("DeathSuffix");
 
@@ -756,11 +761,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         LivingEntity entity = event.getEntity();
 
-        for (IBoss boss : bosses)
+        Iterator<IBoss> bossIterator = bosses.iterator();
+        while (bossIterator.hasNext())
         {
+            IBoss boss = bossIterator.next();
             if (entity == boss.GetHost())
             {
-                Player killer = boss.GetHost().getKiller();
+                Player killer = resolveBossKiller(boss.GetHost());
                 if (killer != null)
                 {
 
@@ -768,10 +775,15 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 }
 
                 boss.Kill(killer != null && isInProgress());
-                bosses.remove(boss);
+                runBossRewardCommands(boss.GetName(), boss.GetHost(), killer);
+                bossIterator.remove();
                 return;
             }
         }
+
+        String bossMarker = entity.getPersistentDataContainer().get(Bloodmoon.GetInstance().getBossKey(),
+                org.bukkit.persistence.PersistentDataType.STRING);
+        if ("MYTHICMOBS".equals(bossMarker)) return; // MythicMobs owns its drops/rewards by default.
 
         if (!isInProgress()) return; //Only during BloodMoon
 
@@ -838,6 +850,11 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
             }
         }
 
+        Player responsiblePlayer = responsiblePlayer(damager);
+        if (responsiblePlayer != null && bosses.stream().anyMatch(boss -> boss.GetHost() == receiver)) {
+            bossDamagers.put(receiver.getUniqueId(), responsiblePlayer.getUniqueId());
+        }
+
 
         if (receiver instanceof LivingEntity && damager instanceof LivingEntity)
         {
@@ -899,5 +916,45 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
         KillBosses(false, false);
         world.save();
+    }
+
+    private Player responsiblePlayer(Entity damager) {
+        if (damager instanceof Player player) return player;
+        if (damager instanceof Tameable tameable) {
+            AnimalTamer owner = tameable.getOwner();
+            if (owner instanceof Player player) return player;
+        }
+        return null;
+    }
+
+    private Player resolveBossKiller(LivingEntity boss) {
+        Player killer = boss.getKiller();
+        if (killer != null) return killer;
+        UUID playerId = bossDamagers.get(boss.getUniqueId());
+        return playerId == null ? null : Bukkit.getPlayer(playerId);
+    }
+
+    private void runBossRewardCommands(String bossName, LivingEntity bossHost, Player killer) {
+        ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
+        UUID bossId = bossHost.getUniqueId();
+        boolean firstReward = rewardedBosses.add(bossId);
+        if (!BossRewardPolicy.shouldReward(config.GetBossRewardsEnabled(), config.GetBossRequirePlayerKiller(),
+                killer != null, config.GetBossRewardOnce(), firstReward)) return;
+        Location location = bossHost.getLocation();
+        Map<String, Object> values = new HashMap<>();
+        values.put("boss_name", bossName);
+        values.put("boss_type", bossHost.getType().name());
+        values.put("boss_uuid", bossId);
+        values.put("boss_killer", killer == null ? "" : killer.getName());
+        values.put("boss_killer_uuid", killer == null ? "" : killer.getUniqueId());
+        values.put("boss_world", world.getName());
+        values.put("boss_x", location.getBlockX());
+        values.put("boss_y", location.getBlockY());
+        values.put("boss_z", location.getBlockZ());
+        List<Player> targets = killer == null ? List.of() : List.of(killer);
+        Bloodmoon.GetInstance().getSessionCoordinator().commandRunner().run(config.GetBossRewardCommands(),
+                CommandExecutionMode.SERVER_FOR_EACH_PLAYER, world, session, targets, values);
+        Bloodmoon.GetInstance().getLogger().info("Boss command reward processed for " + bossId
+                + (killer == null ? " without a killer" : "; killer=" + killer.getUniqueId()));
     }
 }

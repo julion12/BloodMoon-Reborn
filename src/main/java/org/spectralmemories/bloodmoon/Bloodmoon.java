@@ -1,6 +1,8 @@
 package org.spectralmemories.bloodmoon;
 
 import org.bukkit.World;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -8,6 +10,10 @@ import org.spectralmemories.sqlaccess.FieldType;
 import org.spectralmemories.sqlaccess.SQLAccess;
 import org.spectralmemories.sqlaccess.SQLField;
 import org.spectralmemories.sqlaccess.SQLTable;
+import org.spectralmemories.bloodmoon.config.ConfigMigrator;
+import org.spectralmemories.bloodmoon.session.SessionCoordinator;
+import org.spectralmemories.bloodmoon.integration.MythicMobsBridge;
+import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.time.Clock;
 
 /**
  * Entry class for the BloodMoon plugin. Singleton, you should never create an instance manually
@@ -49,6 +56,8 @@ public final class Bloodmoon extends JavaPlugin
     private static List<ConfigReader> allConfigReaders;
 
     private static WorldManager worldManager;
+    private SessionCoordinator sessionCoordinator;
+    private MythicMobsBridge mythicMobs = new NoMythicMobsBridge();
 
     /**
      * Returns the Bloodmoon instance
@@ -186,6 +195,10 @@ public final class Bloodmoon extends JavaPlugin
         return localeReader;
     }
 
+    public SessionCoordinator getSessionCoordinator() { return sessionCoordinator; }
+    public NamespacedKey getBossKey() { return new NamespacedKey(this, "bloodmoon_boss"); }
+    public MythicMobsBridge getMythicMobs() { return mythicMobs; }
+
     /**
      * Creates the BloodMoon folder if it does not exist
      */
@@ -242,6 +255,19 @@ public final class Bloodmoon extends JavaPlugin
             }
         }
         ConfigReader reader = new ConfigReader(configFile, world);
+        if (!reader.TryRefreshConfigs()) {
+            getLogger().severe("Invalid YAML in " + configFile + "; preserving the file and using safe defaults");
+        } else {
+            try {
+                ConfigMigrator.MigrationResult migration = ConfigMigrator.migrate(configFile.toPath(), Clock.systemUTC());
+                if (migration.changed()) {
+                    getLogger().info("Migrated " + world.getName() + "/config.yml to 1.1.0; backup: " + migration.backup().getFileName());
+                    reader.TryRefreshConfigs();
+                }
+            } catch (IOException exception) {
+                getLogger().log(Level.SEVERE, "Could not migrate " + configFile + "; original file preserved", exception);
+            }
+        }
         reader.ReadAllSettings();
         configReaders.put(world, reader);
         allConfigReaders.add(reader);
@@ -254,12 +280,24 @@ public final class Bloodmoon extends JavaPlugin
     @Override
     public void onEnable()
     {
-		getLogger().info("BloodMoon-Reborn v1.0.1");
+		getLogger().info("BloodMoon-Reborn v" + getDescription().getVersion());
 		getLogger().info("Original author: SpectralMemories");
 		getLogger().info("Maintained by: JulioN12");
         instance = this;
 
         CreateFolder();
+
+        sessionCoordinator = new SessionCoordinator(this);
+
+        if (getServer().getPluginManager().isPluginEnabled("MythicMobs")) {
+            try {
+                mythicMobs = new org.spectralmemories.bloodmoon.integration.mythic.MythicMobsIntegration(this);
+                getLogger().info("MythicMobs integration enabled");
+            } catch (LinkageError | RuntimeException exception) {
+                mythicMobs = new NoMythicMobsBridge();
+                getLogger().log(Level.WARNING, "MythicMobs was found but its public API could not be initialized; vanilla fallback remains available", exception);
+            }
+        }
 
         getSqlAccess();
         getLocaleReader();
@@ -281,10 +319,14 @@ public final class Bloodmoon extends JavaPlugin
 
         getServer().getPluginManager().registerEvents (worldManager, this);
 
-        getCommand("bloodmoon").setExecutor(new BloodmoonCommandExecutor());
+        BloodmoonCommandExecutor commandExecutor = new BloodmoonCommandExecutor();
+        if (getCommand("bloodmoon") != null) {
+            getCommand("bloodmoon").setExecutor(commandExecutor);
+            getCommand("bloodmoon").setTabCompleter(commandExecutor);
+        }
 
 
-        getCommand("testsuite").setExecutor(new TestCommandExecutor());
+        if (getCommand("testsuite") != null) getCommand("testsuite").setExecutor(new TestCommandExecutor());
 
         CheckOlderConfigs();
     }
@@ -332,11 +374,11 @@ public final class Bloodmoon extends JavaPlugin
      */
     private void PurgeBosses (World world){
         for(LivingEntity entity : world.getLivingEntities()){
-            if(
-                    entity.getCustomName() != null
+            boolean markedBoss = entity.getPersistentDataContainer().has(getBossKey(), PersistentDataType.STRING);
+            boolean legacyBoss = entity.getCustomName() != null
                     && !entity.getCustomName().isEmpty()
-                    && entity.getCustomName().equals(getLocaleReader().GetLocaleString("ZombieBossName"))
-            ){
+                    && entity.getCustomName().equals(getLocaleReader().GetLocaleString("ZombieBossName"));
+            if(markedBoss || legacyBoss){
                 entity.remove();
             }
         }
@@ -355,11 +397,13 @@ public final class Bloodmoon extends JavaPlugin
 
         for (BloodmoonActuator actuator : actuators)
         {
-            if (actuator.isInProgress()) actuator.StopBloodMoon();
+            if (actuator.isInProgress()) actuator.AbortBloodMoon();
             actuator.close();
         }
 
         if (sqlAccess != null) sqlAccess.close();
+        if (sessionCoordinator != null) sessionCoordinator.abortAll();
+        mythicMobs.close();
         for (ConfigReader configReader : allConfigReaders)
         {
             if (configReader != null)
@@ -387,7 +431,7 @@ public final class Bloodmoon extends JavaPlugin
 
     private void CheckOlderConfigs ()
     {
-        getLogger().log(Level.INFO,"BloodMoon-Reborn v1.0.1 - Modernized for Minecraft 1.21+");
+        getLogger().log(Level.INFO,"BloodMoon-Reborn v" + getDescription().getVersion() + " - multi-version rewards release");
 
         File oldConfig = new File (getDataFolder() + SLASH + CONFIG_FILE);
         if (oldConfig.exists()) getLogger().log(Level.WARNING,"[Deprecated] BloodMoon/config.yml is no longer used. Use per-world configuration instead");
@@ -421,6 +465,6 @@ public final class Bloodmoon extends JavaPlugin
     private static String GetMajorVersions (String version)
     {
         String[] segments = version.split("\\.");
-        return segments[0] + "." + segments[1];
+        return segments.length >= 2 ? segments[0] + "." + segments[1] : version;
     }
 }
