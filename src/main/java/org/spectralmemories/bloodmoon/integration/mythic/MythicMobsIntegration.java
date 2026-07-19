@@ -23,7 +23,7 @@ import java.util.function.BiConsumer;
 
 /** Loaded only when MythicMobs is present. Uses MythicMobs' public API and death event. */
 public final class MythicMobsIntegration implements MythicMobsBridge, Listener {
-    private final Map<UUID, BiConsumer<LivingEntity, Player>> deathCallbacks = new HashMap<>();
+    private final Map<UUID, TrackedMob> trackedMobs = new HashMap<>();
 
     public MythicMobsIntegration(Bloodmoon plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -32,35 +32,38 @@ public final class MythicMobsIntegration implements MythicMobsBridge, Listener {
     @Override public boolean available() { return true; }
 
     @Override
-    public Optional<LivingEntity> spawn(String internalName, Location location,
+    public Optional<LivingEntity> spawn(String internalName, Location location, boolean useMythicRewards,
                                         BiConsumer<LivingEntity, Player> onDeath) {
         Optional<MythicMob> type = MythicBukkit.inst().getMobManager().getMythicMob(internalName);
         if (type.isEmpty()) return Optional.empty();
         ActiveMob active = type.get().spawn(BukkitAdapter.adapt(location), 1.0);
         Entity entity = active.getEntity().getBukkitEntity();
         if (!(entity instanceof LivingEntity living)) return Optional.empty();
-        deathCallbacks.put(living.getUniqueId(), onDeath);
+        trackedMobs.put(living.getUniqueId(), new TrackedMob(onDeath, useMythicRewards));
         return Optional.of(living);
     }
 
     @EventHandler
     public void onMythicMobDeath(MythicMobDeathEvent event) {
         Entity entity = event.getEntity();
-        BiConsumer<LivingEntity, Player> callback = deathCallbacks.remove(entity.getUniqueId());
-        if (callback == null || !(entity instanceof LivingEntity living)) return;
+        TrackedMob tracked = trackedMobs.remove(entity.getUniqueId());
+        if (tracked == null || !(entity instanceof LivingEntity living)) return;
+        if (!tracked.useMythicRewards()) event.setDrops(new java.util.ArrayList<>());
         Player killer = event.getKiller() instanceof Player player ? player : living.getKiller();
-        callback.accept(living, killer);
+        tracked.callback().accept(living, killer);
     }
 
     @Override
     public void remove(UUID entityId) {
-        deathCallbacks.remove(entityId);
+        trackedMobs.remove(entityId);
         Entity entity = Bukkit.getEntity(entityId);
         if (entity != null) entity.remove();
     }
 
     @Override public void close() {
-        for (UUID entityId : deathCallbacks.keySet().toArray(UUID[]::new)) remove(entityId);
-        deathCallbacks.clear();
+        for (UUID entityId : trackedMobs.keySet().toArray(UUID[]::new)) remove(entityId);
+        trackedMobs.clear();
     }
+
+    private record TrackedMob(BiConsumer<LivingEntity, Player> callback, boolean useMythicRewards) { }
 }

@@ -343,7 +343,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         Location location = target.getLocation().clone().add(10, 0, 10);
         location.setY(world.getHighestBlockYAt(location));
         Optional<LivingEntity> spawned = Bloodmoon.GetInstance().getMythicMobs().spawn(
-                reader.GetMythicMobInternalName(), location, this::HandleMythicBossDeath);
+                reader.GetMythicMobInternalName(), location, reader.GetUseMythicMobsRewards(), this::HandleMythicBossDeath);
         if (spawned.isEmpty()) return false;
         mythicBossId = spawned.get().getUniqueId();
         spawned.get().getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),

@@ -11,7 +11,8 @@ import java.util.function.BiConsumer;
 /** MythicMobs-free boundary used by the core plugin. */
 public interface MythicMobsBridge {
     boolean available();
-    Optional<LivingEntity> spawn(String internalName, Location location, BiConsumer<LivingEntity, Player> onDeath);
+    Optional<LivingEntity> spawn(String internalName, Location location, boolean useMythicRewards,
+                                 BiConsumer<LivingEntity, Player> onDeath);
     void remove(UUID entityId);
     void close();
 }

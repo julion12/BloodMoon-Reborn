@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 public final class NoMythicMobsBridge implements MythicMobsBridge {
     @Override public boolean available() { return false; }
-    @Override public Optional<LivingEntity> spawn(String name, Location location, BiConsumer<LivingEntity, Player> callback) { return Optional.empty(); }
+    @Override public Optional<LivingEntity> spawn(String name, Location location, boolean useRewards, BiConsumer<LivingEntity, Player> callback) { return Optional.empty(); }
     @Override public void remove(UUID entityId) { }
     @Override public void close() { }
 }
