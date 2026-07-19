@@ -316,6 +316,11 @@ public class ConfigReader implements Closeable
                 cache = new HashMap<>();
                 validConfig = false;
             }
+            if (Bloodmoon.GetInstance() != null) {
+                Bloodmoon.GetInstance().getLogger().log(java.util.logging.Level.SEVERE,
+                        "Could not parse YAML config " + configFile.getAbsolutePath()
+                                + "; previous in-memory values were retained", exception);
+            }
             return false;
         }
     }
