@@ -14,6 +14,7 @@ import org.spectralmemories.bloodmoon.config.ConfigMigrator;
 import org.spectralmemories.bloodmoon.session.SessionCoordinator;
 import org.spectralmemories.bloodmoon.integration.MythicMobsBridge;
 import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
+import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
 
 import java.io.File;
 import java.io.IOException;
@@ -172,27 +173,48 @@ public final class Bloodmoon extends JavaPlugin
         if (localeReader == null)
         {
             File localeFile = new File (getDataFolder () + SLASH + LOCALES_YML);
+            File localeDirectory = new File(getDataFolder(), "locales");
 
             try
             {
+                if (!localeDirectory.exists() && !localeDirectory.mkdirs()) {
+                    throw new IOException("Could not create " + localeDirectory);
+                }
+                saveBundledLocale("locales/en.yml");
+                saveBundledLocale("locales/es.yml");
                 if (! localeFile.exists())
                 {
                     localeFile.createNewFile();
-
-                    localeReader = new LocaleReader (localeFile);
+                    localeReader = new LocaleReader(localeFile, localeDirectory,
+                            message -> getLogger().warning(message));
                     localeReader.GenerateDefaultFile();
+                } else {
+                    LocaleMigrator.MigrationResult migration = LocaleMigrator.migrate(localeFile.toPath(), Clock.systemUTC());
+                    localeReader = new LocaleReader(localeFile, localeDirectory,
+                            message -> getLogger().warning(message));
+                    if (migration.changed()) {
+                        getLogger().info(localeReader.GetLocalePlainString("ConfigurationMigrationCompleted")
+                                .replace("%file%", LOCALES_YML)
+                                .replace("%version%", LocaleMigrator.TARGET_VERSION)
+                                .replace("%backup%", migration.backup().getFileName().toString()));
+                    }
                 }
             }
             catch (IOException e)
             {
-                getLogger().log(Level.SEVERE, "Error: Could not create locale file");
+                getLogger().log(Level.SEVERE, "Could not initialize locale files; built-in English remains available", e);
+                localeReader = new LocaleReader(localeFile, localeDirectory,
+                        message -> getLogger().warning(message));
             }
-
-            localeReader = new LocaleReader (localeFile);
             localeReader.ReadAllEntries();
         }
 
         return localeReader;
+    }
+
+    private void saveBundledLocale(String resourcePath) {
+        File target = new File(getDataFolder(), resourcePath.replace('/', File.separatorChar));
+        if (!target.exists()) saveResource(resourcePath, false);
     }
 
     public SessionCoordinator getSessionCoordinator() { return sessionCoordinator; }
@@ -261,11 +283,17 @@ public final class Bloodmoon extends JavaPlugin
             try {
                 ConfigMigrator.MigrationResult migration = ConfigMigrator.migrate(configFile.toPath(), Clock.systemUTC());
                 if (migration.changed()) {
-                    getLogger().info("Migrated " + world.getName() + "/config.yml to 1.1.0; backup: " + migration.backup().getFileName());
+                    String message = getLocaleReader().GetLocalePlainString("ConfigurationMigrationCompleted")
+                            .replace("%file%", world.getName() + "/config.yml")
+                            .replace("%version%", ConfigMigrator.TARGET_VERSION)
+                            .replace("%backup%", migration.backup().getFileName().toString());
+                    getLogger().info(message);
                     reader.TryRefreshConfigs();
                 }
             } catch (IOException exception) {
-                getLogger().log(Level.SEVERE, "Could not migrate " + configFile + "; original file preserved", exception);
+                String message = getLocaleReader().GetLocalePlainString("ConfigurationMigrationFailed")
+                        .replace("%file%", configFile.toString());
+                getLogger().log(Level.SEVERE, message, exception);
             }
         }
         reader.ReadAllSettings();

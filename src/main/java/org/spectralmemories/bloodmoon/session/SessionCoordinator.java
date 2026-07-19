@@ -70,12 +70,18 @@ public final class SessionCoordinator {
         }
         Map<String, Object> extras = Map.of("survivor_count", eligible.size());
         for (Player player : eligible) {
+            org.spectralmemories.bloodmoon.LocaleReader.MessageLocale("SurvivorRewardReceived", null, null, player);
             for (String message : config.GetSurvivorMessages()) {
                 player.sendMessage(CommandRunner.render(message, world, session, player, extras));
             }
             commandRunner.run(config.GetSurvivorCommands(), CommandExecutionMode.SERVER_FOR_EACH_PLAYER,
                     world, session, List.of(player), extras);
             plugin.getLogger().info("Survivor reward processed for " + player.getUniqueId() + " in session " + session.sessionId());
+        }
+        if (eligible.isEmpty()) {
+            String message = plugin.getLocaleReader().GetLocalePlainString("NoEligibleSurvivors")
+                    .replace("%world%", world.getName());
+            plugin.getLogger().info(message);
         }
         store.save(active.values());
     }
@@ -110,7 +116,11 @@ public final class SessionCoordinator {
     public void death(World world, Player player) {
         BloodMoonSession session = active.get(world.getUID());
         if (session != null) {
-            session.die(player.getUniqueId(), plugin.getConfigReader(world).GetSurvivorDisqualifyOnDeath());
+            boolean disqualify = plugin.getConfigReader(world).GetSurvivorDisqualifyOnDeath();
+            session.die(player.getUniqueId(), disqualify);
+            if (disqualify && plugin.getConfigReader(world).GetSurvivorRewardsEnabled()) {
+                org.spectralmemories.bloodmoon.LocaleReader.MessageLocale("SurvivorDisqualifiedByDeath", null, null, player);
+            }
             store.save(active.values());
         }
     }

@@ -365,12 +365,17 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
         }
         var session = Bloodmoon.GetInstance().getSessionCoordinator().current(world);
         if (session.isEmpty()) {
-            sender.sendMessage("No active Blood Moon session in " + world.getName());
+            LocaleReader.MessageLocale("BloodMoonSessionNotFound", new String[]{"%world%"},
+                    new String[]{world.getName()}, sender);
             return true;
         }
         long alive = session.get().participants().stream().filter(p -> !p.died() && !p.disqualified()).count();
-        sender.sendMessage("Session " + session.get().sessionId() + ": " + alive + "/"
-                + session.get().participants().size() + " participants currently eligible");
+        LocaleReader.MessageLocale("BloodMoonSurvivorsHeader", new String[]{"%world%"},
+                new String[]{world.getName()}, sender);
+        LocaleReader.MessageLocale("BloodMoonStatus",
+                new String[]{"%session_uuid%", "%eligible_count%", "%participant_count%", "%world%"},
+                new String[]{session.get().sessionId().toString(), String.valueOf(alive),
+                        String.valueOf(session.get().participants().size()), world.getName()}, sender);
         return true;
     }
 

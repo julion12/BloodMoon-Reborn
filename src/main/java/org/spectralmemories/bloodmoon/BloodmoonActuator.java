@@ -315,10 +315,12 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 if (mode == BossModeResolver.Mode.NONE) return;
                 if (mode == BossModeResolver.Mode.MYTHICMOBS) {
                     if (SpawnMythicBoss()) return;
-                    Bloodmoon.GetInstance().getLogger().warning("Could not spawn configured MythicMob '"
-                            + reader.GetMythicMobInternalName() + "' in " + world.getName());
+                    logLocalizedWarning("MythicBossNotFound",
+                            new String[]{"%boss_name%", "%world%"},
+                            new String[]{reader.GetMythicMobInternalName(), world.getName()});
                     if (!reader.GetMythicFallbackToVanilla()) return;
-                    Bloodmoon.GetInstance().getLogger().warning("Falling back to the existing vanilla Blood Moon boss");
+                    logLocalizedWarning("MythicMobsFallbackToVanilla", new String[]{"%world%"},
+                            new String[]{world.getName()});
                     SpawnZombieBoss();
                     return;
                 }
@@ -349,8 +351,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         ConfigReader reader = Bloodmoon.GetInstance().getConfigReader(world);
         if (!Bloodmoon.GetInstance().getMythicMobs().available()) {
-            Bloodmoon.GetInstance().getLogger().warning("Boss mode MYTHICMOBS requested in " + world.getName()
-                    + " but MythicMobs is not installed or compatible");
+            logLocalizedWarning("MythicMobsUnavailable", new String[]{"%world%"},
+                    new String[]{world.getName()});
             return false;
         }
         if (world.getPlayers().isEmpty()) return false;
@@ -364,7 +366,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         mythicBossId = entity.getUniqueId();
         BossNameResolver.ResolvedBossName resolved = BossNameResolver.resolve("MYTHICMOBS",
                 spawned.get().entityDisplayName(), spawned.get().configuredDisplayName(),
-                reader.GetMythicMobInternalName(), "", "Mythic Boss");
+                reader.GetMythicMobInternalName(), "",
+                Bloodmoon.GetInstance().getLocaleReader().GetLocalePlainString("MythicBossFallbackName"));
         mythicBossName = resolved.name();
         entity.getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),
                 org.bukkit.persistence.PersistentDataType.STRING, "MYTHICMOBS");
@@ -1003,5 +1006,19 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 CommandExecutionMode.SERVER_FOR_EACH_PLAYER, world, session, targets, values);
         Bloodmoon.GetInstance().getLogger().info("Boss command reward processed for " + bossId
                 + (killer == null ? " without a killer" : "; killer=" + killer.getUniqueId()));
+        if (killer != null) {
+            LocaleReader.MessageLocale("BossRewardReceived", new String[]{"%boss_name%", "%boss_type%"},
+                    new String[]{bossName == null ? "" : bossName, bossType == null ? "NONE" : bossType}, killer);
+        }
+    }
+
+    private void logLocalizedWarning(String id, String[] placeholders, String[] replacements) {
+        String message = Bloodmoon.GetInstance().getLocaleReader().GetLocalePlainString(id);
+        if (placeholders != null && replacements != null && placeholders.length == replacements.length) {
+            for (int i = 0; i < placeholders.length; i++) {
+                message = message.replace(placeholders[i], replacements[i] == null ? "" : replacements[i]);
+            }
+        }
+        Bloodmoon.GetInstance().getLogger().warning(message);
     }
 }
