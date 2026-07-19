@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.spectralmemories.bloodmoon.Bloodmoon;
 import org.spectralmemories.bloodmoon.integration.MythicMobsBridge;
+import org.spectralmemories.bloodmoon.integration.SpawnedMythicMob;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,15 +33,21 @@ public final class MythicMobsIntegration implements MythicMobsBridge, Listener {
     @Override public boolean available() { return true; }
 
     @Override
-    public Optional<LivingEntity> spawn(String internalName, Location location, boolean useMythicRewards,
-                                        BiConsumer<LivingEntity, Player> onDeath) {
+    public Optional<SpawnedMythicMob> spawn(String internalName, Location location, boolean useMythicRewards,
+                                            BiConsumer<LivingEntity, Player> onDeath) {
         Optional<MythicMob> type = MythicBukkit.inst().getMobManager().getMythicMob(internalName);
         if (type.isEmpty()) return Optional.empty();
         ActiveMob active = type.get().spawn(BukkitAdapter.adapt(location), 1.0);
         Entity entity = active.getEntity().getBukkitEntity();
         if (!(entity instanceof LivingEntity living)) return Optional.empty();
         trackedMobs.put(living.getUniqueId(), new TrackedMob(onDeath, useMythicRewards));
-        return Optional.of(living);
+        String entityDisplayName = living.getCustomName();
+        String configuredDisplayName = active.getDisplayName();
+        if ((configuredDisplayName == null || configuredDisplayName.isBlank()) && type.get().getDisplayName() != null) {
+            configuredDisplayName = type.get().getDisplayName().get(active);
+        }
+        return Optional.of(new SpawnedMythicMob(living, entityDisplayName, configuredDisplayName,
+                type.get().getInternalName()));
     }
 
     @EventHandler

@@ -90,7 +90,6 @@ public final class CommandRunner {
         }
         if (extras != null) values.putAll(extras);
         String rendered = PlaceholderEngine.replace(template, values);
-        return rendered.replace("$w", world == null ? "" : world.getName())
-                .replace("$p", player == null ? "" : player.getName());
+        return PlaceholderEngine.replaceLegacy(rendered, values);
     }
 }

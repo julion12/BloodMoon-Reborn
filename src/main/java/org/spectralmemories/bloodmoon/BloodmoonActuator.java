@@ -37,7 +37,9 @@ import org.bukkit.entity.AnimalTamer;
 import org.spectralmemories.bloodmoon.command.CommandExecutionMode;
 import org.spectralmemories.bloodmoon.session.BloodMoonSession;
 import org.spectralmemories.bloodmoon.boss.BossModeResolver;
+import org.spectralmemories.bloodmoon.boss.BossNameResolver;
 import org.spectralmemories.bloodmoon.boss.BossRewardPolicy;
+import org.spectralmemories.bloodmoon.integration.SpawnedMythicMob;
 import org.bukkit.util.Vector;
 
 import java.io.Closeable;
@@ -79,6 +81,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     private final Map<UUID, UUID> bossDamagers = new HashMap<>();
     private BloodMoonSession session;
     private UUID mythicBossId;
+    private String mythicBossName = "";
 
     private void AddActuator (BloodmoonActuator instance)
     {
@@ -165,6 +168,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         if (mythicBossId != null) {
             Bloodmoon.GetInstance().getMythicMobs().remove(mythicBossId);
             mythicBossId = null;
+            mythicBossName = "";
         }
         world.setMonsterSpawnLimit(originalMaxSpawn);
         BloodMoonSession finished = Bloodmoon.GetInstance().getSessionCoordinator().finish(world, complete);
@@ -342,13 +346,21 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         Player target = world.getPlayers().get(new Random().nextInt(world.getPlayers().size()));
         Location location = target.getLocation().clone().add(10, 0, 10);
         location.setY(world.getHighestBlockYAt(location));
-        Optional<LivingEntity> spawned = Bloodmoon.GetInstance().getMythicMobs().spawn(
+        Optional<SpawnedMythicMob> spawned = Bloodmoon.GetInstance().getMythicMobs().spawn(
                 reader.GetMythicMobInternalName(), location, reader.GetUseMythicMobsRewards(), this::HandleMythicBossDeath);
         if (spawned.isEmpty()) return false;
-        mythicBossId = spawned.get().getUniqueId();
-        spawned.get().getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),
+        LivingEntity entity = spawned.get().entity();
+        mythicBossId = entity.getUniqueId();
+        BossNameResolver.ResolvedBossName resolved = BossNameResolver.resolve("MYTHICMOBS",
+                spawned.get().entityDisplayName(), spawned.get().configuredDisplayName(),
+                reader.GetMythicMobInternalName(), "", "Mythic Boss");
+        mythicBossName = resolved.name();
+        entity.getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),
                 org.bukkit.persistence.PersistentDataType.STRING, "MYTHICMOBS");
         if (session != null) session.bossId(mythicBossId);
+        LocaleReader.MessageAllLocale("ZombieBossSpawned",
+                new String[]{"$b", "%boss_name%", "%boss_type%"},
+                new String[]{mythicBossName, mythicBossName, resolved.type()}, world);
         return true;
     }
 
@@ -357,9 +369,15 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         if (mythicBossId == null || !mythicBossId.equals(entity.getUniqueId())) return;
         mythicBossId = null;
         ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
-        if (config.GetRunBloodMoonRewardCommandsForMythic()) {
-            runBossRewardCommands(config.GetMythicMobInternalName(), entity, killer);
+        if (killer != null) {
+            LocaleReader.MessageAllLocale("BossSlain",
+                    new String[]{"$b", "$p", "%boss_name%", "%boss_type%"},
+                    new String[]{mythicBossName, killer.getName(), mythicBossName, "MYTHICMOBS"}, world);
         }
+        if (config.GetRunBloodMoonRewardCommandsForMythic()) {
+            runBossRewardCommands(mythicBossName, "MYTHICMOBS", entity, killer);
+        }
+        mythicBossName = "";
     }
 
     public void AddToBlacklist (LivingEntity entity)
@@ -771,11 +789,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 if (killer != null)
                 {
 
-                    LocaleReader.MessageAllLocale("BossSlain", new String[]{"$b", "$p"}, new String[]{boss.GetName(), killer.getName()}, world);
+                    LocaleReader.MessageAllLocale("BossSlain",
+                            new String[]{"$b", "$p", "%boss_name%", "%boss_type%"},
+                            new String[]{boss.GetName(), killer.getName(), boss.GetName(), "VANILLA"}, world);
                 }
 
                 boss.Kill(killer != null && isInProgress());
-                runBossRewardCommands(boss.GetName(), boss.GetHost(), killer);
+                runBossRewardCommands(boss.GetName(), "VANILLA", boss.GetHost(), killer);
                 bossIterator.remove();
                 return;
             }
@@ -934,7 +954,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         return playerId == null ? null : Bukkit.getPlayer(playerId);
     }
 
-    private void runBossRewardCommands(String bossName, LivingEntity bossHost, Player killer) {
+    private void runBossRewardCommands(String bossName, String bossType, LivingEntity bossHost, Player killer) {
         ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
         UUID bossId = bossHost.getUniqueId();
         boolean firstReward = rewardedBosses.add(bossId);
@@ -943,7 +963,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         Location location = bossHost.getLocation();
         Map<String, Object> values = new HashMap<>();
         values.put("boss_name", bossName);
-        values.put("boss_type", bossHost.getType().name());
+        values.put("boss_type", bossType == null ? "NONE" : bossType);
         values.put("boss_uuid", bossId);
         values.put("boss_killer", killer == null ? "" : killer.getName());
         values.put("boss_killer_uuid", killer == null ? "" : killer.getUniqueId());

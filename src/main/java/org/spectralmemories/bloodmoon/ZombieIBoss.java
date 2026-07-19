@@ -167,6 +167,8 @@ public final class ZombieIBoss extends Boss {
 
     @Override
     public void Announce() {
-        LocaleReader.MessageAllLocale("ZombieBossSpawned", new String[]{"$b"}, new String[]{GetName()}, world);
+        LocaleReader.MessageAllLocale("ZombieBossSpawned",
+                new String[]{"$b", "%boss_name%", "%boss_type%"},
+                new String[]{GetName(), GetName(), "VANILLA"}, world);
     }
 }

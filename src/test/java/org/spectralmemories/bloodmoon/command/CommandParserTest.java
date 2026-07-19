@@ -25,4 +25,10 @@ class CommandParserTest {
         assertEquals("$1\\name:%missing%:", output);
         assertEquals("", PlaceholderEngine.replace(null, Map.of()));
     }
+
+    @Test void legacyAndModernBossPlaceholdersUseResolvedNameAndMode() {
+        Map<String, Object> values = Map.of("boss_name", "Crimson King", "boss_type", "MYTHICMOBS");
+        assertEquals("say Crimson King", PlaceholderEngine.replaceLegacy("say $b", values));
+        assertEquals("MYTHICMOBS:Crimson King", PlaceholderEngine.replace("%boss_type%:%boss_name%", values));
+    }
 }
