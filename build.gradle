@@ -1,5 +1,8 @@
 apply plugin: 'java'
 
+group = 'org.spectralmemories'
+version = '1.1.0'
+
 repositories {
     mavenCentral()
 
@@ -10,6 +13,10 @@ repositories {
     maven {
         url = 'https://maven.enginehub.org/repo/'
     }
+
+    maven {
+        url = 'https://mvn.lumine.io/repository/maven-public/'
+    }
 }
 
 java {
@@ -18,18 +25,32 @@ java {
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
 
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.9'
 
+    compileOnly 'io.lumine:Mythic-Dist:5.12.1'
+
     implementation 'org.yaml:snakeyaml:1.23'
     implementation 'org.jetbrains:annotations:18.0.0'
 
     implementation(files('libs/SQLAccess.jar'))
+
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 jar {
+    archiveBaseName = 'BloodMoon-Reborn'
+    archiveVersion = project.version
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.findAll {
             it.name.endsWith('jar')
@@ -37,8 +58,13 @@ jar {
             zipTree(it)
         }
     }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
 
-    destinationDirectory.set(file("exes/server/plugins"))
+test {
+    useJUnitPlatform()
 }
 
 task runSpigot(type: Exec) {

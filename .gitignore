@@ -5,6 +5,7 @@
 # Gradle
 .gradle/
 build/
+exes/
 
 # Compiled files
 *.class

@@ -1,11 +1,13 @@
 name: BloodMoon
-version: 1.0.1
+version: 1.1.0
 main: org.spectralmemories.bloodmoon.Bloodmoon
 softdepend:
-  - "Mutliverse-Core"
+  - "Multiverse-Core"
   - "WorldGuard"
+  - "MythicMobs"
 api-version: 1.21
 authors: [SpectralMemories]
+contributors: [JulioN12]
 description: A BloodMoon shines every couple of nights
 commands:
   bloodmoon:
