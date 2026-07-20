@@ -23,6 +23,7 @@ class BossCommandCompatibilityTest {
         String executor = Files.readString(root.resolve("src/main/java/org/spectralmemories/bloodmoon/BloodmoonCommandExecutor.java"));
         assertTrue(executor.contains("actuator.SpawnConfiguredBoss()"));
         assertFalse(executor.contains("actuator.SpawnZombieBoss()"));
+        assertFalse(executor.contains("ConfirmToConsole(sender,ExecuteSpawnZombieBoss"));
     }
 
     @Test void automaticAndPermanentRespawnUseConfiguredBossEntryPoint() throws IOException {

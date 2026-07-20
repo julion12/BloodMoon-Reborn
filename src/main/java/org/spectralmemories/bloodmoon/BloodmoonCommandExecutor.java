@@ -131,7 +131,7 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
             }
             else if (arg0.equalsIgnoreCase("spawnzombieboss"))
             {
-                return ConfirmToConsole(sender,ExecuteSpawnZombieBoss(sender, chosenWorld), arg0, chosenWorld.getName());
+                return ExecuteSpawnZombieBoss(sender, chosenWorld);
             }
             else if (arg0.equalsIgnoreCase("killbosses"))
             {
