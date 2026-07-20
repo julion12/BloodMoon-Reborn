@@ -5,6 +5,7 @@ softdepend:
   - "Multiverse-Core"
   - "WorldGuard"
   - "MythicMobs"
+  - "PlaceholderAPI"
 api-version: 1.21
 authors: [SpectralMemories]
 contributors: [JulioN12]

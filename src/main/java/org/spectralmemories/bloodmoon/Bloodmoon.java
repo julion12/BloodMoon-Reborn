@@ -14,6 +14,8 @@ import org.spectralmemories.bloodmoon.config.ConfigMigrator;
 import org.spectralmemories.bloodmoon.session.SessionCoordinator;
 import org.spectralmemories.bloodmoon.integration.MythicMobsBridge;
 import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
+import org.spectralmemories.bloodmoon.placeholder.NoPlaceholderIntegration;
+import org.spectralmemories.bloodmoon.placeholder.PlaceholderIntegration;
 import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
 
 import java.io.File;
@@ -59,6 +61,7 @@ public final class Bloodmoon extends JavaPlugin
     private static WorldManager worldManager;
     private SessionCoordinator sessionCoordinator;
     private MythicMobsBridge mythicMobs = new NoMythicMobsBridge();
+    private PlaceholderIntegration placeholderIntegration = new NoPlaceholderIntegration();
 
     /**
      * Returns the Bloodmoon instance
@@ -220,6 +223,7 @@ public final class Bloodmoon extends JavaPlugin
     public SessionCoordinator getSessionCoordinator() { return sessionCoordinator; }
     public NamespacedKey getBossKey() { return new NamespacedKey(this, "bloodmoon_boss"); }
     public MythicMobsBridge getMythicMobs() { return mythicMobs; }
+    public PlaceholderIntegration getPlaceholderIntegration() { return placeholderIntegration; }
 
     /**
      * Creates the BloodMoon folder if it does not exist
@@ -345,6 +349,16 @@ public final class Bloodmoon extends JavaPlugin
             LoadWorld(world);
         }
 
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            try {
+                placeholderIntegration = new org.spectralmemories.bloodmoon.placeholder.papi.PlaceholderApiIntegration(this);
+                if (placeholderIntegration.registered()) getLogger().info("PlaceholderAPI expansion registered");
+            } catch (LinkageError | RuntimeException exception) {
+                placeholderIntegration = new NoPlaceholderIntegration();
+                getLogger().log(Level.WARNING, "PlaceholderAPI was found but the BloodMoon expansion could not be registered", exception);
+            }
+        }
+
         getServer().getPluginManager().registerEvents (worldManager, this);
 
         BloodmoonCommandExecutor commandExecutor = new BloodmoonCommandExecutor();
@@ -431,6 +445,7 @@ public final class Bloodmoon extends JavaPlugin
 
         if (sqlAccess != null) sqlAccess.close();
         if (sessionCoordinator != null) sessionCoordinator.abortAll();
+        placeholderIntegration.close();
         mythicMobs.close();
         for (ConfigReader configReader : allConfigReaders)
         {

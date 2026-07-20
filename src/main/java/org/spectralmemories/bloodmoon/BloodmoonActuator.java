@@ -46,6 +46,7 @@ import org.spectralmemories.bloodmoon.boss.ConfiguredBossSpawner;
 import org.spectralmemories.bloodmoon.boss.SpawnedBossResult;
 import org.spectralmemories.bloodmoon.boss.VanillaBossBarValues;
 import org.spectralmemories.bloodmoon.integration.SpawnedMythicMob;
+import org.spectralmemories.bloodmoon.placeholder.BossPlaceholderState;
 import org.bukkit.util.Vector;
 
 import java.io.Closeable;
@@ -87,6 +88,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     private final Map<UUID, UUID> bossDamagers = new HashMap<>();
     private BloodMoonSession session;
     private final Map<UUID, String> mythicBosses = new LinkedHashMap<>();
+    private final Map<UUID, TrackedPlaceholderBoss> placeholderBosses = new LinkedHashMap<>();
+    private UUID currentPlaceholderBossId;
 
     private void AddActuator (BloodmoonActuator instance)
     {
@@ -214,6 +217,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
             Bloodmoon.GetInstance().getMythicMobs().remove(mythicBossId);
         }
         mythicBosses.clear();
+        placeholderBosses.clear();
+        currentPlaceholderBossId = null;
         if (session != null) session.bossId(null);
     }
 
@@ -355,6 +360,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
             ZombieIBoss zombieBoss = new ZombieIBoss(newLocation);
             zombieBoss.Start();
             bosses.add(zombieBoss);
+            trackPlaceholderBoss(zombieBoss.GetHost(), zombieBoss.GetName(), "VANILLA", true);
             if (session != null) session.bossId(zombieBoss.GetHost().getUniqueId());
             return SpawnedBossResult.success(BossModeResolver.Mode.VANILLA,
                     zombieBoss.GetHost().getUniqueId(), zombieBoss.GetName(), zombieBoss.HasActiveBossBar());
@@ -385,6 +391,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 Bloodmoon.GetInstance().getLocaleReader().GetLocalePlainString("MythicBossFallbackName"));
         String mythicBossName = resolved.name();
         mythicBosses.put(mythicBossId, mythicBossName);
+        trackPlaceholderBoss(entity, mythicBossName, "MYTHICMOBS", false);
         entity.getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),
                 org.bukkit.persistence.PersistentDataType.STRING, "MYTHICMOBS");
         if (session != null) session.bossId(mythicBossId);
@@ -396,6 +403,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         String mythicBossName = mythicBosses.remove(entity.getUniqueId());
         if (mythicBossName == null) return;
+        untrackPlaceholderBoss(entity.getUniqueId());
         if (session != null && session.bossId().filter(entity.getUniqueId()::equals).isPresent()) session.bossId(null);
         ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
         if (killer != null) {
@@ -664,6 +672,43 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         return inProgress || reader.GetPermanentBloodMoonConfig();
     }
 
+    public BossPlaceholderState GetBossPlaceholderState() {
+        if (currentPlaceholderBossId == null) return BossPlaceholderState.none();
+        TrackedPlaceholderBoss tracked = placeholderBosses.get(currentPlaceholderBossId);
+        if (tracked == null) return BossPlaceholderState.none();
+        Entity raw = Bukkit.getEntity(currentPlaceholderBossId);
+        if (!(raw instanceof LivingEntity entity) || !entity.isValid() || entity.isDead()) {
+            return BossPlaceholderState.none();
+        }
+        double current = Math.max(0, entity.getHealth())
+                + (tracked.includeAbsorption() ? Math.max(0, entity.getAbsorptionAmount()) : 0);
+        double maximum = tracked.includeAbsorption() ? tracked.maximumHealth() : entityMaximumHealth(entity);
+        return new BossPlaceholderState(true, tracked.name(), tracked.type(), current, maximum);
+    }
+
+    private void trackPlaceholderBoss(LivingEntity entity, String name, String type, boolean includeAbsorption) {
+        double maximum = entityMaximumHealth(entity)
+                + (includeAbsorption ? Math.max(0, entity.getAbsorptionAmount()) : 0);
+        currentPlaceholderBossId = entity.getUniqueId();
+        placeholderBosses.put(currentPlaceholderBossId,
+                new TrackedPlaceholderBoss(name, type, Math.max(0, maximum), includeAbsorption));
+    }
+
+    private void untrackPlaceholderBoss(UUID entityId) {
+        placeholderBosses.remove(entityId);
+        if (!entityId.equals(currentPlaceholderBossId)) return;
+        currentPlaceholderBossId = null;
+        for (UUID remaining : placeholderBosses.keySet()) currentPlaceholderBossId = remaining;
+    }
+
+    private static double entityMaximumHealth(LivingEntity entity) {
+        return entity.getAttribute(Attribute.MAX_HEALTH) == null
+                ? Math.max(entity.getHealth(), 1.0) : entity.getAttribute(Attribute.MAX_HEALTH).getValue();
+    }
+
+    private record TrackedPlaceholderBoss(String name, String type, double maximumHealth,
+                                          boolean includeAbsorption) { }
+
 
     //Events
     @EventHandler
@@ -825,6 +870,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 boss.Kill(killer != null && isInProgress());
                 runBossRewardCommands(boss.GetName(), "VANILLA", boss.GetHost(), killer);
                 if (session != null && session.bossId().filter(entity.getUniqueId()::equals).isPresent()) session.bossId(null);
+                untrackPlaceholderBoss(entity.getUniqueId());
                 bossIterator.remove();
                 return;
             }
