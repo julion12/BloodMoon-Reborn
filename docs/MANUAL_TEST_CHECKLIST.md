@@ -27,11 +27,11 @@ Enable a harmless, uniquely identifiable survivor command and set a short minimu
 
 Set `Boss.Mode: VANILLA`, enable a uniquely identifiable boss reward command, and disable unrelated rewards.
 
-1. Spawn the boss with a player present and defeat it normally; confirm only the credited killer receives exactly one command reward.
-2. Repeat with environmental/no-player final damage; confirm the configured no-killer behavior and no console exception.
-3. Exercise cleanup (`bloodmoon killbosses`, event end, and plugin disable) and confirm no reward is issued for administrative removal.
-4. Inspect the log for duplicate death processing and verify the reward cannot run twice for the same boss UUID.
-5. With `VanillaBossBar.Enabled: true`, confirm one bar appears using `ZombieBossName`, follows damage, and disappears after death.
+1. Run `/bloodmoon spawnzombieboss` with a player present; confirm `ZombieBossName`, exactly one vanilla BossBar, and no Mythic entity.
+2. Damage the boss and confirm the bar decreases; defeat it normally and confirm only the credited killer receives exactly one command reward and the bar disappears.
+3. Repeat with environmental/no-player final damage; confirm the configured no-killer behavior and no console exception.
+4. Exercise cleanup (`bloodmoon killbosses`, event end, and plugin disable) and confirm no reward is issued for administrative removal.
+5. Inspect the log for duplicate death processing and verify the reward cannot run twice for the same boss UUID.
 6. Test `NEARBY`, `WORLD`, and `ALL`; for `NEARBY`, cross the configured radius and confirm the audience refreshes without creating another bar.
 7. Reload repeatedly, disable/re-enable the bar through config plus reload, end the event, unload the disposable world, and stop the plugin. Confirm no duplicate or orphan bar remains.
 
@@ -40,12 +40,12 @@ Set `Boss.Mode: VANILLA`, enable a uniquely identifiable boss reward command, an
 Use a MythicMobs build that officially supports the exact server version. MythicMobs 5.12.1 is suitable for the validated Paper 1.21.8 bridge test but not for the tested Paper 26.2 build.
 
 1. Install the example `BloodMoonBoss` definition from `docs/MYTHICMOBS.md`; set `Boss.Mode: MYTHICMOBS`, `Enabled: true`, and its exact `InternalName`.
-2. With `UseMythicMobsRewards: true` and `RunBloodMoonRewardCommands: false`, spawn and kill the boss. Confirm Mythic drops/skills run once and BloodMoon boss reward commands do not run.
-3. Enable `RunBloodMoonRewardCommands`, repeat with a credited killer, and confirm the additional BloodMoon command runs exactly once without duplicating ordinary enhanced-mob drops.
-4. End an event and disable the plugin while a tracked Mythic boss exists; confirm only that entity is removed and no reward is granted.
-5. Test an unknown `InternalName`: with `FallbackToVanilla: true`, confirm one vanilla boss; with it `false`, confirm no boss and one clear warning.
-6. Remove MythicMobs completely and restart. Confirm BloodMoon enables, reloads, runs the vanilla/default path, and stops without `NoClassDefFoundError` or linkage errors.
-7. Confirm the arrival and death messages show the Mythic `Display`, never the customized vanilla `ZombieBossName`, and that no BloodMoon vanilla BossBar appears.
+2. Run `/bloodmoon spawnzombieboss`. Confirm only the MythicMob appears, the arrival uses its display (never `ZombieBossName`), and no BloodMoon vanilla BossBar exists while damaging it.
+3. With `UseMythicMobsRewards: true` and `RunBloodMoonRewardCommands: false`, kill the boss. Confirm the death name is correct, Mythic drops/skills run once, BloodMoon boss reward commands do not run, and no vanilla bar/state remains.
+4. Enable `RunBloodMoonRewardCommands`, repeat with a credited killer, and confirm the additional BloodMoon command runs exactly once without duplicating ordinary enhanced-mob drops.
+5. End an event, run `killbosses`, and disable the plugin with tracked Mythic bosses; confirm every exact entity is removed and no reward is granted.
+6. Set an unknown `InternalName` and `FallbackToVanilla: true`; run the command and confirm one vanilla entity, one vanilla announcement, and one functional vanilla BossBar. Repeat with fallback `false`; confirm no entity/bar and one clear failure response.
+7. Remove MythicMobs completely and restart. Confirm BloodMoon enables, reloads, follows the configured fallback policy, and stops without `NoClassDefFoundError` or linkage errors.
 
 ## 5. Languages and legacy locales
 

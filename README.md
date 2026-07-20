@@ -40,11 +40,13 @@ Select `Language: en` or `Language: es` in `plugins/BloodMoon/locales.yml`. See 
 | `/bloodmoon stop` | `bloodmoon.stop` | Stop in the player's world |
 | `/bloodmoon reload` | `bloodmoon.reload` | Validate and reload config without recreating tasks |
 | `/bloodmoon survivors` | `bloodmoon.show` | Show current eligible participant count |
-| `/bloodmoon spawnzombieboss` | `bloodmoon.spawnzombieboss` | Spawn the existing vanilla boss |
-| `/bloodmoon killbosses [rewards]` | `bloodmoon.killbosses` | Remove active vanilla bosses |
+| `/bloodmoon spawnzombieboss` | `bloodmoon.spawnzombieboss` | Spawn the currently configured Blood Moon boss |
+| `/bloodmoon killbosses [rewards]` | `bloodmoon.killbosses` | Remove active vanilla and Mythic bosses |
 | `/bloodmoon spawnhorde [player]` | `bloodmoon.spawnhorde` | Spawn a configured horde |
 
 Console commands require a world argument except `reload`. Tab completion is included.
+
+`spawnzombieboss` keeps its historical name and permission for compatibility. It resolves `Boss.Mode` before creating or announcing anything: `VANILLA` creates the built-in zombie and its configured Bukkit BossBar, `MYTHICMOBS` creates only the configured MythicMob and leaves its BossBar to MythicMobs, and `NONE` creates nothing. A successful Mythic fallback produces one vanilla boss and one final vanilla announcement.
 
 ## Documentation
 

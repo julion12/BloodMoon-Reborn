@@ -23,6 +23,7 @@
 - Build remains against Paper API 1.21.4 and emits Java 21 bytecode for one cross-version JAR.
 - Vanilla bosses now carry a PersistentDataContainer identity marker; legacy named bosses remain recognized during cleanup.
 - Mythic boss messages now use the active/configured Mythic display name while UUID tracking remains unchanged.
+- The historical `/bloodmoon spawnzombieboss` command now spawns the boss selected by `Boss.Mode`; its name and permission remain compatible.
 
 ### Fixed
 
@@ -32,5 +33,7 @@
 - Null death-message handling.
 - Misspelled `Multiverse-Core` soft dependency.
 - Mythic arrival/death text incorrectly reusing the vanilla `ZombieBossName`.
+- Administrative boss spawning bypassing `Boss.Mode` and creating vanilla announcements/BossBars before a Mythic spawn.
+- `killbosses` leaving tracked Mythic boss entities and session state behind.
 
 No existing configuration key or vanilla boss default was removed or renamed.

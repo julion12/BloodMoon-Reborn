@@ -92,6 +92,8 @@ Boss:
 
 The vanilla bar is created only for the built-in zombie boss. It follows effective health, refreshes its audience every 10 ticks, and is removed on death, administrative removal, event end, world unload, plugin disable, or session cleanup. Reload updates the existing bar and never creates a second one. `ShowHealthNumbers: false` reduces the title to `%boss_name%`.
 
+Both automatic spawning and `/bloodmoon spawnzombieboss` use this same `Boss` selection. The command name is historical: in `MYTHICMOBS` mode it creates only `InternalName`, announces the resolved Mythic display, and never creates the vanilla BossBar. In `NONE` mode the localized `BossDisabled` message is returned. If a Mythic spawn fails, `FallbackToVanilla` determines whether the result is one fully initialized vanilla boss or a localized `BossSpawnFailed` response.
+
 Audience modes:
 
 - `NEARBY`: same-world players within `ViewDistance` blocks.

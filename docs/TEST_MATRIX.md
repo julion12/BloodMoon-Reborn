@@ -7,7 +7,7 @@ Validation date: 2026-07-19. `PASSED` means the check was executed in an isolate
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 37 tests, 0 failures, including the original 19 |
+| JUnit suite | PASSED | 54 tests, 0 failures, including the original 19 |
 | Reproducible JAR task | PASSED | JDK 21 and JDK 25 produced the same 477,833-byte JAR; SHA-256 `a5739e10e07979ffa7c031d9325d7c6ea15ef58ba6757c97667984c95ed4f47e` |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
@@ -72,6 +72,23 @@ Paper 1.21.8 build 60 with Temurin 21.0.8+9 was rerun using the new 477,833-byte
 | Vanilla boss message/bar/damage/removal/reward | MANUAL REQUIRED | No real Minecraft player was connected; the production boss intentionally does not spawn without one |
 | Mythic display/death/no-vanilla-bar/reward isolation | MANUAL REQUIRED | Bridge and schema loaded, but the live boss lifecycle requires a real connected player |
 | Reload without duplicate visible bars | MANUAL REQUIRED | Lifecycle state is unit-tested; visual confirmation requires a player observing an active boss |
+
+## Contextual `spawnzombieboss` regression
+
+The 2026-07-19 follow-up routes the historical command and automatic/permanent respawn through `SpawnConfiguredBoss`. Unit tests cover the actual-mode result, UUID/name/bar metadata, no vanilla supplier call after a successful Mythic spawn, one-shot fallback, disabled/failure results, preserved command/permission, shared entry point, and vanilla/Mythic cleanup state.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| VANILLA/MYTHICMOBS/NONE routing | PASSED | Pure coordinator tests; the unselected concrete spawner is never called |
+| Mythic display and vanilla BossBar exclusion | PASSED | Result and source-boundary tests; Mythic method contains no `ZombieIBoss`, `ZombieBossName`, or vanilla bar access |
+| Fallback true/false | PASSED | Tests cover successful vanilla result with one name/bar and failed result with no entity/bar |
+| Historical command and permission | PASSED | `spawnzombieboss` and `bloodmoon.spawnzombieboss` remain registered; executor calls `SpawnConfiguredBoss` |
+| `killbosses` cleanup | PASSED | Tests verify tracked Mythic UUID removal, map clear, and session boss-ID clear in addition to vanilla cleanup |
+| Paper 1.21.8 + MythicMobs 5.12.1 startup | PASSED | Final plugin loaded, integration enabled, documented YAML raised loaded mob count from 8 to 9, reload/command/killbosses/shutdown completed cleanly |
+| Console command without a player | PASSED | Returned localized `BossSpawnFailed`; no entity or BossBar can be created because the production policy requires a player |
+| VANILLA damage/bar/death/reward with player | MANUAL REQUIRED | No connected Minecraft player was used in this smoke |
+| MYTHIC display/bar/death/reward with player | MANUAL REQUIRED | No connected Minecraft player was used in this smoke |
+| Successful fallback entity/bar with player | MANUAL REQUIRED | No connected Minecraft player was used in this smoke |
 
 ## Release gate
 

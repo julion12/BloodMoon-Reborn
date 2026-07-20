@@ -46,6 +46,8 @@ The example is also stored as [`docs/examples/MythicMobs-BloodMoonBoss.yml`](exa
 
 BloodMoon does not create its vanilla BossBar in `MYTHICMOBS` mode. The `BossBar` block above belongs to MythicMobs, avoiding duplicate bars.
 
-If MythicMobs is absent, incompatible, or the name is unknown, a warning is logged. `FallbackToVanilla: true` uses the existing `ZombieIBoss`; otherwise no boss is spawned. Despawn/event-end/disable cleanup removes the exact tracked entity.
+The compatible administrative command is `/bloodmoon spawnzombieboss`. Despite its historical name, it goes through the same configured-mode entry point as automatic spawning. A successful Mythic result is tracked by its exact entity UUID and resolved display name, emits one Mythic arrival message, and never constructs `ZombieIBoss` or a Bukkit BossBar. The permission remains `bloodmoon.spawnzombieboss`.
+
+If MythicMobs is absent, incompatible, or the name is unknown, a warning is logged. `FallbackToVanilla: true` uses the existing `ZombieIBoss`, its `ZombieBossName`, and its vanilla BossBar with one final announcement; otherwise no boss is spawned. `killbosses`, event-end, and disable cleanup remove every exact tracked Mythic UUID without running death rewards.
 
 The bridge-load test does not replace the player-driven spawn/death test. Before release, follow `docs/MANUAL_TEST_CHECKLIST.md` to verify the configured internal name, exact-entity tracking, Mythic-owned rewards, optional BloodMoon commands, and fallback behavior on the actual deployment build.

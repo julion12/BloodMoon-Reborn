@@ -37,7 +37,7 @@ permissions:
     description: Allows to reload config files
     default: op
   bloodmoon.spawnzombieboss:
-    description: Allows to spawn zombie boss at will
+    description: Allows spawning the currently configured Blood Moon boss; historical name retained for compatibility
     default: op
   bloodmoon.killbosses:
     description: Allows to kill all bosses at will
