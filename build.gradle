@@ -41,7 +41,7 @@ dependencies {
 
     compileOnly 'io.lumine:Mythic-Dist:5.12.1'
 
-    compileOnly 'me.clip:placeholderapi:2.12.1'
+    compileOnly 'me.clip:placeholderapi:2.12.3'
 
     implementation 'org.yaml:snakeyaml:1.23'
     implementation 'org.jetbrains:annotations:18.0.0'
@@ -50,7 +50,7 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'me.clip:placeholderapi:2.12.1'
+    testImplementation 'me.clip:placeholderapi:2.12.3'
     testImplementation 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
