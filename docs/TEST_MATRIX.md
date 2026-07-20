@@ -7,8 +7,8 @@ Validation date: 2026-07-19. `PASSED` means the check was executed in an isolate
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 54 tests, 0 failures, including the original 19 |
-| Release artifact task | PASSED | Final JDK 21 artifact is 482,339 bytes; SHA-256 `ace89854bd5458d3645e05f69c5f466b5f4426aeb195c2bb9e28bf698d20a047` |
+| JUnit suite | PASSED | 70 tests, 0 failures, including the original 19 |
+| Release artifact task | PASSED | Final JDK 21 artifact is 500,323 bytes; SHA-256 `0a06a4030d4acdbf6da1f3ade1983e17a017b7f1775bae1a1f85906e2b49d1c1` |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, and two-world isolation | PASSED | Unit tests |
@@ -100,8 +100,10 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
 | Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; runtime uses tracked UUID/entity/session references |
-| Paper/Purpur 1.21.8 with PlaceholderAPI | MANUAL REQUIRED | Pending live `/papi list`, `/papi parse`, reload, and player-world/boss checks |
-| Server without PlaceholderAPI | MANUAL REQUIRED | Pending final-artifact startup smoke without the optional plugin |
+| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Exact final JAR registered `bloodmoon` once; `/papi list` and `info` succeeded; null-player parses returned safe localized values; BloodMoon reload and PAPI reload retained one expansion; clean shutdown |
+| Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
+| Server without PlaceholderAPI | PASSED | Exact final JAR enabled, reloaded, and stopped on Paper 1.21.8 without missing-class errors or PlaceholderAPI warnings |
+| Connected-player event/boss/world/TAB behavior | MANUAL REQUIRED | No Minecraft player or TAB plugin was connected during the smoke; visual and live-entity checks remain pending |
 
 ## Release gate
 
