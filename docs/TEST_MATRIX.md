@@ -91,6 +91,18 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | MYTHIC display/bar/death/reward with player | MANUAL REQUIRED | No connected Minecraft player was used in this smoke |
 | Successful fallback entity/bar with player | MANUAL REQUIRED | No connected Minecraft player was used in this smoke |
 
+## PlaceholderAPI expansion
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Resolver identifiers and fallbacks | PASSED | Unit tests cover all 17 public identifiers, unknown identifiers, null player, localized fallbacks, boolean stability, time formatting, and safe absent state |
+| World/event/player context | PASSED | Unit tests cover active/inactive world snapshots, participation, eligibility, disqualification, and non-participation |
+| Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
+| Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
+| Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; runtime uses tracked UUID/entity/session references |
+| Paper/Purpur 1.21.8 with PlaceholderAPI | MANUAL REQUIRED | Pending live `/papi list`, `/papi parse`, reload, and player-world/boss checks |
+| Server without PlaceholderAPI | MANUAL REQUIRED | Pending final-artifact startup smoke without the optional plugin |
+
 ## Release gate
 
 **NOT READY for publication.** Core runtime compatibility is demonstrated through Paper/Purpur 26.2, but the critical live Mythic spawn/death/reward test and the player reward scenarios remain manual. Paper 26.2 cannot currently complete the requested MythicMobs 5.12.1 test because that MythicMobs build fails before BloodMoon integration starts. Follow `docs/MANUAL_TEST_CHECKLIST.md` and attach the resulting logs before changing this gate.

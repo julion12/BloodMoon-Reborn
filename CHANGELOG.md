@@ -16,6 +16,7 @@
 - A configurable Bukkit BossBar for the vanilla boss with health and scoped audience updates.
 - Complete English and Spanish locale catalogs, English fallback, and non-destructive legacy locale migration.
 - Boss health placeholders and contextual `$b`, `%boss_name%`, and `%boss_type%` resolution.
+- Optional internal PlaceholderAPI expansion under `%bloodmoon_*%`, with localized event/boss/player fallbacks and constant-time runtime snapshots.
 
 ### Changed
 

@@ -16,10 +16,11 @@ Modernization and maintenance: **JulioN12**
 - Contextual Mythic boss names without reusing the vanilla `ZombieBossName`.
 - Configurable vanilla-only BossBar with nearby/world/all audiences and health placeholders.
 - Complete English and Spanish catalogs with English fallback and legacy `locales.yml` overrides.
+- Optional internal PlaceholderAPI expansion for event, boss, time, participation, and survivor state.
 - Timestamped, idempotent per-world configuration migration from 1.0.1.
 - Crash markers discard incomplete sessions without granting uncertain rewards.
 
-All new rewards default to disabled. MythicMobs, WorldGuard, and Multiverse-Core are soft dependencies.
+All new rewards default to disabled. PlaceholderAPI, MythicMobs, WorldGuard, and Multiverse-Core are soft dependencies. TAB is not a dependency.
 
 ## Installation and update
 
@@ -54,6 +55,7 @@ Console commands require a world argument except `reload`. Tab completion is inc
 - [Survivor rewards](docs/SURVIVOR_REWARDS.md)
 - [MythicMobs](docs/MYTHICMOBS.md)
 - [Placeholders](docs/PLACEHOLDERS.md)
+- [PlaceholderAPI and TAB](docs/PLACEHOLDERAPI.md)
 - [Migration](docs/MIGRATION.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Test matrix](docs/TEST_MATRIX.md)

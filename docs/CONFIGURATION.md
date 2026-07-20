@@ -103,3 +103,7 @@ Audience modes:
 Vanilla reward commands are additional to the boss's legacy item/experience drops. Rewards remain off until `Boss.Rewards.Enabled` is explicitly set to `true`.
 
 For MythicMobs, `InternalName` must exactly match the mob ID. The Mythic entity's resolved `Display` is used in arrival/death messages; `ZombieBossName` remains exclusive to the vanilla boss. `UseMythicMobsRewards` retains Mythic drops, while `RunBloodMoonRewardCommands` adds the commands above. Enabling both can intentionally duplicate value. `FallbackToVanilla` uses the old boss when MythicMobs or the configured mob is unavailable.
+
+## PlaceholderAPI labels
+
+PlaceholderAPI support has no per-world enable switch: installing the optional plugin registers the internal `bloodmoon` expansion. The formatted values come from `PlaceholderActive`, `PlaceholderInactive`, `PlaceholderNone`, `PlaceholderEligible`, `PlaceholderDisqualified`, `PlaceholderNotParticipating`, and `PlaceholderNoBoss` in the selected locale. English fallback and customized legacy `locales.yml` overrides apply immediately after `/bloodmoon reload`. Boolean placeholders remain unlocalized `true`/`false`. See [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).

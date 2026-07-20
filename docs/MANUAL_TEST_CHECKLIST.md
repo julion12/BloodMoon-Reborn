@@ -56,6 +56,21 @@ Use a MythicMobs build that officially supports the exact server version. Mythic
 5. Restart and reload twice; confirm no second migration write or backup.
 6. Spawn vanilla and Mythic bosses in turn. Confirm vanilla uses `el duro`, while Mythic uses its own `Display`.
 
+## 6. PlaceholderAPI and TAB
+
+Use Paper/Purpur 1.21.8, PlaceholderAPI, and a real connected player. TAB is optional and must be installed separately when validating the scoreboard example.
+
+1. Without PlaceholderAPI installed, start BloodMoon-Reborn, run reload/status, and stop; confirm no missing-class error or unnecessary warning.
+2. Install PlaceholderAPI, restart, and run `/papi list`; confirm the internal `bloodmoon` expansion appears once.
+3. Outside an event, parse every command listed in `docs/PLACEHOLDERAPI.md`; confirm inactive, `00:00`, no-boss, and not-participating fallbacks.
+4. Start a Blood Moon in the player's world and repeat; move a second player to another world and confirm active/time/session values remain world-contextual.
+5. Spawn a vanilla boss, parse its name/type/health, damage it, parse again, kill it, and confirm the no-boss fallbacks.
+6. Repeat with a configured MythicMob; confirm its resolved display and Bukkit health, `MYTHICMOBS`, and no BloodMoon vanilla BossBar.
+7. Confirm participation seconds increase, survivor eligibility follows the configured rules, and a disqualified player receives the localized status.
+8. Run `/bloodmoon reload`; confirm values reflect locale/config changes and `/papi list` still contains one `bloodmoon` expansion.
+9. Run `/papi reload`; confirm `%bloodmoon_active%` still resolves because the expansion persists.
+10. Install the documented TAB example, confirm the Blood Moon scoreboard has priority while active, and confirm the normal scoreboard returns afterward.
+
 ## Sign-off
 
 Release status may change from `NOT READY` only after the real player tests above pass, the deployment server/Mythic combination enables, and the collected logs show no duplicate reward, cross-world leakage, unsafe crash payout, class-link error, or shutdown exception.

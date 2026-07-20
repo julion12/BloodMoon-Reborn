@@ -17,4 +17,6 @@ Boss-name rules:
 - MythicMobs: `$b` and `%boss_name%` use the active entity display, then configured Mythic display, then `InternalName`, then localized fallback; `%boss_type%` is `MYTHICMOBS`.
 - None/missing context: boss values are empty or `NONE`, without throwing an exception.
 
-Legacy `$w`, `$p`, and `$b` remain supported. `$b` is available in boss locale messages and boss reward commands. `%boss_health%`, `%boss_max_health%`, and `%boss_health_percent%` are available in the vanilla BossBar and boss command context. PlaceholderAPI is not required and no external expansion is registered in 1.1.0.
+Legacy `$w`, `$p`, and `$b` remain supported. `$b` is available in boss locale messages and boss reward commands. `%boss_health%`, `%boss_max_health%`, and `%boss_health_percent%` are available in the vanilla BossBar and boss command context.
+
+These internal tokens are not global PlaceholderAPI identifiers and remain intentionally unchanged. Optional public integration uses the collision-safe `%bloodmoon_*%` namespace documented in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md); for example, the public boss name is `%bloodmoon_boss_name%`, not `%boss_name%`.
