@@ -17,9 +17,11 @@ import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
 import org.spectralmemories.bloodmoon.placeholder.NoPlaceholderIntegration;
 import org.spectralmemories.bloodmoon.placeholder.PlaceholderIntegration;
 import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -217,7 +219,28 @@ public final class Bloodmoon extends JavaPlugin
 
     private void saveBundledLocale(String resourcePath) {
         File target = new File(getDataFolder(), resourcePath.replace('/', File.separatorChar));
-        if (!target.exists()) saveResource(resourcePath, false);
+        if (!target.exists()) {
+            saveResource(resourcePath, false);
+            return;
+        }
+        try (InputStream input = getResource(resourcePath)) {
+            if (input == null) return;
+            Object loaded = new Yaml().load(input);
+            if (!(loaded instanceof Map<?, ?> map)) return;
+            Map<String, Object> bundled = new java.util.LinkedHashMap<>();
+            map.forEach((key, value) -> {
+                if (key != null) bundled.put(String.valueOf(key), value);
+            });
+            LocaleMigrator.MigrationResult migration = LocaleMigrator.migrateCatalog(
+                    target.toPath(), bundled, Clock.systemUTC());
+            if (migration.changed()) {
+                getLogger().info("Added missing entries to " + resourcePath + "; backup: "
+                        + migration.backup().getFileName());
+            }
+        } catch (IOException | RuntimeException exception) {
+            getLogger().log(Level.WARNING, "Could not update missing entries in " + resourcePath
+                    + "; existing locale was preserved", exception);
+        }
     }
 
     public SessionCoordinator getSessionCoordinator() { return sessionCoordinator; }

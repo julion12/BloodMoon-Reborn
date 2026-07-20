@@ -45,6 +45,42 @@ public final class LocaleMigrator {
         return new MigrationResult(true, backup);
     }
 
+    /** Adds keys introduced in a newer bundled language catalog without overwriting administrator values. */
+    public static MigrationResult migrateCatalog(Path file, Map<String, Object> bundled, Clock clock) throws IOException {
+        String original = Files.readString(file, StandardCharsets.UTF_8);
+        try {
+            new Yaml().load(original);
+        } catch (RuntimeException exception) {
+            throw new IOException("Invalid bundled locale YAML; original file preserved", exception);
+        }
+        String migrated = migrateCatalogContent(original, bundled);
+        if (original.equals(migrated)) return new MigrationResult(false, null);
+        Path backup = file.resolveSibling(file.getFileName() + ".bak-" + BACKUP_TIME.format(clock.instant()));
+        int suffix = 1;
+        while (Files.exists(backup)) {
+            backup = file.resolveSibling(file.getFileName() + ".bak-" + BACKUP_TIME.format(clock.instant()) + "-" + suffix++);
+        }
+        Files.copy(file, backup, StandardCopyOption.COPY_ATTRIBUTES);
+        Files.writeString(file, migrated, StandardCharsets.UTF_8);
+        return new MigrationResult(true, backup);
+    }
+
+    public static String migrateCatalogContent(String original, Map<String, Object> bundled) {
+        String source = original == null ? "" : original;
+        Map<String, Object> existing = parse(source);
+        StringBuilder additions = new StringBuilder();
+        if (bundled != null) bundled.forEach((key, value) -> {
+            if (key != null && value != null && !existing.containsKey(key)) {
+                additions.append(key).append(": \"").append(escape(String.valueOf(value))).append("\"")
+                        .append(System.lineSeparator());
+            }
+        });
+        if (additions.isEmpty()) return source;
+        return source.stripTrailing() + System.lineSeparator() + System.lineSeparator()
+                + "# BloodMoon-Reborn missing bundled locale entries; existing values were preserved."
+                + System.lineSeparator() + additions;
+    }
+
     public static String migrateContent(String original) {
         String source = original == null ? "" : original;
         Map<String, Object> existing = parse(source);
