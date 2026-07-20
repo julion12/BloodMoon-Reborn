@@ -271,7 +271,12 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
                 LocaleReader.MessageLocale("NoBloodMoonInWorld", null, null, sender);
                 return true;
             }
-            actuator.SpawnZombieBoss();
+            org.spectralmemories.bloodmoon.boss.SpawnedBossResult result = actuator.SpawnConfiguredBoss();
+            if (result.status() == org.spectralmemories.bloodmoon.boss.SpawnedBossResult.Status.DISABLED) {
+                LocaleReader.MessageLocale("BossDisabled", null, null, sender);
+            } else if (!result.success()) {
+                LocaleReader.MessageLocale("BossSpawnFailed", null, null, sender);
+            }
             return true;
         }
     }

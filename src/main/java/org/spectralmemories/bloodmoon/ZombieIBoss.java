@@ -49,7 +49,6 @@ public final class ZombieIBoss extends Boss {
         zombieHost.setBaby(false);
         bossBar = new VanillaBossBarController(host, reader, GetName());
         bossBar.refresh();
-        Announce();
         tasks.add(scheduler.scheduleSyncRepeatingTask(Bloodmoon.GetInstance(), new Runnable() {
             public void run() {
                 world.strikeLightningEffect(host.getLocation());
@@ -123,7 +122,7 @@ public final class ZombieIBoss extends Boss {
             scheduler.scheduleSyncDelayedTask(Bloodmoon.GetInstance(), new Runnable() {
                 @Override
                 public void run() {
-                    BloodmoonActuator.GetActuator(world).SpawnZombieBoss();
+                    BloodmoonActuator.GetActuator(world).SpawnConfiguredBoss();
                 }
             }, reader.GetBossRespawnTime("Zombie"));
         }
@@ -139,6 +138,10 @@ public final class ZombieIBoss extends Boss {
 
     public String GetName() {
         return locales.GetLocaleString("ZombieBossName");
+    }
+
+    public boolean HasActiveBossBar() {
+        return bossBar != null && bossBar.isActive();
     }
 
     @Override

@@ -35,6 +35,8 @@ MythicBossNotFound: "No se encontró el MythicMob configurado '%boss_name%' en %
 MythicMobsUnavailable: "MythicMobs no está disponible o no es compatible en %world%."
 MythicMobsFallbackToVanilla: "Se usará el boss vanilla de BloodMoon en %world%."
 MythicBossFallbackName: "Boss mítico"
+BossDisabled: "&eEl boss de la Luna de Sangre está deshabilitado en este mundo."
+BossSpawnFailed: "&cNo se pudo generar el boss de la Luna de Sangre configurado."
 BloodMoonStatus: "&fSesión %session_uuid%: %eligible_count%/%participant_count% participantes siguen cumpliendo los requisitos."
 BloodMoonSurvivorsHeader: "&fSupervivientes elegibles de la Luna de Sangre en %world%:"
 BloodMoonSessionNotFound: "&fNo hay una sesión activa de Luna de Sangre en %world%."

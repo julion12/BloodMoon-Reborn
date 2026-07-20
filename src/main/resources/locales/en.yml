@@ -35,6 +35,8 @@ MythicBossNotFound: "Configured MythicMob '%boss_name%' was not found in %world%
 MythicMobsUnavailable: "MythicMobs is unavailable or incompatible in %world%."
 MythicMobsFallbackToVanilla: "Falling back to the vanilla Blood Moon boss in %world%."
 MythicBossFallbackName: "Mythic Boss"
+BossDisabled: "&eThe Blood Moon boss is disabled in this world."
+BossSpawnFailed: "&cThe configured Blood Moon boss could not be spawned."
 BloodMoonStatus: "&fSession %session_uuid%: %eligible_count%/%participant_count% participants are currently eligible."
 BloodMoonSurvivorsHeader: "&fEligible Blood Moon survivors in %world%:"
 BloodMoonSessionNotFound: "&fThere is no active Blood Moon session in %world%."

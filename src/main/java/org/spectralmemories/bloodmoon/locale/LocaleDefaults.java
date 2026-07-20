@@ -48,6 +48,8 @@ public final class LocaleDefaults {
         values.put("MythicMobsUnavailable", "MythicMobs is unavailable or incompatible in %world%.");
         values.put("MythicMobsFallbackToVanilla", "Falling back to the vanilla Blood Moon boss in %world%.");
         values.put("MythicBossFallbackName", "Mythic Boss");
+        values.put("BossDisabled", "&eThe Blood Moon boss is disabled in this world.");
+        values.put("BossSpawnFailed", "&cThe configured Blood Moon boss could not be spawned.");
         values.put("BloodMoonStatus", "&fSession %session_uuid%: %eligible_count%/%participant_count% participants are currently eligible.");
         values.put("BloodMoonSurvivorsHeader", "&fEligible Blood Moon survivors in %world%:");
         values.put("BloodMoonSessionNotFound", "&fThere is no active Blood Moon session in %world%.");

@@ -61,6 +61,8 @@ public final class VanillaBossBarController {
         removeBar();
     }
 
+    public boolean isActive() { return lifecycle.active(); }
+
     private void updateBar() {
         double current = effectiveHealth();
         maximumHealth = Math.max(maximumHealth, current);
