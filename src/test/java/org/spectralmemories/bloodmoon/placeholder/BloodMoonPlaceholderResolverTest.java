@@ -1,6 +1,7 @@
 package org.spectralmemories.bloodmoon.placeholder;
 
 import org.junit.jupiter.api.Test;
+import org.spectralmemories.bloodmoon.session.BossSessionState;
 
 import java.util.List;
 
@@ -8,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BloodMoonPlaceholderResolverTest {
     private static final PlaceholderLabels EN = new PlaceholderLabels("Active", "Inactive", "None", "Eligible",
-            "Disqualified", "Not participating", "Not spawned yet");
+            "Disqualified", "Not participating", "Not spawned yet",
+            "No active event", "Not spawned yet", "Alive", "Defeated");
 
     @Test void activeAndWorldAreContextual() {
         assertAll(() -> assertEquals("true", resolve(active(), "active")),
@@ -64,6 +66,25 @@ class BloodMoonPlaceholderResolverTest {
                 () -> assertEquals("0%", resolve(inactive(), "boss_health_formatted")));
     }
 
+    @Test void bossNarrativeStateIsTechnicalLocalizedAndCoherent() {
+        PlaceholderContext notSpawned = withBossState(BossPlaceholderState.none(), BossSessionState.NOT_SPAWNED);
+        PlaceholderContext defeated = withBossState(
+                new BossPlaceholderState(false, "Crimson King", "MYTHICMOBS", 0, 0),
+                BossSessionState.DEFEATED);
+        assertAll(() -> assertEquals("NONE", resolve(inactive(), "boss_state")),
+                () -> assertEquals("No active event", resolve(inactive(), "boss_state_formatted")),
+                () -> assertEquals("NOT_SPAWNED", resolve(notSpawned, "boss_state")),
+                () -> assertEquals("Not spawned yet", resolve(notSpawned, "boss_state_formatted")),
+                () -> assertEquals("false", resolve(notSpawned, "boss_alive")),
+                () -> assertEquals("NONE", resolve(notSpawned, "boss_type")),
+                () -> assertEquals("DEFEATED", resolve(defeated, "boss_state")),
+                () -> assertEquals("Defeated", resolve(defeated, "boss_state_formatted")),
+                () -> assertEquals("false", resolve(defeated, "boss_alive")),
+                () -> assertEquals("Crimson King", resolve(defeated, "boss_name")),
+                () -> assertEquals("MYTHICMOBS", resolve(defeated, "boss_type")),
+                () -> assertEquals("0%", resolve(defeated, "boss_health_formatted")));
+    }
+
     @Test void participationAndEligibilityAreContextual() {
         PlaceholderContext eligible = withPlayer(new PlayerPlaceholderState(true, 125, true, false));
         PlaceholderContext disqualified = withPlayer(new PlayerPlaceholderState(true, 10, false, true));
@@ -100,29 +121,34 @@ class BloodMoonPlaceholderResolverTest {
                 "time_remaining_formatted", "boss_alive", "boss_name", "boss_type", "boss_health",
                 "boss_max_health", "boss_health_percent", "boss_health_formatted", "participating",
                 "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status",
-                "death_count", "unique_deaths", "participants_current", "survivors_current");
+                "death_count", "unique_deaths", "participants_current", "survivors_current",
+                "boss_state", "boss_state_formatted");
         identifiers.forEach(identifier -> assertNotNull(resolve(active(), identifier), identifier));
     }
 
     private static PlaceholderContext active() {
         return new PlaceholderContext(true, "world", 90,
                 new BossPlaceholderState(true, "Boss", "VANILLA", 50, 100),
-                new PlayerPlaceholderState(true, 30, true, false),
+                BossSessionState.ALIVE, new PlayerPlaceholderState(true, 30, true, false),
                 new SessionPlaceholderState(2, 1, 5, 4), EN);
     }
 
     private static PlaceholderContext inactive() { return PlaceholderContext.inactive(EN); }
     private static PlaceholderContext withBoss(BossPlaceholderState boss) {
-        return new PlaceholderContext(true, "world", 90, boss, PlayerPlaceholderState.none(),
+        return new PlaceholderContext(true, "world", 90, boss, BossSessionState.ALIVE, PlayerPlaceholderState.none(),
                 SessionPlaceholderState.none(), EN);
     }
     private static PlaceholderContext withPlayer(PlayerPlaceholderState player) {
-        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(), player,
+        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(), BossSessionState.NOT_SPAWNED, player,
                 SessionPlaceholderState.none(), EN);
     }
     private static PlaceholderContext withSession(SessionPlaceholderState session) {
-        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(),
+        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(), BossSessionState.NOT_SPAWNED,
                 PlayerPlaceholderState.none(), session, EN);
+    }
+    private static PlaceholderContext withBossState(BossPlaceholderState boss, BossSessionState state) {
+        return new PlaceholderContext(true, "world", 90, boss, state,
+                PlayerPlaceholderState.none(), SessionPlaceholderState.none(), EN);
     }
     private static String resolve(PlaceholderContext context, String identifier) {
         return BloodMoonPlaceholderResolver.resolve(context, identifier);

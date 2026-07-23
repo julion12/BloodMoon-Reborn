@@ -1,6 +1,7 @@
 package org.spectralmemories.bloodmoon.placeholder;
 
 import java.util.Locale;
+import org.spectralmemories.bloodmoon.session.BossSessionState;
 
 /** Pure, allocation-light resolver shared by the PAPI adapter and unit tests. */
 public final class BloodMoonPlaceholderResolver {
@@ -12,6 +13,7 @@ public final class BloodMoonPlaceholderResolver {
         PlayerPlaceholderState player = context.player() == null ? PlayerPlaceholderState.none() : context.player();
         SessionPlaceholderState session = context.session() == null
                 ? SessionPlaceholderState.none() : context.session();
+        BossSessionState bossState = context.bossState() == null ? BossSessionState.NONE : context.bossState();
         PlaceholderLabels labels = context.labels();
         if (labels == null) return null;
         return switch (identifier.toLowerCase(Locale.ROOT)) {
@@ -20,13 +22,17 @@ public final class BloodMoonPlaceholderResolver {
             case "world" -> context.active() ? safe(context.world(), labels.none()) : labels.none();
             case "time_remaining_seconds" -> Long.toString(Math.max(0, context.remainingSeconds()));
             case "time_remaining_formatted" -> formatDuration(context.active() ? context.remainingSeconds() : 0);
-            case "boss_alive" -> Boolean.toString(boss.alive());
-            case "boss_name" -> boss.alive() ? safe(boss.name(), labels.noBoss()) : labels.noBoss();
-            case "boss_type" -> boss.alive() ? safe(boss.type(), "NONE") : "NONE";
-            case "boss_health" -> number(boss.alive() ? boss.health() : 0);
-            case "boss_max_health" -> number(boss.alive() ? boss.maximumHealth() : 0);
-            case "boss_health_percent" -> Integer.toString(healthPercent(boss.health(), boss.maximumHealth()));
-            case "boss_health_formatted" -> healthPercent(boss.health(), boss.maximumHealth()) + "%";
+            case "boss_alive" -> Boolean.toString(bossState == BossSessionState.ALIVE && boss.alive());
+            case "boss_name" -> hasBossIdentity(bossState) ? safe(boss.name(), labels.noBoss()) : labels.noBoss();
+            case "boss_type" -> hasBossIdentity(bossState) ? safe(boss.type(), "NONE") : "NONE";
+            case "boss_health" -> number(bossState == BossSessionState.ALIVE && boss.alive() ? boss.health() : 0);
+            case "boss_max_health" -> number(bossState == BossSessionState.ALIVE && boss.alive() ? boss.maximumHealth() : 0);
+            case "boss_health_percent" -> Integer.toString(bossState == BossSessionState.ALIVE && boss.alive()
+                    ? healthPercent(boss.health(), boss.maximumHealth()) : 0);
+            case "boss_health_formatted" -> (bossState == BossSessionState.ALIVE && boss.alive()
+                    ? healthPercent(boss.health(), boss.maximumHealth()) : 0) + "%";
+            case "boss_state" -> bossState.name();
+            case "boss_state_formatted" -> formattedBossState(bossState, labels);
             case "participating" -> Boolean.toString(player.participating());
             case "participation_seconds" -> Long.toString(Math.max(0, player.participationSeconds()));
             case "participation_formatted" -> formatDuration(player.participationSeconds());
@@ -65,6 +71,19 @@ public final class BloodMoonPlaceholderResolver {
         if (!player.participating()) return labels.notParticipating();
         if (player.disqualified()) return labels.disqualified();
         return player.eligible() ? labels.eligible() : labels.none();
+    }
+
+    private static String formattedBossState(BossSessionState state, PlaceholderLabels labels) {
+        return switch (state) {
+            case NOT_SPAWNED -> labels.bossStateNotSpawned();
+            case ALIVE -> labels.bossStateAlive();
+            case DEFEATED -> labels.bossStateDefeated();
+            case NONE -> labels.bossStateNone();
+        };
+    }
+
+    private static boolean hasBossIdentity(BossSessionState state) {
+        return state == BossSessionState.ALIVE || state == BossSessionState.DEFEATED;
     }
 
     private static String number(double value) {

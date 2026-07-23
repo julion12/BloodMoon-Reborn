@@ -51,6 +51,6 @@ class BossCommandCompatibilityTest {
         String method = actuator.substring(start, end);
         assertAll(() -> assertTrue(method.contains("getMythicMobs().remove(mythicBossId)")),
                 () -> assertTrue(method.contains("mythicBosses.clear()")),
-                () -> assertTrue(method.contains("session.bossId(null)")));
+                () -> assertTrue(method.contains("session::bossRemoved")));
     }
 }

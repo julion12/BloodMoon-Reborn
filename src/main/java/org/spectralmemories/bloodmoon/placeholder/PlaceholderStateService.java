@@ -7,6 +7,7 @@ import org.spectralmemories.bloodmoon.Bloodmoon;
 import org.spectralmemories.bloodmoon.BloodmoonActuator;
 import org.spectralmemories.bloodmoon.ConfigReader;
 import org.spectralmemories.bloodmoon.session.BloodMoonSession;
+import org.spectralmemories.bloodmoon.session.BossSessionState;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -29,10 +30,25 @@ public final class PlaceholderStateService {
         BossPlaceholderState boss = actuator == null
                 ? BossPlaceholderState.none() : actuator.GetBossPlaceholderState();
         Optional<BloodMoonSession> current = plugin.getSessionCoordinator().current(world);
+        BossSessionState bossState = active && current.isPresent()
+                ? current.get().bossState() : BossSessionState.NONE;
+        boss = coherentBossState(boss, current, bossState);
         PlayerPlaceholderState participant = playerState(player, world, config, current);
         SessionPlaceholderState session = active && current.isPresent()
                 ? sessionState(current.get()) : SessionPlaceholderState.none();
-        return new PlaceholderContext(active, world.getName(), remaining, boss, participant, session, labels);
+        return new PlaceholderContext(active, world.getName(), remaining, boss, bossState,
+                participant, session, labels);
+    }
+
+    private BossPlaceholderState coherentBossState(BossPlaceholderState live,
+                                                    Optional<BloodMoonSession> current,
+                                                    BossSessionState state) {
+        if (state == BossSessionState.ALIVE && live.alive()) return live;
+        if (state == BossSessionState.DEFEATED && current.isPresent()) {
+            BloodMoonSession session = current.get();
+            return new BossPlaceholderState(false, session.lastBossName(), session.lastBossType(), 0, 0);
+        }
+        return BossPlaceholderState.none();
     }
 
     private PlayerPlaceholderState playerState(Player player, World world, ConfigReader config,
@@ -59,7 +75,9 @@ public final class PlaceholderStateService {
     private PlaceholderLabels labels() {
         return new PlaceholderLabels(locale("PlaceholderActive"), locale("PlaceholderInactive"),
                 locale("PlaceholderNone"), locale("PlaceholderEligible"), locale("PlaceholderDisqualified"),
-                locale("PlaceholderNotParticipating"), locale("PlaceholderNoBoss"));
+                locale("PlaceholderNotParticipating"), locale("PlaceholderNoBoss"),
+                locale("PlaceholderBossStateNone"), locale("PlaceholderBossStateNotSpawned"),
+                locale("PlaceholderBossStateAlive"), locale("PlaceholderBossStateDefeated"));
     }
 
     private String locale(String key) { return plugin.getLocaleReader().GetLocalePlainString(key); }

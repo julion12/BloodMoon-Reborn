@@ -18,6 +18,11 @@ public final class BloodMoonSession {
     private final Instant startedAt;
     private Instant endedAt;
     private UUID bossId;
+    private volatile BossSessionState bossState = BossSessionState.NOT_SPAWNED;
+    private volatile String lastBossName = "";
+    private volatile String lastBossType = "NONE";
+    private final Set<UUID> spawnedBosses = new HashSet<>();
+    private final Set<UUID> defeatedBosses = new HashSet<>();
     private final Map<UUID, Participant> participants = new LinkedHashMap<>();
     private final Set<UUID> uniqueDeadPlayers = new HashSet<>();
     private volatile long totalDeathEvents;
@@ -113,7 +118,33 @@ public final class BloodMoonSession {
     public Instant startedAt() { return startedAt; }
     public Optional<Instant> endedAt() { return Optional.ofNullable(endedAt); }
     public Optional<UUID> bossId() { return Optional.ofNullable(bossId); }
-    public void bossId(UUID bossId) { this.bossId = bossId; }
+    public BossSessionState bossState() { return bossState; }
+    public String lastBossName() { return lastBossName; }
+    public String lastBossType() { return lastBossType; }
+    public boolean bossSpawned(UUID entityId, String name, String type) {
+        if (entityId == null) return false;
+        boolean firstSpawn = spawnedBosses.add(entityId);
+        bossId = entityId;
+        lastBossName = name == null ? "" : name;
+        lastBossType = type == null || type.isBlank() ? "NONE" : type;
+        bossState = BossSessionState.ALIVE;
+        return firstSpawn;
+    }
+    public boolean bossDefeated(UUID entityId) {
+        if (entityId == null || !spawnedBosses.contains(entityId) || !defeatedBosses.add(entityId)) return false;
+        if (entityId.equals(bossId)) {
+            bossId = null;
+            bossState = BossSessionState.DEFEATED;
+        }
+        return true;
+    }
+    public void bossRemoved(UUID entityId) {
+        if (entityId != null && entityId.equals(bossId)) {
+            bossId = null;
+            bossState = BossSessionState.DEFEATED;
+        }
+    }
+    public void clearBossReference() { bossId = null; }
     public Collection<Participant> participants() { return Collections.unmodifiableCollection(participants.values()); }
     public Optional<Participant> participant(UUID playerId) { return Optional.ofNullable(participants.get(playerId)); }
     public long totalDeathEvents() { return totalDeathEvents; }

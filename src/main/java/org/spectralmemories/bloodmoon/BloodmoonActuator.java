@@ -204,6 +204,9 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     public void KillBosses (boolean giveRewards, boolean effects, boolean respawn)
     {
+        Set<UUID> removedBossIds = new LinkedHashSet<>();
+        for (IBoss boss : bosses) removedBossIds.add(boss.GetHost().getUniqueId());
+        removedBossIds.addAll(mythicBosses.keySet());
         Iterator var2 = bosses.iterator();
 
         while (var2.hasNext())
@@ -219,7 +222,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         mythicBosses.clear();
         placeholderBosses.clear();
         currentPlaceholderBossId = null;
-        if (session != null) session.bossId(null);
+        if (session != null) removedBossIds.forEach(session::bossRemoved);
     }
 
     public void SpawnHorde ()
@@ -338,6 +341,9 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                     new String[]{reader.GetMythicMobInternalName(), world.getName()});
         }
         if (result.success()) {
+            if (session != null) {
+                session.bossSpawned(result.entityUuid(), result.displayName(), result.actualMode().name());
+            }
             LocaleReader.MessageAllLocale("ZombieBossSpawned",
                     new String[]{"$b", "%boss_name%", "%boss_type%"},
                     new String[]{result.displayName(), result.displayName(), result.actualMode().name()}, world);
@@ -361,7 +367,6 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
             zombieBoss.Start();
             bosses.add(zombieBoss);
             trackPlaceholderBoss(zombieBoss.GetHost(), zombieBoss.GetName(), "VANILLA", true);
-            if (session != null) session.bossId(zombieBoss.GetHost().getUniqueId());
             return SpawnedBossResult.success(BossModeResolver.Mode.VANILLA,
                     zombieBoss.GetHost().getUniqueId(), zombieBoss.GetName(), zombieBoss.HasActiveBossBar());
         }
@@ -394,7 +399,6 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         trackPlaceholderBoss(entity, mythicBossName, "MYTHICMOBS", false);
         entity.getPersistentDataContainer().set(Bloodmoon.GetInstance().getBossKey(),
                 org.bukkit.persistence.PersistentDataType.STRING, "MYTHICMOBS");
-        if (session != null) session.bossId(mythicBossId);
         return SpawnedBossResult.success(BossModeResolver.Mode.MYTHICMOBS,
                 mythicBossId, mythicBossName, false);
     }
@@ -403,8 +407,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         String mythicBossName = mythicBosses.remove(entity.getUniqueId());
         if (mythicBossName == null) return;
+        if (session != null) session.bossDefeated(entity.getUniqueId());
         untrackPlaceholderBoss(entity.getUniqueId());
-        if (session != null && session.bossId().filter(entity.getUniqueId()::equals).isPresent()) session.bossId(null);
         ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
         if (killer != null) {
             LocaleReader.MessageAllLocale("BossSlain",
@@ -869,7 +873,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
                 boss.Kill(killer != null && isInProgress());
                 runBossRewardCommands(boss.GetName(), "VANILLA", boss.GetHost(), killer);
-                if (session != null && session.bossId().filter(entity.getUniqueId()::equals).isPresent()) session.bossId(null);
+                if (session != null) session.bossDefeated(entity.getUniqueId());
                 untrackPlaceholderBoss(entity.getUniqueId());
                 bossIterator.remove();
                 return;

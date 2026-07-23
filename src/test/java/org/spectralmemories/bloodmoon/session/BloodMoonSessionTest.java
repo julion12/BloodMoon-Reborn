@@ -145,5 +145,50 @@ class BloodMoonSessionTest {
         assertEquals(0, session.currentSurvivors());
     }
 
+    @Test void bossNarrativeStartsNotSpawnedAndSuccessfulVanillaOrMythicSpawnIsAlive() {
+        BloodMoonSession session = session();
+        assertEquals(BossSessionState.NOT_SPAWNED, session.bossState());
+
+        UUID vanilla = UUID.randomUUID();
+        assertTrue(session.bossSpawned(vanilla, "The Tough One", "VANILLA"));
+        assertAll(() -> assertEquals(BossSessionState.ALIVE, session.bossState()),
+                () -> assertEquals(vanilla, session.bossId().orElseThrow()),
+                () -> assertEquals("The Tough One", session.lastBossName()),
+                () -> assertEquals("VANILLA", session.lastBossType()));
+
+        UUID mythic = UUID.randomUUID();
+        assertTrue(session.bossSpawned(mythic, "Crimson King", "MYTHICMOBS"));
+        assertAll(() -> assertEquals(BossSessionState.ALIVE, session.bossState()),
+                () -> assertEquals(mythic, session.bossId().orElseThrow()),
+                () -> assertEquals("Crimson King", session.lastBossName()),
+                () -> assertEquals("MYTHICMOBS", session.lastBossType()));
+    }
+
+    @Test void naturalBossDeathIsIdempotentAndPreservesLastIdentity() {
+        BloodMoonSession session = session();
+        UUID boss = UUID.randomUUID();
+        session.bossSpawned(boss, "Crimson King", "MYTHICMOBS");
+
+        assertTrue(session.bossDefeated(boss));
+        assertFalse(session.bossDefeated(boss));
+        assertAll(() -> assertEquals(BossSessionState.DEFEATED, session.bossState()),
+                () -> assertTrue(session.bossId().isEmpty()),
+                () -> assertEquals("Crimson King", session.lastBossName()),
+                () -> assertEquals("MYTHICMOBS", session.lastBossType()));
+    }
+
+    @Test void newSessionResetsBossNarrative() {
+        UUID world = UUID.randomUUID();
+        BloodMoonSession first = new BloodMoonSession(world, "world", START);
+        UUID boss = UUID.randomUUID();
+        first.bossSpawned(boss, "Boss", "VANILLA");
+        first.bossDefeated(boss);
+
+        BloodMoonSession second = new BloodMoonSession(world, "world", START.plusSeconds(60));
+        assertAll(() -> assertEquals(BossSessionState.NOT_SPAWNED, second.bossState()),
+                () -> assertEquals("", second.lastBossName()),
+                () -> assertEquals("NONE", second.lastBossType()));
+    }
+
     private BloodMoonSession session() { return new BloodMoonSession(UUID.randomUUID(), "world", START); }
 }
