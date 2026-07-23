@@ -12,9 +12,23 @@ exes/
 
 # Logs
 *.log
+/logs/
 
 # Temporary files
 out/
+*.tmp
+
+# Local server and smoke-test runtimes
+/server/
+/smoke/
+/runtime/
+/plugins/
+/world/
+/world_nether/
+/world_the_end/
+/eula.txt
+/server.properties
+*.db
 
 # Windows
 Thumbs.db
