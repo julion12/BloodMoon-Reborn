@@ -86,6 +86,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     private List<IBoss> bosses;
     private final Set<UUID> rewardedBosses = new HashSet<>();
     private final Set<UUID> administrativelyRemovedBosses = new HashSet<>();
+    private final Set<UUID> historicallyDefeatedBosses = new HashSet<>();
     private final Map<UUID, UUID> bossDamagers = new HashMap<>();
     private BloodMoonSession session;
     private final Map<UUID, String> mythicBosses = new LinkedHashMap<>();
@@ -343,11 +344,9 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                     new String[]{reader.GetMythicMobInternalName(), world.getName()});
         }
         if (result.success()) {
-            if (session != null) {
-                boolean firstSpawn = session.bossSpawned(
-                        result.entityUuid(), result.displayName(), result.actualMode().name());
-                Bloodmoon.GetInstance().getStatisticsService().recordBossSpawned(firstSpawn);
-            }
+            boolean firstSpawn = session == null || session.bossSpawned(
+                    result.entityUuid(), result.displayName(), result.actualMode().name());
+            Bloodmoon.GetInstance().getStatisticsService().recordBossSpawned(firstSpawn);
             LocaleReader.MessageAllLocale("ZombieBossSpawned",
                     new String[]{"$b", "%boss_name%", "%boss_type%"},
                     new String[]{result.displayName(), result.displayName(), result.actualMode().name()}, world);
@@ -412,8 +411,10 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         boolean administrativeRemoval = administrativelyRemovedBosses.remove(entity.getUniqueId());
         String mythicBossName = mythicBosses.remove(entity.getUniqueId());
         if (mythicBossName == null) return;
-        if (session != null && !administrativeRemoval) {
-            boolean firstDefeat = session.bossDefeated(entity.getUniqueId());
+        if (!administrativeRemoval) {
+            boolean firstDefeat = session == null
+                    ? historicallyDefeatedBosses.add(entity.getUniqueId())
+                    : session.bossDefeated(entity.getUniqueId());
             Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
         } else if (session != null) {
             session.bossRemoved(entity.getUniqueId());
@@ -883,10 +884,10 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
                 boss.Kill(killer != null && isInProgress());
                 runBossRewardCommands(boss.GetName(), "VANILLA", boss.GetHost(), killer);
-                if (session != null) {
-                    boolean firstDefeat = session.bossDefeated(entity.getUniqueId());
-                    Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
-                }
+                boolean firstDefeat = session == null
+                        ? historicallyDefeatedBosses.add(entity.getUniqueId())
+                        : session.bossDefeated(entity.getUniqueId());
+                Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
                 untrackPlaceholderBoss(entity.getUniqueId());
                 bossIterator.remove();
                 return;

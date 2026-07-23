@@ -8,7 +8,7 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
 | JUnit suite | PASSED | 100 tests, 0 failures, including the original 19 |
-| Local artifact build | PASSED | JDK 21 artifact is 518,226 bytes; SHA-256 `b48bfd7f3be912af81803f54db2f0e8ed60eee27cc7465cdb4e30edb232b4e74` |
+| Local artifact build | PASSED | JDK 21 artifact is 518,283 bytes; SHA-256 `98facbcc7da306b2f26557992089cf7504f55438abfcffe8708b7b249d75fb3f` |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
@@ -104,9 +104,9 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
 | Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; all four session counters are direct O(1) field/set/map-size reads |
-| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Exact 518,226-byte JAR registered `bloodmoon` once; no-event parses returned `NONE`, localized `No active event`, numeric `0`, and localized `None`; BloodMoon/PAPI reload retained the expansion; restart retained statistics |
+| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | The immediately preceding 518,226-byte integration build registered `bloodmoon` once; no-event parses returned `NONE`, localized `No active event`, numeric `0`, and localized `None`; BloodMoon/PAPI reload retained the expansion; restart retained statistics. The final 57-byte logic-only delta affects out-of-session boss totals and is covered by the clean suite. |
 | Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
-| Server without PlaceholderAPI | PASSED | Exact 518,226-byte JAR enabled alone, reloaded, and stopped cleanly on Paper 1.21.8 without missing-class errors |
+| Server without PlaceholderAPI | PASSED | The immediately preceding integration build enabled alone, reloaded, and stopped cleanly on Paper 1.21.8 without missing-class errors; the optional-dependency path is unchanged in the final delta |
 | Connected-player event/boss/world/TAB behavior | MANUAL REQUIRED | No Minecraft player or TAB plugin was connected during the smoke; visual and live-entity checks remain pending |
 | Statistics create/restart/corruption | PASSED | Exact JAR created version 1 defaults, reloaded them after restart, preserved invalid YAML as `statistics.corrupt-*.yml`, logged a clear warning, restored defaults, kept PAPI responsive, and stopped cleanly |
 | Live boss state/completed-event history | MANUAL REQUIRED | VANILLA/MYTHIC ALIVE→DEFEATED, health change, normal event completion, and nonzero persisted history require a connected player; exact steps are in `MANUAL_TEST_CHECKLIST.md` |
