@@ -1,11 +1,26 @@
 package org.spectralmemories.bloodmoon.placeholder;
 
 import java.util.Locale;
+import java.util.Set;
 import org.spectralmemories.bloodmoon.session.BossSessionState;
 
 /** Pure, allocation-light resolver shared by the PAPI adapter and unit tests. */
 public final class BloodMoonPlaceholderResolver {
+    private static final Set<String> IDENTIFIERS = Set.of(
+            "active", "active_formatted", "world", "time_remaining_seconds", "time_remaining_formatted",
+            "boss_alive", "boss_name", "boss_type", "boss_health", "boss_max_health",
+            "boss_health_percent", "boss_health_formatted", "boss_state", "boss_state_formatted",
+            "participating", "participation_seconds", "participation_formatted",
+            "survivor_eligible", "survivor_status", "death_count", "unique_deaths",
+            "participants_current", "survivors_current", "total_events", "total_death_events",
+            "total_unique_deaths", "total_bosses_spawned", "total_bosses_defeated",
+            "last_event_world", "last_event_duration_seconds", "last_event_duration_formatted",
+            "last_event_death_count", "last_event_unique_deaths", "last_event_participants",
+            "last_event_survivors", "last_boss_name", "last_boss_type", "last_event_ended_at");
+
     private BloodMoonPlaceholderResolver() { }
+
+    public static Set<String> identifiers() { return IDENTIFIERS; }
 
     public static String resolve(PlaceholderContext context, String identifier) {
         if (context == null || identifier == null) return null;

@@ -7,7 +7,7 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 98 tests, 0 failures, including the original 19 |
+| JUnit suite | PASSED | 100 tests, 0 failures, including the original 19 |
 | Local artifact build | PENDING FINAL BUILD | Size and SHA-256 are recorded after the final clean build |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
