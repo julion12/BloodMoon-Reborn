@@ -17,6 +17,10 @@
 - Complete English and Spanish locale catalogs, English fallback, and non-destructive legacy locale migration.
 - Boss health placeholders and contextual `$b`, `%boss_name%`, and `%boss_type%` resolution.
 - Optional internal PlaceholderAPI expansion under `%bloodmoon_*%`, with localized event/boss/player fallbacks and constant-time runtime snapshots.
+- Real-time per-session death, unique-death, participant, and survivor counters isolated by world.
+- Narrative state for the most recently spawned session boss, including localized `boss_state` placeholders.
+- Versioned server-wide historical aggregates and last-completed-event data in atomically replaced `statistics.yml`.
+- Copy-ready TAB, lifecycle-command, survivor-reward, boss-reward, PlaceholderAPI, and MythicMobs examples under `docs/examples/`.
 
 ### Changed
 
@@ -36,5 +40,6 @@
 - Mythic arrival/death text incorrectly reusing the vanilla `ZombieBossName`.
 - Administrative boss spawning bypassing `Boss.Mode` and creating vanilla announcements/BossBars before a Mythic spawn.
 - `killbosses` leaving tracked Mythic boss entities and session state behind.
+- Placeholder consumers needing to infer whether a missing boss had not spawned or had already been defeated.
 
 No existing configuration key or vanilla boss default was removed or renamed.

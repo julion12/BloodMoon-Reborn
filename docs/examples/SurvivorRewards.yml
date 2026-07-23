@@ -1,0 +1,19 @@
+# Copy or merge this section into each BloodMoon world config.yml.
+# Disabled by default. Eligibility applies the options below to registered
+# participants. The `eco` example requires Vault and a compatible economy plugin.
+SurvivorRewards:
+  Enabled: false
+  RequireOnlineAtEnd: true
+  IncludeLateJoiners: true
+  MinimumParticipationSeconds: 300
+  DisqualifyOnDeath: true
+  DisqualifyOnWorldLeave: false
+  DisqualifyOnDisconnect: false
+  RewardOncePerSession: true
+  Messages:
+    - "&aSobreviviste en %world% durante %participation_seconds% segundos."
+  Commands:
+    - "give %player% minecraft:diamond 1;f"
+    - "experience add %player% 100 points;f"
+    # Optional economy reward:
+    # - "eco give %player% 500;f"

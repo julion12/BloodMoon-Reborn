@@ -38,6 +38,8 @@ CommandsOnEnd:
 
 Commands can invoke effects, sounds, economy, permissions, or other plugins. Those plugins remain optional; for example, `eco` works only when a compatible economy command is installed.
 
+Ready-to-merge examples: [`CommandsOnStart.yml`](examples/CommandsOnStart.yml) and [`CommandsOnEnd.yml`](examples/CommandsOnEnd.yml).
+
 ## Survivor rewards
 
 ```yaml
@@ -59,6 +61,8 @@ SurvivorRewards:
 ```
 
 These commands run from the console for each eligible player because they use `;f`. Players who die are disqualified when `DisqualifyOnDeath` is true. UUID tracking prevents reconnects, world changes, reloads, or name changes from duplicating a reward.
+
+Ready-to-merge example: [`SurvivorRewards.yml`](examples/SurvivorRewards.yml).
 
 ## Boss selection, vanilla bar, and rewards
 
@@ -102,8 +106,16 @@ Audience modes:
 
 Vanilla reward commands are additional to the boss's legacy item/experience drops. Rewards remain off until `Boss.Rewards.Enabled` is explicitly set to `true`.
 
+Ready-to-merge example: [`BossRewards.yml`](examples/BossRewards.yml).
+
 For MythicMobs, `InternalName` must exactly match the mob ID. The Mythic entity's resolved `Display` is used in arrival/death messages; `ZombieBossName` remains exclusive to the vanilla boss. `UseMythicMobsRewards` retains Mythic drops, while `RunBloodMoonRewardCommands` adds the commands above. Enabling both can intentionally duplicate value. `FallbackToVanilla` uses the old boss when MythicMobs or the configured mob is unavailable.
 
 ## PlaceholderAPI labels
 
-PlaceholderAPI support has no per-world enable switch: installing the optional plugin registers the internal `bloodmoon` expansion. The formatted values come from `PlaceholderActive`, `PlaceholderInactive`, `PlaceholderNone`, `PlaceholderEligible`, `PlaceholderDisqualified`, `PlaceholderNotParticipating`, and `PlaceholderNoBoss` in the selected locale. English fallback and customized legacy `locales.yml` overrides apply immediately after `/bloodmoon reload`. Boolean placeholders remain unlocalized `true`/`false`. See [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).
+PlaceholderAPI support has no per-world enable switch: installing the optional plugin registers the internal `bloodmoon` expansion. The formatted values come from `PlaceholderActive`, `PlaceholderInactive`, `PlaceholderNone`, `PlaceholderEligible`, `PlaceholderDisqualified`, `PlaceholderNotParticipating`, `PlaceholderNoBoss`, and the four `PlaceholderBossState*` keys in the selected locale. English fallback and customized legacy `locales.yml` overrides apply immediately after `/bloodmoon reload`. Boolean and technical state placeholders remain unlocalized. See [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).
+
+## Historical statistics
+
+`plugins/BloodMoon/statistics.yml` is a server-wide, versioned runtime data file; it is not part of any world's `config.yml`. It is loaded once during enable and written only on boss lifecycle changes, completed events, or pending disable flushes. Writes use `statistics.yml.tmp` followed by atomic replacement where the filesystem supports it. Invalid data is copied to `statistics.corrupt-<timestamp>.yml`, a warning is logged, and safe defaults are installed without preventing startup.
+
+Only aggregate counts and the last completed event are stored. No player UUID/name, IP, coordinate, inventory, or detailed death record is retained. `/bloodmoon reload` does not recreate this service and therefore neither loses nor duplicates the snapshot.

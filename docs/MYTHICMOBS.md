@@ -4,6 +4,8 @@ MythicMobs is optional (`softdepend`). The core plugin does not load Mythic clas
 
 Boss identity remains UUID-based. The visible name is display-only and resolves in this order: active entity display, configured Mythic `Display`, BloodMoon `InternalName`, then the localized `MythicBossFallbackName`. Legacy/MiniMessage formatting codes are removed from the inserted name so raw markup is never shown. `ZombieBossName` is never used for a successfully spawned Mythic boss.
 
+Every successful Mythic spawn changes the active session's narrative state to `ALIVE`. A natural Mythic death changes it to `DEFEATED`, retains the resolved display and `MYTHICMOBS` type with zero health, and increments the global defeated-boss total exactly once. A later successful spawn becomes the new narrative subject. Administrative `killbosses` closes the narrative but intentionally does not count as a historical victory.
+
 Live validation on 2026-07-19 confirmed that MythicMobs 5.12.1 and the BloodMoon bridge enable on Paper 1.21.8. The same MythicMobs build fails during its own NMS/server-version initialization on Paper 26.2 build 62, before BloodMoon can activate the bridge. BloodMoon core continues safely without it. Treat 26.2 + MythicMobs 5.12.1 as unsupported and test a future 26.2-compatible MythicMobs build before deployment.
 
 ```yaml
@@ -51,3 +53,5 @@ The compatible administrative command is `/bloodmoon spawnzombieboss`. Despite i
 If MythicMobs is absent, incompatible, or the name is unknown, a warning is logged. `FallbackToVanilla: true` uses the existing `ZombieIBoss`, its `ZombieBossName`, and its vanilla BossBar with one final announcement; otherwise no boss is spawned. `killbosses`, event-end, and disable cleanup remove every exact tracked Mythic UUID without running death rewards.
 
 The bridge-load test does not replace the player-driven spawn/death test. Before release, follow `docs/MANUAL_TEST_CHECKLIST.md` to verify the configured internal name, exact-entity tracking, Mythic-owned rewards, optional BloodMoon commands, and fallback behavior on the actual deployment build.
+
+The separate [`examples/BossRewards.yml`](examples/BossRewards.yml) shows the reward-authority switches, while [`examples/MythicMobs-BloodMoonBoss.yml`](examples/MythicMobs-BloodMoonBoss.yml) remains the copy-ready Mythic mob definition.

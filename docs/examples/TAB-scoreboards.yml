@@ -1,0 +1,103 @@
+# BloodMoon-Reborn 1.1.0 - TAB scoreboard integration example
+#
+# Required plugins: TAB, PlaceholderAPI, BloodMoon-Reborn.
+# BloodMoon-Reborn does NOT require TAB; this is an administrator-facing example only.
+#
+# Target: plugins/TAB/config.yml
+# Merge the entries below into TAB's existing `conditions` and
+# `scoreboard.scoreboards` maps. Do not create a second global `conditions:` or
+# `scoreboard:` section in an existing file.
+#
+# Priority is top-to-bottom. Players with permission
+# `bloodmoon.scoreboard.full` see the full design. Other players see the compact
+# design during an event. Remove the design you do not want if permissions are
+# not being used.
+#
+# Syntax checked against the official TAB scoreboard and conditional-placeholder
+# guides current on 2026-07-23:
+# https://github.com/NEZNAMY/TAB/wiki/Feature-guide%3A-Scoreboard
+# https://github.com/NEZNAMY/TAB/wiki/Feature-guide%3A-Conditional-placeholders
+
+conditions:
+  bloodmoon-boss-name:
+    conditions:
+      - "%bloodmoon_boss_state%=NOT_SPAWNED"
+    true: "&cBoss: &f%bloodmoon_boss_state_formatted%"
+    false: "&cBoss: &f%bloodmoon_boss_name%"
+  bloodmoon-boss-type:
+    conditions:
+      - "%bloodmoon_boss_state%=ALIVE"
+    true: "&cTipo: &f%bloodmoon_boss_type%"
+    false: ""
+  bloodmoon-boss-health:
+    conditions:
+      - "%bloodmoon_boss_state%=ALIVE"
+    true: "&cVida: &f%bloodmoon_boss_health_formatted%"
+    false: ""
+  bloodmoon-boss-defeated:
+    conditions:
+      - "%bloodmoon_boss_state%=DEFEATED"
+    true: "&cEstado: &f%bloodmoon_boss_state_formatted%"
+    false: ""
+
+scoreboard:
+  enabled: true
+  scoreboards:
+    # Complete Blood Moon scoreboard (highest priority).
+    blood-moon-full:
+      display-condition: "%bloodmoon_active%=true;permission:bloodmoon.scoreboard.full"
+      title: "&4&lLUNA DE SANGRE"
+      lines:
+        - "&7Jugador: &f%player%"
+        - "&7Mundo: &f%bloodmoon_world%"
+        - "&7Tiempo: &f%bloodmoon_time_remaining_formatted%"
+        - "&7Estado: &f%bloodmoon_active_formatted%"
+        - "&7Participación: &f%bloodmoon_survivor_status%"
+        - ""
+        - "&7Participantes: &f%bloodmoon_participants_current%"
+        - "&7Caídos: &f%bloodmoon_unique_deaths%"
+        - "&7Muertes: &f%bloodmoon_death_count%"
+        - "&7Supervivientes: &f%bloodmoon_survivors_current%"
+        - ""
+        - "%condition:bloodmoon-boss-name%"
+        - "%condition:bloodmoon-boss-type%"
+        - "%condition:bloodmoon-boss-health%"
+        - "%condition:bloodmoon-boss-defeated%"
+
+    # Compact Blood Moon fallback. Choose this or the full variant for players
+    # with equivalent priority; do not give both the same condition.
+    blood-moon-compact:
+      display-condition: "%bloodmoon_active%=true"
+      title: "&4&lLUNA DE SANGRE"
+      lines:
+        - "&7Tiempo: &f%bloodmoon_time_remaining_formatted%"
+        - "&7Caídos: &f%bloodmoon_unique_deaths%"
+        - "&7Vivos: &f%bloodmoon_survivors_current%"
+        - "%condition:bloodmoon-boss-name%"
+        - "%condition:bloodmoon-boss-health%"
+        - "%condition:bloodmoon-boss-defeated%"
+
+    # Optional lobby/history design. Change `lobby` to the real lobby world.
+    blood-moon-history:
+      display-condition: "%world%=lobby"
+      title: "&4&lÚLTIMA LUNA"
+      lines:
+        - "&7Mundo: &f%bloodmoon_last_event_world%"
+        - "&7Duración: &f%bloodmoon_last_event_duration_formatted%"
+        - "&7Participantes: &f%bloodmoon_last_event_participants%"
+        - "&7Caídos: &f%bloodmoon_last_event_unique_deaths%"
+        - "&7Supervivientes: &f%bloodmoon_last_event_survivors%"
+        - "&7Boss: &f%bloodmoon_last_boss_name%"
+        - ""
+        - "&7Eventos: &f%bloodmoon_total_events%"
+        - "&7Bosses derrotados: &f%bloodmoon_total_bosses_defeated%"
+
+    # Normal fallback must remain after the Blood Moon designs.
+    normal:
+      title: "&6&lMI SERVIDOR"
+      lines:
+        - "&7Jugador: &f%player%"
+        - "&7Mundo: &f%world%"
+        - "&7Online: &f%online%"
+        - ""
+        - "&aSin Luna de Sangre"

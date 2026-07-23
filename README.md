@@ -17,12 +17,16 @@ Modernization and maintenance: **JulioN12**
 - Configurable vanilla-only BossBar with nearby/world/all audiences and health placeholders.
 - Complete English and Spanish catalogs with English fallback and legacy `locales.yml` overrides.
 - Optional internal PlaceholderAPI expansion for event, boss, time, participation, survivor state, and O(1) per-world session statistics.
+- Narrative per-session boss state (`NOT_SPAWNED`, `ALIVE`, `DEFEATED`) with localized public output.
+- Atomic server-wide historical statistics in `statistics.yml`, without personal player history.
 - Timestamped, idempotent per-world configuration migration from 1.0.1.
 - Crash markers discard incomplete sessions without granting uncertain rewards.
 
 All new rewards default to disabled. PlaceholderAPI, MythicMobs, WorldGuard, and Multiverse-Core are soft dependencies. TAB is not a dependency.
 
 Active Blood Moon sessions expose total deaths, unique dead-player UUIDs, registered participants, and current survivors through `%bloodmoon_death_count%`, `%bloodmoon_unique_deaths%`, `%bloodmoon_participants_current%`, and `%bloodmoon_survivors_current%`. These counters are isolated per world, reset with each event, and are not persisted as history.
+
+Completed events contribute aggregate server history and a last-event snapshot. Boss state and history are available through the same optional `%bloodmoon_*%` expansion without disk access on placeholder requests.
 
 ## Installation and update
 
@@ -58,6 +62,7 @@ Console commands require a world argument except `reload`. Tab completion is inc
 - [MythicMobs](docs/MYTHICMOBS.md)
 - [Placeholders](docs/PLACEHOLDERS.md)
 - [PlaceholderAPI and TAB](docs/PLACEHOLDERAPI.md)
+- [Ready-to-copy examples](docs/EXAMPLES.md)
 - [Migration](docs/MIGRATION.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Test matrix](docs/TEST_MATRIX.md)

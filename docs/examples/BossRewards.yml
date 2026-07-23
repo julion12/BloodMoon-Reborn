@@ -1,0 +1,22 @@
+# Copy or merge this section into each BloodMoon world config.yml.
+# Mode may be VANILLA or MYTHICMOBS. Reward Mode KILLER targets the verified
+# player killer. Keep rewards disabled until every command has been reviewed.
+Boss:
+  Mode: VANILLA
+  Rewards:
+    Enabled: false
+    Mode: KILLER
+    RequirePlayerKiller: true
+    RewardOnce: true
+    Commands:
+      - "give %boss_killer% minecraft:diamond 3;s"
+      - "experience add %boss_killer% 250 points;s"
+      - "say %boss_killer% derrotó a %boss_name% (%boss_type%);s"
+  MythicMobs:
+    Enabled: false
+    InternalName: BloodMoonBoss
+    UseMythicMobsRewards: true
+    RunBloodMoonRewardCommands: false
+    FallbackToVanilla: true
+    # Enabling both MythicMobs drops/rewards and BloodMoon reward commands can
+    # intentionally duplicate rewards. Keep only the desired reward authority.

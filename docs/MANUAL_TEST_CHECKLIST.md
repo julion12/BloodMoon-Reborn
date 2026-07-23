@@ -62,14 +62,30 @@ Use Paper/Purpur 1.21.8, PlaceholderAPI, and a real connected player. TAB is opt
 
 1. Without PlaceholderAPI installed, start BloodMoon-Reborn, run reload/status, and stop; confirm no missing-class error or unnecessary warning.
 2. Install PlaceholderAPI, restart, and run `/papi list`; confirm the internal `bloodmoon` expansion appears once.
-3. Outside an event, parse every command listed in `docs/PLACEHOLDERAPI.md`; confirm inactive, `00:00`, no-boss, and not-participating fallbacks.
+3. Outside an event, run every command in `docs/examples/PlaceholderAPI-examples.txt`; confirm `boss_state=NONE`, numeric zeroes, localized no-history/no-boss values, and `00:00`.
 4. Start a Blood Moon in the player's world and repeat; move a second player to another world and confirm active/time/session values remain world-contextual.
-5. Spawn a vanilla boss, parse its name/type/health, damage it, parse again, kill it, and confirm the no-boss fallbacks.
-6. Repeat with a configured MythicMob; confirm its resolved display and Bukkit health, `MYTHICMOBS`, and no BloodMoon vanilla BossBar.
-7. Confirm participation seconds increase, survivor eligibility follows the configured rules, and a disqualified player receives the localized status.
-8. Run `/bloodmoon reload`; confirm values reflect locale/config changes and `/papi list` still contains one `bloodmoon` expansion.
-9. Run `/papi reload`; confirm `%bloodmoon_active%` still resolves because the expansion persists.
-10. Install the documented TAB example, confirm the Blood Moon scoreboard has priority while active, and confirm the normal scoreboard returns afterward.
+5. Before spawning, confirm `boss_state=NOT_SPAWNED`, `boss_alive=false`, type `NONE`, and zero health.
+6. Spawn a vanilla boss, confirm `ALIVE`, parse its name/type/health, damage it, parse again, kill it, and confirm `DEFEATED`, retained name/type, and zero health.
+7. Repeat with a configured MythicMob; confirm `ALIVE`, its resolved display and Bukkit health, `MYTHICMOBS`, and no BloodMoon vanilla BossBar; after death confirm `DEFEATED`.
+8. Confirm participation seconds and all four live session counters update immediately and remain isolated in a second world.
+9. End normally; confirm all last-event fields and totals update once. Restart and confirm the values persist.
+10. Run `/bloodmoon reload` during another active session; confirm state/counters remain unchanged and the completed-event total does not increment.
+11. Run `/papi reload`; confirm `%bloodmoon_active%` still resolves because the expansion persists.
+12. Corrupt a disposable copy of `statistics.yml`, restart, and confirm one `statistics.corrupt-*.yml` copy, a clear warning, safe defaults, and successful enable.
+13. Remove PlaceholderAPI and restart; confirm BloodMoon lifecycle, boss state tracking, statistics writes, reload, and shutdown still work.
+
+## 7. TAB visual validation
+
+Use the exact [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml), merged into an existing TAB configuration without duplicate global sections.
+
+1. Run `/tab reload` and confirm no parse/condition warnings.
+2. Outside an event, confirm the normal design; in the configured lobby, confirm the optional historical design when it has priority.
+3. Start an event and confirm the Blood Moon design precedes normal.
+4. With no boss, confirm only “Aún no ha aparecido” appears—never type `NONE` or health `0%`.
+5. Spawn a boss and confirm name, type, and live health appear.
+6. Defeat it and confirm retained name plus localized “Derrotado”, with no `0%` health line.
+7. Grant/remove `bloodmoon.scoreboard.full` and confirm the full/compact selection behaves as documented.
+8. Verify all designs stay within 15 visible lines and inspect flicker/line transitions with a real client.
 
 ## Sign-off
 
