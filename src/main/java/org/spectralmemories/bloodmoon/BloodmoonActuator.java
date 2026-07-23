@@ -85,6 +85,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     private List<LivingEntity> blacklistedMobs;
     private List<IBoss> bosses;
     private final Set<UUID> rewardedBosses = new HashSet<>();
+    private final Set<UUID> administrativelyRemovedBosses = new HashSet<>();
     private final Map<UUID, UUID> bossDamagers = new HashMap<>();
     private BloodMoonSession session;
     private final Map<UUID, String> mythicBosses = new LinkedHashMap<>();
@@ -217,6 +218,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
         bosses.clear();
         for (UUID mythicBossId : new ArrayList<>(mythicBosses.keySet())) {
+            administrativelyRemovedBosses.add(mythicBossId);
             Bloodmoon.GetInstance().getMythicMobs().remove(mythicBossId);
         }
         mythicBosses.clear();
@@ -407,11 +409,14 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     private void HandleMythicBossDeath(LivingEntity entity, Player killer)
     {
+        boolean administrativeRemoval = administrativelyRemovedBosses.remove(entity.getUniqueId());
         String mythicBossName = mythicBosses.remove(entity.getUniqueId());
         if (mythicBossName == null) return;
-        if (session != null) {
+        if (session != null && !administrativeRemoval) {
             boolean firstDefeat = session.bossDefeated(entity.getUniqueId());
             Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
+        } else if (session != null) {
+            session.bossRemoved(entity.getUniqueId());
         }
         untrackPlaceholderBoss(entity.getUniqueId());
         ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
