@@ -1,17 +1,17 @@
 # Test matrix
 
-Validation date: 2026-07-19. `PASSED` means the check was executed in an isolated server in this workspace. `MANUAL REQUIRED` means the check needs a real connected player or an administrative legacy configuration that was not available. Server downloads came from the official Paper, Purpur, Adoptium, and Lumine endpoints.
+Validation date: 2026-07-23. `PASSED` means the automated check was executed in this workspace or, for the server rows, in the previously documented isolated server. `MANUAL REQUIRED` means the check needs a real connected player or an administrative legacy configuration that was not available. Server downloads came from the official Paper, Purpur, Adoptium, and Lumine endpoints.
 
 ## Automated regression
 
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 70 tests, 0 failures, including the original 19 |
-| Release artifact task | PASSED | Final JDK 21 artifact is 500,323 bytes; SHA-256 `0a06a4030d4acdbf6da1f3ade1983e17a017b7f1775bae1a1f85906e2b49d1c1` |
+| JUnit suite | PASSED | 83 tests, 0 failures, including the original 19 |
+| Local artifact build | PASSED | JDK 21 artifact is 502,158 bytes; SHA-256 `d8ea303c766d1c1ad11d219b25c1f71d902dec76e0a37896e326419ba358d678` |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
-| Survival, death, reconnect, late join, minimum time, once-only reward, and two-world isolation | PASSED | Unit tests |
+| Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
 | Vanilla boss killer, no-killer, and duplicate death handling | PASSED | Unit tests |
 | MythicMobs absent, fallback, and default reward policy | PASSED | Unit tests |
 | Contextual vanilla/Mythic boss names and `$b`/modern placeholders | PASSED | Unit tests cover display order, InternalName fallback, nulls, legacy and modern tokens |
@@ -95,11 +95,12 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Resolver identifiers and fallbacks | PASSED | Unit tests cover all 17 public identifiers, unknown identifiers, null player, localized fallbacks, boolean stability, time formatting, and safe absent state |
-| World/event/player context | PASSED | Unit tests cover active/inactive world snapshots, participation, eligibility, disqualification, and non-participation |
+| Resolver identifiers and fallbacks | PASSED | Unit tests cover all 21 public identifiers, unknown identifiers, null/offline player, localized fallbacks, boolean stability, time formatting, and safe absent state |
+| World/event/player context | PASSED | Unit tests cover active/inactive world snapshots, participation, eligibility, disqualification, non-participation, late-join policy, and reload ownership |
+| Real-time session statistics | PASSED | First/repeated/second-player deaths, unique UUIDs, unregistered-player death, reset, world isolation, participant count, survivor updates, non-negative clamp, inactive zeros, and all four public placeholders |
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
-| Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; runtime uses tracked UUID/entity/session references |
+| Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; all four session counters are direct O(1) field/set/map-size reads |
 | Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Exact final JAR registered `bloodmoon` once; `/papi list` and `info` succeeded; null-player parses returned safe localized values; BloodMoon reload and PAPI reload retained one expansion; clean shutdown |
 | Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
 | Server without PlaceholderAPI | PASSED | Exact final JAR enabled, reloaded, and stopped on Paper 1.21.8 without missing-class errors or PlaceholderAPI warnings |

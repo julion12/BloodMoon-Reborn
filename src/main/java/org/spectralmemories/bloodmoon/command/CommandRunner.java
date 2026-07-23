@@ -78,7 +78,7 @@ public final class CommandRunner {
             values.put("start_time", session.startedAt());
             values.put("end_time", session.endedAt().map(Instant::toString).orElse(""));
             values.put("duration_seconds", session.durationSeconds());
-            values.put("participant_count", session.participants().size());
+            values.put("participant_count", session.currentParticipants());
             values.put("death_count", session.deathCount());
             if (player != null) session.participant(player.getUniqueId()).ifPresent(participant -> {
                 long seconds = participant.participationSeconds(session.endedAt().orElse(Instant.now()));

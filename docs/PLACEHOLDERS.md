@@ -19,4 +19,6 @@ Boss-name rules:
 
 Legacy `$w`, `$p`, and `$b` remain supported. `$b` is available in boss locale messages and boss reward commands. `%boss_health%`, `%boss_max_health%`, and `%boss_health_percent%` are available in the vanilla BossBar and boss command context.
 
-These internal tokens are not global PlaceholderAPI identifiers and remain intentionally unchanged. Optional public integration uses the collision-safe `%bloodmoon_*%` namespace documented in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md); for example, the public boss name is `%bloodmoon_boss_name%`, not `%boss_name%`.
+For active-session command rendering, `%participant_count%` is the registered participant count and `%death_count%` is the total number of death events, including repeated deaths by the same UUID. The public expansion additionally exposes unique deaths and the live survivor count; these are active-session values, not historical persistence.
+
+These internal tokens are not global PlaceholderAPI identifiers and remain intentionally unchanged. Optional public integration uses the collision-safe `%bloodmoon_*%` namespace documented in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md); for example, the public boss name is `%bloodmoon_boss_name%`, not `%boss_name%`. Its real-time session counters are `%bloodmoon_death_count%`, `%bloodmoon_unique_deaths%`, `%bloodmoon_participants_current%`, and `%bloodmoon_survivors_current%`.

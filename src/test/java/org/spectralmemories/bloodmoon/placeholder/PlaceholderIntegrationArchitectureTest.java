@@ -33,6 +33,7 @@ class PlaceholderIntegrationArchitectureTest {
         String requestPath = service + resolver;
         assertAll(() -> assertFalse(requestPath.contains("java.nio.file")),
                 () -> assertFalse(requestPath.contains("Yaml")),
+                () -> assertFalse(requestPath.contains(".participants()")),
                 () -> assertFalse(requestPath.contains("getLivingEntities")),
                 () -> assertFalse(requestPath.contains("getScheduler")),
                 () -> assertFalse(requestPath.contains("dispatchCommand")));

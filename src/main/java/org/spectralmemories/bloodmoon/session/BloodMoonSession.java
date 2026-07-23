@@ -3,9 +3,11 @@ package org.spectralmemories.bloodmoon.session;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /** Lightweight, world-scoped state for one Blood Moon. */
@@ -17,6 +19,11 @@ public final class BloodMoonSession {
     private Instant endedAt;
     private UUID bossId;
     private final Map<UUID, Participant> participants = new LinkedHashMap<>();
+    private final Set<UUID> uniqueDeadPlayers = new HashSet<>();
+    private volatile long totalDeathEvents;
+    private volatile int uniqueDeathCount;
+    private volatile int currentParticipants;
+    private volatile int currentSurvivors;
 
     public BloodMoonSession(UUID worldId, String worldName, Instant startedAt) {
         this(UUID.randomUUID(), worldId, worldName, startedAt);
@@ -30,7 +37,13 @@ public final class BloodMoonSession {
     }
 
     public Participant join(UUID playerId, Instant when) {
-        Participant participant = participants.computeIfAbsent(playerId, id -> new Participant(id, when));
+        Participant participant = participants.get(playerId);
+        if (participant == null) {
+            participant = new Participant(playerId, when);
+            participants.put(playerId, participant);
+            currentParticipants++;
+            currentSurvivors++;
+        }
         participant.presentSince = when;
         participant.connected = true;
         participant.inWorld = true;
@@ -42,7 +55,7 @@ public final class BloodMoonSession {
         if (participant == null) return;
         participant.addPresenceUntil(when);
         participant.inWorld = false;
-        if (disqualify) participant.disqualified = true;
+        if (disqualify) disqualify(participant);
     }
 
     public void disconnect(UUID playerId, Instant when, boolean disqualify) {
@@ -50,15 +63,27 @@ public final class BloodMoonSession {
         if (participant == null) return;
         participant.addPresenceUntil(when);
         participant.connected = false;
-        if (disqualify) participant.disqualified = true;
+        if (disqualify) disqualify(participant);
     }
 
     public void die(UUID playerId, boolean disqualify) {
+        totalDeathEvents++;
+        if (uniqueDeadPlayers.add(playerId)) uniqueDeathCount++;
         Participant participant = participants.get(playerId);
         if (participant != null) {
+            if (!participant.died && !participant.disqualified) decrementSurvivors();
             participant.died = true;
             if (disqualify) participant.disqualified = true;
         }
+    }
+
+    private void disqualify(Participant participant) {
+        if (!participant.disqualified && !participant.died) decrementSurvivors();
+        participant.disqualified = true;
+    }
+
+    private void decrementSurvivors() {
+        currentSurvivors = Math.max(0, currentSurvivors - 1);
     }
 
     public void end(Instant when) {
@@ -91,10 +116,14 @@ public final class BloodMoonSession {
     public void bossId(UUID bossId) { this.bossId = bossId; }
     public Collection<Participant> participants() { return Collections.unmodifiableCollection(participants.values()); }
     public Optional<Participant> participant(UUID playerId) { return Optional.ofNullable(participants.get(playerId)); }
+    public long totalDeathEvents() { return totalDeathEvents; }
+    public int uniqueDeadPlayers() { return uniqueDeathCount; }
+    public int currentParticipants() { return currentParticipants; }
+    public int currentSurvivors() { return currentSurvivors; }
     public long durationSeconds() {
         return Math.max(0, (endedAt == null ? Instant.now() : endedAt).getEpochSecond() - startedAt.getEpochSecond());
     }
-    public long deathCount() { return participants.values().stream().filter(Participant::died).count(); }
+    public long deathCount() { return totalDeathEvents; }
 
     public static final class Participant {
         private final UUID playerId;

@@ -10,6 +10,8 @@ public final class BloodMoonPlaceholderResolver {
         if (context == null || identifier == null) return null;
         BossPlaceholderState boss = context.boss() == null ? BossPlaceholderState.none() : context.boss();
         PlayerPlaceholderState player = context.player() == null ? PlayerPlaceholderState.none() : context.player();
+        SessionPlaceholderState session = context.session() == null
+                ? SessionPlaceholderState.none() : context.session();
         PlaceholderLabels labels = context.labels();
         if (labels == null) return null;
         return switch (identifier.toLowerCase(Locale.ROOT)) {
@@ -30,6 +32,10 @@ public final class BloodMoonPlaceholderResolver {
             case "participation_formatted" -> formatDuration(player.participationSeconds());
             case "survivor_eligible" -> Boolean.toString(player.eligible());
             case "survivor_status" -> survivorStatus(player, labels);
+            case "death_count" -> Long.toString(Math.max(0, session.deathCount()));
+            case "unique_deaths" -> Integer.toString(Math.max(0, session.uniqueDeaths()));
+            case "participants_current" -> Integer.toString(Math.max(0, session.currentParticipants()));
+            case "survivors_current" -> Integer.toString(Math.max(0, session.currentSurvivors()));
             default -> null;
         };
     }

@@ -28,12 +28,15 @@ public final class PlaceholderStateService {
                 config.GetPermanentBloodMoonConfig(), world.getTime());
         BossPlaceholderState boss = actuator == null
                 ? BossPlaceholderState.none() : actuator.GetBossPlaceholderState();
-        PlayerPlaceholderState participant = playerState(player, world, config);
-        return new PlaceholderContext(active, world.getName(), remaining, boss, participant, labels);
+        Optional<BloodMoonSession> current = plugin.getSessionCoordinator().current(world);
+        PlayerPlaceholderState participant = playerState(player, world, config, current);
+        SessionPlaceholderState session = active && current.isPresent()
+                ? sessionState(current.get()) : SessionPlaceholderState.none();
+        return new PlaceholderContext(active, world.getName(), remaining, boss, participant, session, labels);
     }
 
-    private PlayerPlaceholderState playerState(Player player, World world, ConfigReader config) {
-        Optional<BloodMoonSession> current = plugin.getSessionCoordinator().current(world);
+    private PlayerPlaceholderState playerState(Player player, World world, ConfigReader config,
+                                               Optional<BloodMoonSession> current) {
         if (current.isEmpty()) return PlayerPlaceholderState.none();
         BloodMoonSession session = current.get();
         Optional<BloodMoonSession.Participant> found = session.participant(player.getUniqueId());
@@ -46,6 +49,11 @@ public final class PlaceholderStateService {
                 spectator, npc);
         return new PlayerPlaceholderState(true, participant.participationSeconds(Instant.now()),
                 eligible, participant.disqualified());
+    }
+
+    private SessionPlaceholderState sessionState(BloodMoonSession session) {
+        return new SessionPlaceholderState(session.totalDeathEvents(), session.uniqueDeadPlayers(),
+                session.currentParticipants(), session.currentSurvivors());
     }
 
     private PlaceholderLabels labels() {

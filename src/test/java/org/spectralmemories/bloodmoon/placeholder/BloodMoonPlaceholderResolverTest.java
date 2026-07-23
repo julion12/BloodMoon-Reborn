@@ -80,26 +80,49 @@ class BloodMoonPlaceholderResolverTest {
         assertNull(resolve(active(), "does_not_exist"));
     }
 
+    @Test void activeSessionCountersResolveInConstantTime() {
+        PlaceholderContext context = withSession(new SessionPlaceholderState(7, 4, 12, 8));
+        assertAll(() -> assertEquals("7", resolve(context, "death_count")),
+                () -> assertEquals("4", resolve(context, "unique_deaths")),
+                () -> assertEquals("12", resolve(context, "participants_current")),
+                () -> assertEquals("8", resolve(context, "survivors_current")));
+    }
+
+    @Test void inactiveSessionCountersAreZero() {
+        assertAll(() -> assertEquals("0", resolve(inactive(), "death_count")),
+                () -> assertEquals("0", resolve(inactive(), "unique_deaths")),
+                () -> assertEquals("0", resolve(inactive(), "participants_current")),
+                () -> assertEquals("0", resolve(inactive(), "survivors_current")));
+    }
+
     @Test void everyDocumentedIdentifierResponds() {
         List<String> identifiers = List.of("active", "active_formatted", "world", "time_remaining_seconds",
                 "time_remaining_formatted", "boss_alive", "boss_name", "boss_type", "boss_health",
                 "boss_max_health", "boss_health_percent", "boss_health_formatted", "participating",
-                "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status");
+                "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status",
+                "death_count", "unique_deaths", "participants_current", "survivors_current");
         identifiers.forEach(identifier -> assertNotNull(resolve(active(), identifier), identifier));
     }
 
     private static PlaceholderContext active() {
         return new PlaceholderContext(true, "world", 90,
                 new BossPlaceholderState(true, "Boss", "VANILLA", 50, 100),
-                new PlayerPlaceholderState(true, 30, true, false), EN);
+                new PlayerPlaceholderState(true, 30, true, false),
+                new SessionPlaceholderState(2, 1, 5, 4), EN);
     }
 
     private static PlaceholderContext inactive() { return PlaceholderContext.inactive(EN); }
     private static PlaceholderContext withBoss(BossPlaceholderState boss) {
-        return new PlaceholderContext(true, "world", 90, boss, PlayerPlaceholderState.none(), EN);
+        return new PlaceholderContext(true, "world", 90, boss, PlayerPlaceholderState.none(),
+                SessionPlaceholderState.none(), EN);
     }
     private static PlaceholderContext withPlayer(PlayerPlaceholderState player) {
-        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(), player, EN);
+        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(), player,
+                SessionPlaceholderState.none(), EN);
+    }
+    private static PlaceholderContext withSession(SessionPlaceholderState session) {
+        return new PlaceholderContext(true, "world", 90, BossPlaceholderState.none(),
+                PlayerPlaceholderState.none(), session, EN);
     }
     private static String resolve(PlaceholderContext context, String identifier) {
         return BloodMoonPlaceholderResolver.resolve(context, identifier);

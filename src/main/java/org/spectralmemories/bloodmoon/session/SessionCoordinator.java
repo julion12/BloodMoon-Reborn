@@ -90,9 +90,14 @@ public final class SessionCoordinator {
         BloodMoonSession session = active.get(world.getUID());
         if (session == null) return;
         ConfigReader config = plugin.getConfigReader(world);
-        if (!config.GetSurvivorIncludeLateJoiners() && session.participant(player.getUniqueId()).isEmpty()) return;
+        if (!allowsRegistration(config.GetSurvivorIncludeLateJoiners(),
+                session.participant(player.getUniqueId()).isPresent())) return;
         session.join(player.getUniqueId(), Instant.now());
         store.save(active.values());
+    }
+
+    static boolean allowsRegistration(boolean includeLateJoiners, boolean alreadyRegistered) {
+        return includeLateJoiners || alreadyRegistered;
     }
 
     public void leave(World world, Player player) {

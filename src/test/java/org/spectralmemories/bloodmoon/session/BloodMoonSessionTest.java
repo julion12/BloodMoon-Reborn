@@ -63,5 +63,87 @@ class BloodMoonSessionTest {
         assertFalse(session.isEligible(player, 0, false, false, false, false, false));
     }
 
+    @Test void firstAndRepeatedDeathsTrackEventsAndUniquePlayersSeparately() {
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        BloodMoonSession session = session();
+        session.join(first, START);
+        session.join(second, START);
+
+        session.die(first, true);
+        assertAll(() -> assertEquals(1, session.totalDeathEvents()),
+                () -> assertEquals(1, session.uniqueDeadPlayers()),
+                () -> assertEquals(1, session.currentSurvivors()));
+
+        session.die(first, true);
+        assertAll(() -> assertEquals(2, session.totalDeathEvents()),
+                () -> assertEquals(1, session.uniqueDeadPlayers()),
+                () -> assertEquals(1, session.currentSurvivors()));
+
+        session.die(second, false);
+        assertAll(() -> assertEquals(3, session.totalDeathEvents()),
+                () -> assertEquals(2, session.uniqueDeadPlayers()),
+                () -> assertEquals(0, session.currentSurvivors()));
+    }
+
+    @Test void deathsOfUnregisteredPlayersStillCountDuringTheSession() {
+        BloodMoonSession session = session();
+        session.die(UUID.randomUUID(), true);
+        assertAll(() -> assertEquals(1, session.totalDeathEvents()),
+                () -> assertEquals(1, session.uniqueDeadPlayers()),
+                () -> assertEquals(0, session.currentParticipants()),
+                () -> assertEquals(0, session.currentSurvivors()));
+    }
+
+    @Test void worldSessionsKeepIndependentStatistics() {
+        UUID player = UUID.randomUUID();
+        BloodMoonSession first = session();
+        BloodMoonSession second = new BloodMoonSession(UUID.randomUUID(), "other", START);
+        first.join(player, START);
+        second.join(player, START);
+        first.die(player, true);
+
+        assertAll(() -> assertEquals(1, first.totalDeathEvents()),
+                () -> assertEquals(0, second.totalDeathEvents()),
+                () -> assertEquals(0, first.currentSurvivors()),
+                () -> assertEquals(1, second.currentSurvivors()));
+    }
+
+    @Test void aNewSessionStartsEveryCounterAtZero() {
+        UUID world = UUID.randomUUID();
+        BloodMoonSession old = new BloodMoonSession(world, "world", START);
+        old.join(UUID.randomUUID(), START);
+        old.die(UUID.randomUUID(), true);
+        BloodMoonSession fresh = new BloodMoonSession(world, "world", START.plusSeconds(100));
+
+        assertAll(() -> assertEquals(0, fresh.totalDeathEvents()),
+                () -> assertEquals(0, fresh.uniqueDeadPlayers()),
+                () -> assertEquals(0, fresh.currentParticipants()),
+                () -> assertEquals(0, fresh.currentSurvivors()));
+    }
+
+    @Test void survivorCountHonorsDisqualificationOptionsAndNeverBecomesNegative() {
+        UUID death = UUID.randomUUID();
+        UUID leave = UUID.randomUUID();
+        UUID disconnect = UUID.randomUUID();
+        UUID staysEligible = UUID.randomUUID();
+        BloodMoonSession session = session();
+        session.join(death, START);
+        session.join(leave, START);
+        session.join(disconnect, START);
+        session.join(staysEligible, START);
+
+        session.die(death, false);
+        session.die(death, false);
+        session.leaveWorld(leave, START.plusSeconds(1), true);
+        session.disconnect(disconnect, START.plusSeconds(1), true);
+        session.disconnect(staysEligible, START.plusSeconds(1), false);
+        assertEquals(1, session.currentSurvivors());
+
+        session.die(staysEligible, true);
+        session.die(staysEligible, true);
+        assertEquals(0, session.currentSurvivors());
+    }
+
     private BloodMoonSession session() { return new BloodMoonSession(UUID.randomUUID(), "world", START); }
 }

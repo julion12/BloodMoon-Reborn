@@ -2,7 +2,7 @@
 
 BloodMoon-Reborn contains an internal PlaceholderAPI expansion with identifier `bloodmoon`. PlaceholderAPI is optional; no eCloud expansion is required. If PlaceholderAPI is absent, BloodMoon-Reborn follows the same startup and runtime paths without warnings. TAB, DeluxeMenus, hologram plugins, and other consumers are not BloodMoon-Reborn dependencies.
 
-The expansion registers once during `onEnable`, returns `persist() = true` so `/papi reload` retains it, and is not re-registered by `/bloodmoon reload`. Values are read from the current world session, the tracked boss UUID/entity, and the existing participant record. Requests do not read files, parse YAML, scan world entities, schedule work, or modify state.
+The expansion registers once during `onEnable`, returns `persist() = true` so `/papi reload` retains it, and is not re-registered by `/bloodmoon reload`. Values are read from the current world session, its constant-time counters, the tracked boss UUID/entity, and the existing participant record. Requests do not read files, parse YAML, iterate participants, scan world entities, schedule work, or modify state.
 
 ## Public placeholders
 
@@ -27,10 +27,14 @@ Examples assume an active event in `world`, a vanilla boss named `The Tough One`
 | `%bloodmoon_participation_formatted%` | Time | `02:05` | `00:00` | Player/session | Up to 20/s |
 | `%bloodmoon_survivor_eligible%` | Boolean | `true` | `false` | Player/session/policy | Up to 20/s |
 | `%bloodmoon_survivor_status%` | Localized text | `Eligible` | `Not participating` | Player/session/policy | Up to 20/s |
+| `%bloodmoon_death_count%` | Integer | `7` | `0` | Active session in player world | Up to 20/s |
+| `%bloodmoon_unique_deaths%` | Integer | `4` | `0` | Active session in player world | Up to 20/s |
+| `%bloodmoon_participants_current%` | Integer | `12` | `0` | Active session in player world | Up to 20/s |
+| `%bloodmoon_survivors_current%` | Integer | `8` | `0` | Active session in player world | Up to 20/s |
 
 Boolean placeholders deliberately return lowercase `true` or `false` for conditions. Time uses `MM:SS`, switching to `HH:MM:SS` beyond one hour, and never becomes negative. Health percentage is rounded and clamped to 0–100. Vanilla health includes its real absorption health; Mythic health comes from the tracked Bukkit entity and its current maximum-health attribute, never from either BossBar.
 
-Per-player death and kill counters are not exposed: 1.1.0 records whether a participant died, but does not maintain those two counters. The integration does not add write-heavy counters merely to manufacture placeholders.
+Session counters start at zero for every new Blood Moon and exist only in memory while that world's session is active. `death_count` counts every player death event during the Blood Moon; a repeated death increments it again. `unique_deaths` counts distinct player UUIDs. `participants_current` counts registered participants, including initial players and permitted late joiners. `survivors_current` counts registered participants that have neither died nor been disqualified and is clamped at zero. Deaths by players excluded through `IncludeLateJoiners: false` still count as event deaths, but do not add a participant or remove a survivor. Disconnects and world exits update survivor state only when their existing disqualification option is enabled.
 
 ## Validation commands
 
@@ -45,6 +49,10 @@ Per-player death and kill counters are not exposed: 1.1.0 records whether a part
 /papi parse me %bloodmoon_boss_type%
 /papi parse me %bloodmoon_boss_health_formatted%
 /papi parse me %bloodmoon_survivor_status%
+/papi parse me %bloodmoon_death_count%
+/papi parse me %bloodmoon_unique_deaths%
+/papi parse me %bloodmoon_participants_current%
+/papi parse me %bloodmoon_survivors_current%
 ```
 
 An offline or missing player receives safe inactive/no-boss/not-participating values. Unknown `%bloodmoon_*%` identifiers return `null` to PlaceholderAPI.
@@ -68,6 +76,9 @@ scoreboard:
         - "&cType: &f%bloodmoon_boss_type%"
         - "&cHealth: &f%bloodmoon_boss_health%&7/&f%bloodmoon_boss_max_health%"
         - "&cPercent: &f%bloodmoon_boss_health_formatted%"
+        - ""
+        - "&7Deaths: &f%bloodmoon_death_count% &8(&f%bloodmoon_unique_deaths% unique&8)"
+        - "&7Players: &f%bloodmoon_survivors_current%&7/&f%bloodmoon_participants_current% &7alive"
         - ""
         - "&7Survivor: &f%bloodmoon_survivor_status%"
         - "&7Participation: &f%bloodmoon_participation_formatted%"

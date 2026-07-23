@@ -374,13 +374,13 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
                     new String[]{world.getName()}, sender);
             return true;
         }
-        long alive = session.get().participants().stream().filter(p -> !p.died() && !p.disqualified()).count();
+        int alive = session.get().currentSurvivors();
         LocaleReader.MessageLocale("BloodMoonSurvivorsHeader", new String[]{"%world%"},
                 new String[]{world.getName()}, sender);
         LocaleReader.MessageLocale("BloodMoonStatus",
                 new String[]{"%session_uuid%", "%eligible_count%", "%participant_count%", "%world%"},
                 new String[]{session.get().sessionId().toString(), String.valueOf(alive),
-                        String.valueOf(session.get().participants().size()), world.getName()}, sender);
+                        String.valueOf(session.get().currentParticipants()), world.getName()}, sender);
         return true;
     }
 
