@@ -8,7 +8,7 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
 | JUnit suite | PASSED | 100 tests, 0 failures, including the original 19 |
-| Local artifact build | PENDING FINAL BUILD | Size and SHA-256 are recorded after the final clean build |
+| Local artifact build | PASSED | JDK 21 artifact is 518,226 bytes; SHA-256 `b48bfd7f3be912af81803f54db2f0e8ed60eee27cc7465cdb4e30edb232b4e74` |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
@@ -104,11 +104,12 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
 | Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; all four session counters are direct O(1) field/set/map-size reads |
-| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PREVIOUS PARTIAL PASS | Earlier 1.1.0 JAR registered `bloodmoon` once; the new boss-state/history additions still require the manual smoke below |
+| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Exact 518,226-byte JAR registered `bloodmoon` once; no-event parses returned `NONE`, localized `No active event`, numeric `0`, and localized `None`; BloodMoon/PAPI reload retained the expansion; restart retained statistics |
 | Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
-| Server without PlaceholderAPI | PASSED | Exact final JAR enabled, reloaded, and stopped on Paper 1.21.8 without missing-class errors or PlaceholderAPI warnings |
+| Server without PlaceholderAPI | PASSED | Exact 518,226-byte JAR enabled alone, reloaded, and stopped cleanly on Paper 1.21.8 without missing-class errors |
 | Connected-player event/boss/world/TAB behavior | MANUAL REQUIRED | No Minecraft player or TAB plugin was connected during the smoke; visual and live-entity checks remain pending |
-| Boss state/history restart/corruption smoke | MANUAL REQUIRED | Requires a disposable Paper/Purpur 1.21.8 server and live boss lifecycle; exact steps are in `MANUAL_TEST_CHECKLIST.md` |
+| Statistics create/restart/corruption | PASSED | Exact JAR created version 1 defaults, reloaded them after restart, preserved invalid YAML as `statistics.corrupt-*.yml`, logged a clear warning, restored defaults, kept PAPI responsive, and stopped cleanly |
+| Live boss state/completed-event history | MANUAL REQUIRED | VANILLA/MYTHIC ALIVE→DEFEATED, health change, normal event completion, and nonzero persisted history require a connected player; exact steps are in `MANUAL_TEST_CHECKLIST.md` |
 
 ## Release gate
 
