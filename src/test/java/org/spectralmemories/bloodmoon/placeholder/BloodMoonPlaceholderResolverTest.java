@@ -116,13 +116,45 @@ class BloodMoonPlaceholderResolverTest {
                 () -> assertEquals("0", resolve(inactive(), "survivors_current")));
     }
 
+    @Test void historicalPlaceholdersExposeSnapshotAndSafeEmptyFallbacks() {
+        HistoricalPlaceholderState populated = new HistoricalPlaceholderState(
+                9, 30, 18, 7, 5, "world_nether", 3661, 4, 3,
+                8, 5, "Crimson King", "MYTHICMOBS", "2026-07-23T12:00:00Z", true);
+        PlaceholderContext context = withHistory(populated);
+        assertAll(() -> assertEquals("9", resolve(context, "total_events")),
+                () -> assertEquals("30", resolve(context, "total_death_events")),
+                () -> assertEquals("18", resolve(context, "total_unique_deaths")),
+                () -> assertEquals("7", resolve(context, "total_bosses_spawned")),
+                () -> assertEquals("5", resolve(context, "total_bosses_defeated")),
+                () -> assertEquals("world_nether", resolve(context, "last_event_world")),
+                () -> assertEquals("3661", resolve(context, "last_event_duration_seconds")),
+                () -> assertEquals("01:01:01", resolve(context, "last_event_duration_formatted")),
+                () -> assertEquals("4", resolve(context, "last_event_death_count")),
+                () -> assertEquals("3", resolve(context, "last_event_unique_deaths")),
+                () -> assertEquals("8", resolve(context, "last_event_participants")),
+                () -> assertEquals("5", resolve(context, "last_event_survivors")),
+                () -> assertEquals("Crimson King", resolve(context, "last_boss_name")),
+                () -> assertEquals("MYTHICMOBS", resolve(context, "last_boss_type")),
+                () -> assertEquals("2026-07-23T12:00:00Z", resolve(context, "last_event_ended_at")),
+                () -> assertEquals("0", resolve(inactive(), "total_events")),
+                () -> assertEquals("None", resolve(inactive(), "last_event_world")),
+                () -> assertEquals("00:00", resolve(inactive(), "last_event_duration_formatted")),
+                () -> assertEquals("Not spawned yet", resolve(inactive(), "last_boss_name")),
+                () -> assertEquals("NONE", resolve(inactive(), "last_boss_type")),
+                () -> assertEquals("None", resolve(inactive(), "last_event_ended_at")));
+    }
+
     @Test void everyDocumentedIdentifierResponds() {
         List<String> identifiers = List.of("active", "active_formatted", "world", "time_remaining_seconds",
                 "time_remaining_formatted", "boss_alive", "boss_name", "boss_type", "boss_health",
                 "boss_max_health", "boss_health_percent", "boss_health_formatted", "participating",
                 "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status",
                 "death_count", "unique_deaths", "participants_current", "survivors_current",
-                "boss_state", "boss_state_formatted");
+                "boss_state", "boss_state_formatted", "total_events", "total_death_events",
+                "total_unique_deaths", "total_bosses_spawned", "total_bosses_defeated",
+                "last_event_world", "last_event_duration_seconds", "last_event_duration_formatted",
+                "last_event_death_count", "last_event_unique_deaths", "last_event_participants",
+                "last_event_survivors", "last_boss_name", "last_boss_type", "last_event_ended_at");
         identifiers.forEach(identifier -> assertNotNull(resolve(active(), identifier), identifier));
     }
 
@@ -149,6 +181,10 @@ class BloodMoonPlaceholderResolverTest {
     private static PlaceholderContext withBossState(BossPlaceholderState boss, BossSessionState state) {
         return new PlaceholderContext(true, "world", 90, boss, state,
                 PlayerPlaceholderState.none(), SessionPlaceholderState.none(), EN);
+    }
+    private static PlaceholderContext withHistory(HistoricalPlaceholderState history) {
+        return new PlaceholderContext(false, "", 0, BossPlaceholderState.none(), BossSessionState.NONE,
+                PlayerPlaceholderState.none(), SessionPlaceholderState.none(), history, EN);
     }
     private static String resolve(PlaceholderContext context, String identifier) {
         return BloodMoonPlaceholderResolver.resolve(context, identifier);

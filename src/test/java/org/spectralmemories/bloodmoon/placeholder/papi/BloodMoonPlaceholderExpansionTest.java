@@ -61,7 +61,11 @@ class BloodMoonPlaceholderExpansionTest {
                 "boss_max_health", "boss_health_percent", "boss_health_formatted", "participating",
                 "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status",
                 "death_count", "unique_deaths", "participants_current", "survivors_current",
-                "boss_state", "boss_state_formatted");
+                "boss_state", "boss_state_formatted", "total_events", "total_death_events",
+                "total_unique_deaths", "total_bosses_spawned", "total_bosses_defeated",
+                "last_event_world", "last_event_duration_seconds", "last_event_duration_formatted",
+                "last_event_death_count", "last_event_unique_deaths", "last_event_participants",
+                "last_event_survivors", "last_boss_name", "last_boss_type", "last_event_ended_at");
 
         identifiers.forEach(identifier ->
                 assertNotNull(expansion.onRequest(null, identifier), "%bloodmoon_" + identifier + "%"));

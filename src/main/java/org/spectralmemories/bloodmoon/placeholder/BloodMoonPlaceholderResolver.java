@@ -14,6 +14,8 @@ public final class BloodMoonPlaceholderResolver {
         SessionPlaceholderState session = context.session() == null
                 ? SessionPlaceholderState.none() : context.session();
         BossSessionState bossState = context.bossState() == null ? BossSessionState.NONE : context.bossState();
+        HistoricalPlaceholderState history = context.history() == null
+                ? HistoricalPlaceholderState.none() : context.history();
         PlaceholderLabels labels = context.labels();
         if (labels == null) return null;
         return switch (identifier.toLowerCase(Locale.ROOT)) {
@@ -42,6 +44,25 @@ public final class BloodMoonPlaceholderResolver {
             case "unique_deaths" -> Integer.toString(Math.max(0, session.uniqueDeaths()));
             case "participants_current" -> Integer.toString(Math.max(0, session.currentParticipants()));
             case "survivors_current" -> Integer.toString(Math.max(0, session.currentSurvivors()));
+            case "total_events" -> Long.toString(Math.max(0, history.totalEvents()));
+            case "total_death_events" -> Long.toString(Math.max(0, history.totalDeathEvents()));
+            case "total_unique_deaths" -> Long.toString(Math.max(0, history.totalUniqueDeaths()));
+            case "total_bosses_spawned" -> Long.toString(Math.max(0, history.totalBossesSpawned()));
+            case "total_bosses_defeated" -> Long.toString(Math.max(0, history.totalBossesDefeated()));
+            case "last_event_world" -> history.hasCompletedEvent()
+                    ? safe(history.lastEventWorld(), labels.none()) : labels.none();
+            case "last_event_duration_seconds" -> Long.toString(Math.max(0, history.lastEventDurationSeconds()));
+            case "last_event_duration_formatted" -> formatDuration(history.lastEventDurationSeconds());
+            case "last_event_death_count" -> Long.toString(Math.max(0, history.lastEventDeathCount()));
+            case "last_event_unique_deaths" -> Integer.toString(Math.max(0, history.lastEventUniqueDeaths()));
+            case "last_event_participants" -> Integer.toString(Math.max(0, history.lastEventParticipants()));
+            case "last_event_survivors" -> Integer.toString(Math.max(0, history.lastEventSurvivors()));
+            case "last_boss_name" -> history.hasCompletedEvent()
+                    ? safe(history.lastBossName(), labels.noBoss()) : labels.noBoss();
+            case "last_boss_type" -> history.hasCompletedEvent()
+                    ? safe(history.lastBossType(), "NONE") : "NONE";
+            case "last_event_ended_at" -> history.hasCompletedEvent()
+                    ? safe(history.lastEventEndedAt(), labels.none()) : labels.none();
             default -> null;
         };
     }

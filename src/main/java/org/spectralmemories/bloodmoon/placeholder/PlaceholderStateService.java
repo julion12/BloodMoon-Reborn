@@ -20,7 +20,9 @@ public final class PlaceholderStateService {
 
     public PlaceholderContext snapshot(Player player) {
         PlaceholderLabels labels = labels();
-        if (player == null || !player.isOnline()) return PlaceholderContext.inactive(labels);
+        HistoricalPlaceholderState history = HistoricalPlaceholderState.from(
+                plugin.getStatisticsService().snapshot());
+        if (player == null || !player.isOnline()) return PlaceholderContext.inactive(labels, history);
         World world = player.getWorld();
         BloodmoonActuator actuator = BloodmoonActuator.GetActuator(world);
         boolean active = actuator != null && actuator.isInProgress();
@@ -37,7 +39,7 @@ public final class PlaceholderStateService {
         SessionPlaceholderState session = active && current.isPresent()
                 ? sessionState(current.get()) : SessionPlaceholderState.none();
         return new PlaceholderContext(active, world.getName(), remaining, boss, bossState,
-                participant, session, labels);
+                participant, session, history, labels);
     }
 
     private BossPlaceholderState coherentBossState(BossPlaceholderState live,

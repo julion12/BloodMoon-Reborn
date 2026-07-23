@@ -47,6 +47,7 @@ public final class SessionCoordinator {
         if (session == null) return null;
         session.end(Instant.now());
         if (complete) rewardSurvivors(world, session);
+        if (complete) plugin.getStatisticsService().recordCompletedEvent(session);
         active.remove(world.getUID());
         store.save(active.values());
         return session;

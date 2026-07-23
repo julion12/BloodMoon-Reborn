@@ -17,6 +17,7 @@ import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
 import org.spectralmemories.bloodmoon.placeholder.NoPlaceholderIntegration;
 import org.spectralmemories.bloodmoon.placeholder.PlaceholderIntegration;
 import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
+import org.spectralmemories.bloodmoon.statistics.HistoricalStatisticsService;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -62,6 +63,7 @@ public final class Bloodmoon extends JavaPlugin
 
     private static WorldManager worldManager;
     private SessionCoordinator sessionCoordinator;
+    private HistoricalStatisticsService statisticsService;
     private MythicMobsBridge mythicMobs = new NoMythicMobsBridge();
     private PlaceholderIntegration placeholderIntegration = new NoPlaceholderIntegration();
 
@@ -244,6 +246,7 @@ public final class Bloodmoon extends JavaPlugin
     }
 
     public SessionCoordinator getSessionCoordinator() { return sessionCoordinator; }
+    public HistoricalStatisticsService getStatisticsService() { return statisticsService; }
     public NamespacedKey getBossKey() { return new NamespacedKey(this, "bloodmoon_boss"); }
     public MythicMobsBridge getMythicMobs() { return mythicMobs; }
     public PlaceholderIntegration getPlaceholderIntegration() { return placeholderIntegration; }
@@ -342,6 +345,8 @@ public final class Bloodmoon extends JavaPlugin
 
         CreateFolder();
 
+        statisticsService = new HistoricalStatisticsService(
+                new File(getDataFolder(), "statistics.yml").toPath(), getLogger());
         sessionCoordinator = new SessionCoordinator(this);
 
         if (getServer().getPluginManager().isPluginEnabled("MythicMobs")) {
@@ -468,6 +473,7 @@ public final class Bloodmoon extends JavaPlugin
 
         if (sqlAccess != null) sqlAccess.close();
         if (sessionCoordinator != null) sessionCoordinator.abortAll();
+        if (statisticsService != null) statisticsService.saveIfDirty();
         placeholderIntegration.close();
         mythicMobs.close();
         for (ConfigReader configReader : allConfigReaders)

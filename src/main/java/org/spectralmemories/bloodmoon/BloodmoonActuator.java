@@ -342,7 +342,9 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         }
         if (result.success()) {
             if (session != null) {
-                session.bossSpawned(result.entityUuid(), result.displayName(), result.actualMode().name());
+                boolean firstSpawn = session.bossSpawned(
+                        result.entityUuid(), result.displayName(), result.actualMode().name());
+                Bloodmoon.GetInstance().getStatisticsService().recordBossSpawned(firstSpawn);
             }
             LocaleReader.MessageAllLocale("ZombieBossSpawned",
                     new String[]{"$b", "%boss_name%", "%boss_type%"},
@@ -407,7 +409,10 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         String mythicBossName = mythicBosses.remove(entity.getUniqueId());
         if (mythicBossName == null) return;
-        if (session != null) session.bossDefeated(entity.getUniqueId());
+        if (session != null) {
+            boolean firstDefeat = session.bossDefeated(entity.getUniqueId());
+            Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
+        }
         untrackPlaceholderBoss(entity.getUniqueId());
         ConfigReader config = Bloodmoon.GetInstance().getConfigReader(world);
         if (killer != null) {
@@ -873,7 +878,10 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
                 boss.Kill(killer != null && isInProgress());
                 runBossRewardCommands(boss.GetName(), "VANILLA", boss.GetHost(), killer);
-                if (session != null) session.bossDefeated(entity.getUniqueId());
+                if (session != null) {
+                    boolean firstDefeat = session.bossDefeated(entity.getUniqueId());
+                    Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
+                }
                 untrackPlaceholderBoss(entity.getUniqueId());
                 bossIterator.remove();
                 return;
