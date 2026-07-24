@@ -1,9 +1,11 @@
-# Copy or merge this key into each BloodMoon world config.yml.
-# Suffixes are parsed only at the end of a command:
-# ;s = console once, ;f = console once per online target, ;p = each player.
-# $w / %world% are world placeholders; $p / %player% are player placeholders.
-CommandsOnStart:
-  - "say [BloodMoon] La Luna de Sangre comenzó en %world%;s"
-  - "execute in minecraft:overworld run weather thunder;s"
-  - "effect give %player% minecraft:night_vision 10 0 true;f"
-  - "playsound minecraft:entity.wither.spawn master $p;p"
+# BloodMoon-Reborn - CommandsOnStart examples
+#
+# Choose and merge ONLY ONE version into each world config.yml:
+# - CommandsOnStart-en.yml (English visible messages)
+# - CommandsOnStart-es.yml (mensajes visibles en español)
+#
+# Do not merge both lists. Command names, selectors, placeholders, suffixes,
+# and technical syntax are intentionally identical in both variants.
+#
+# Seleccione y combine SOLO UNA versión con el config.yml de cada mundo.
+# No combine ambas listas.

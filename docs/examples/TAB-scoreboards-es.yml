@@ -1,0 +1,24 @@
+# Copie este scoreboard dentro de la sección scoreboard.scoreboards de TAB.
+# Requiere PlaceholderAPI y la expansión de BloodMoon.
+scoreboard:
+  enabled: true
+  scoreboards:
+    blood-moon:
+      display-condition: "%bloodmoon_active%=true"
+      title: "&4&lLUNA DE SANGRE"
+      lines:
+        - "&7Jugador: &f%player%"
+        - "&7Mundo: &f%bloodmoon_world%"
+        - "&7Tiempo: &c%bloodmoon_time_remaining_formatted%"
+        - "&7Estado: &c%bloodmoon_active_formatted%"
+        - "&7Participación: &a%bloodmoon_survivor_status%"
+        - ""
+        - "&7Participantes: &f%bloodmoon_participants_current%"
+        - "&7Caídos: &c%bloodmoon_unique_deaths%"
+        - "&7Muertes: &4%bloodmoon_death_count%"
+        - "&7Supervivientes: &a%bloodmoon_survivors_current%"
+        - ""
+        - "%bloodmoon_boss_display_line_1%"
+        - "%bloodmoon_boss_display_line_2%"
+        - "%bloodmoon_boss_display_line_3%"
+        - "&8&m----------------"

@@ -1,4 +1,22 @@
-BloodMoonBoss:
+# Two independent MythicMobs definitions are provided. Set Boss.MythicMobs.InternalName
+# to exactly one ID: BloodMoonBoss_EN or BloodMoonBoss_ES.
+# Se incluyen dos definiciones independientes. Configure InternalName con un solo ID.
+BloodMoonBoss_EN:
+  Type: ZOMBIE
+  Display: '&4&lBlood Moon King'
+  Health: 800
+  Damage: 18
+  BossBar:
+    Enabled: true
+    Title: '<mob.name>'
+    Range: 40
+    Color: RED
+    Style: SEGMENTED_10
+  Drops:
+    - diamond 3 1
+    - exp 250 1
+
+BloodMoonBoss_ES:
   Type: ZOMBIE
   Display: '&4&lRey de la Luna Carmesí'
   Health: 800

@@ -13,7 +13,7 @@ Boss:
   Mode: MYTHICMOBS
   MythicMobs:
     Enabled: true
-    InternalName: BloodMoonBoss
+    InternalName: BloodMoonBoss_EN
     UseMythicMobsRewards: true
     RunBloodMoonRewardCommands: false
     FallbackToVanilla: true
@@ -28,9 +28,9 @@ Set `RunBloodMoonRewardCommands: true` only when additional commands under `Boss
 Example MythicMobs file (place manually in MythicMobs; BloodMoon-Reborn never overwrites it):
 
 ```yaml
-BloodMoonBoss:
+BloodMoonBoss_EN:
   Type: ZOMBIE
-  Display: '&4&lRey de la Luna Carmesí'
+  Display: '&4&lBlood Moon King'
   Health: 800
   Damage: 18
   BossBar:
@@ -44,7 +44,12 @@ BloodMoonBoss:
     - exp 250 1
 ```
 
-The example is also stored as [`docs/examples/MythicMobs-BloodMoonBoss.yml`](examples/MythicMobs-BloodMoonBoss.yml) and parsed by the automated test suite. MythicMobs documents drop entries as `<drop> <amount> <chance>` and BossBar styles such as `SEGMENTED_10`; the final `1` above means a 100% chance. See the official [Drops](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/drops/Drops) and [BossBar](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Mobs/BossBar) documentation.
+The copy-ready [`docs/examples/MythicMobs-BloodMoonBoss.yml`](examples/MythicMobs-BloodMoonBoss.yml)
+contains separate `BloodMoonBoss_EN` and `BloodMoonBoss_ES` IDs and is parsed by the automated
+test suite. Set `InternalName` to exactly one of them. MythicMobs documents drop entries as
+`<drop> <amount> <chance>` and BossBar styles such as `SEGMENTED_10`; the final `1` means a 100%
+chance. See the official [Drops](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/drops/Drops)
+and [BossBar](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Mobs/BossBar) documentation.
 
 BloodMoon does not create its vanilla BossBar in `MYTHICMOBS` mode. The `BossBar` block above belongs to MythicMobs, avoiding duplicate bars.
 

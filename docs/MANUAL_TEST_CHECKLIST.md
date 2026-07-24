@@ -39,7 +39,7 @@ Set `Boss.Mode: VANILLA`, enable a uniquely identifiable boss reward command, an
 
 Use a MythicMobs build that officially supports the exact server version. MythicMobs 5.12.1 is suitable for the validated Paper 1.21.8 bridge test but not for the tested Paper 26.2 build.
 
-1. Install the example `BloodMoonBoss` definition from `docs/MYTHICMOBS.md`; set `Boss.Mode: MYTHICMOBS`, `Enabled: true`, and its exact `InternalName`.
+1. Install `MythicMobs-BloodMoonBoss.yml`; choose `BloodMoonBoss_EN` or `BloodMoonBoss_ES`, set `Boss.Mode: MYTHICMOBS`, `Enabled: true`, and its exact `InternalName`.
 2. Run `/bloodmoon spawnzombieboss`. Confirm only the MythicMob appears, the arrival uses its display (never `ZombieBossName`), and no BloodMoon vanilla BossBar exists while damaging it.
 3. With `UseMythicMobsRewards: true` and `RunBloodMoonRewardCommands: false`, kill the boss. Confirm the death name is correct, Mythic drops/skills run once, BloodMoon boss reward commands do not run, and no vanilla bar/state remains.
 4. Enable `RunBloodMoonRewardCommands`, repeat with a credited killer, and confirm the additional BloodMoon command runs exactly once without duplicating ordinary enhanced-mob drops.
@@ -84,28 +84,32 @@ Use Paper/Purpur 1.21.8, PlaceholderAPI, and a real connected player. TAB is opt
 
 ## 7. TAB visual validation
 
-Use the recommended section from [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml),
-merged into an existing TAB configuration without duplicate global sections. It must work without
-copying the optional advanced `conditions:` map.
+Use exactly one functional variant selected through
+[`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml): `TAB-scoreboards-en.yml` or
+`TAB-scoreboards-es.yml`. Merge it into an existing TAB configuration without duplicate global
+sections. Neither variant requires `%condition:*%` placeholders.
 
 1. Run `/tab reload` and confirm no parse/condition warnings.
-2. Outside an event, confirm the normal design; in the configured lobby, confirm the optional historical design when it has priority.
-3. Start an event and confirm the Blood Moon design precedes normal.
-4. With no boss, confirm only “Aún no ha aparecido” appears—never type `NONE` or health `0%`.
-5. Spawn a boss and confirm name, type, and live health appear.
-6. Defeat it and confirm retained name plus localized “Derrotado”, with no `0%` health line.
-7. Grant/remove `bloodmoon.scoreboard.full` and confirm the full/compact selection behaves as documented.
-8. Verify all designs stay within 15 visible lines and inspect flicker/line transitions with a real client.
+2. Start an event and confirm the Blood Moon design appears.
+3. With no boss, confirm only the configured localized “not spawned” text appears—never type `NONE` or health `0%`.
+4. Spawn a boss and confirm name, type, and live health appear.
+5. Defeat it and confirm retained name plus localized defeated status, with no `0%` health line.
+6. Confirm the chosen design stays within 15 visible lines and inspect flicker/line transitions with a real client.
 
-## 8. Bundled administrator guide
+## 8. Bundled administrator files
 
 1. Start a clean Paper/Purpur 1.21.8 server with only the final BloodMoon JAR.
-2. Confirm `README.txt`, all seven `EXAMPLES/` files, `docs/VERSION.txt`, and the administrator
-   guides appear beneath `plugins/BloodMoon/`.
-3. Edit one extracted file, restart, and confirm its bytes and timestamp remain unchanged.
-4. Remove one guide, restart, and confirm only that missing guide is restored.
-5. Repeat from a server path containing spaces.
-6. Obstruct one documentation target; confirm a clear warning and normal plugin enable.
+2. Confirm `README.txt` and all 17 `EXAMPLES/` files appear beneath `plugins/BloodMoon/`.
+3. Confirm `plugins/BloodMoon/docs/` is not created and no Markdown document is extracted.
+4. Confirm README has separate `ENGLISH` and `ESPAÑOL` sections and the official GitHub URL.
+5. Confirm all five indexes are comments-only and every `-en.yml`/`-es.yml` variant is UTF-8 YAML.
+6. Restart and confirm no distributed file is rewritten or retimestamped.
+7. Edit one extracted file, restart, and confirm its bytes and timestamp remain unchanged.
+8. Remove one example, restart, and confirm only that missing example is restored.
+9. Create a legacy `docs/custom-guide.md`, restart, and confirm it remains byte-identical.
+10. Confirm the first-start log mentions `EXAMPLES/` and the GitHub URL but never `docs/`.
+11. Repeat from a server path containing spaces.
+12. Obstruct one example target; confirm a clear warning and normal plugin enable.
 
 ## Sign-off
 

@@ -18,4 +18,5 @@ Natural and manual complete endings evaluate rewards. Plugin disable, crash reco
 
 The active `%bloodmoon_survivors_current%` counter is updated immediately when a registered participant first dies or is disqualified. At normal completion, its final value becomes `lastEventSurvivors` in `statistics.yml`; aborted/incomplete sessions never replace the last completed-event snapshot.
 
-Use the disabled-by-default [`examples/SurvivorRewards.yml`](examples/SurvivorRewards.yml) as a reviewed starting point.
+Use [`examples/SurvivorRewards.yml`](examples/SurvivorRewards.yml) to select one
+disabled-by-default English or Spanish functional variant as a reviewed starting point.

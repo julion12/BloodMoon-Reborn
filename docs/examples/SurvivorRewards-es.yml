@@ -1,0 +1,19 @@
+# Ejemplo completo de recompensa de supervivencia con texto visible en español.
+# Revise todos los comandos antes de cambiar Enabled a true.
+SurvivorRewards:
+  Enabled: false
+  RequireOnlineAtEnd: true
+  IncludeLateJoiners: true
+  MinimumParticipationSeconds: 300
+  DisqualifyOnDeath: true
+  DisqualifyOnWorldLeave: false
+  DisqualifyOnDisconnect: false
+  RewardOncePerSession: true
+  Messages:
+    - "&aSobreviviste en %world% durante %participation_seconds% segundos."
+    - "&6Recompensa: &fDiamante del superviviente"
+  Commands:
+    - "give %player% minecraft:diamond 1;f"
+    - "experience add %player% 100 points;f"
+    # Recompensa económica opcional; requiere Vault y una economía compatible.
+    # - "eco give %player% 500;f"

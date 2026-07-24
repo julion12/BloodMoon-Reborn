@@ -1,0 +1,20 @@
+# Ejemplo completo de recompensa del boss con texto visible en español.
+Boss:
+  Mode: VANILLA
+  Rewards:
+    Enabled: false
+    Mode: KILLER
+    RequirePlayerKiller: true
+    RewardOnce: true
+    Commands:
+      - "give %boss_killer% minecraft:diamond 3;s"
+      - "experience add %boss_killer% 250 points;s"
+      - "tellraw %boss_killer% {\"text\":\"¡Recibiste la recompensa Cazabosses!\",\"color\":\"gold\"};s"
+      - "say %boss_killer% derrotó a %boss_name% (%boss_type%);s"
+  MythicMobs:
+    Enabled: false
+    InternalName: BloodMoonBoss_ES
+    UseMythicMobsRewards: true
+    RunBloodMoonRewardCommands: false
+    FallbackToVanilla: true
+    # Active sólo una autoridad de recompensas salvo que quiera duplicarlas.

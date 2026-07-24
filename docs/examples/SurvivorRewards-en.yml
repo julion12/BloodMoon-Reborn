@@ -1,0 +1,19 @@
+# Complete survivor reward example with English visible text.
+# Review every command before changing Enabled to true.
+SurvivorRewards:
+  Enabled: false
+  RequireOnlineAtEnd: true
+  IncludeLateJoiners: true
+  MinimumParticipationSeconds: 300
+  DisqualifyOnDeath: true
+  DisqualifyOnWorldLeave: false
+  DisqualifyOnDisconnect: false
+  RewardOncePerSession: true
+  Messages:
+    - "&aYou survived in %world% for %participation_seconds% seconds."
+    - "&6Reward: &fSurvivor's Diamond"
+  Commands:
+    - "give %player% minecraft:diamond 1;f"
+    - "experience add %player% 100 points;f"
+    # Optional economy reward; requires Vault and a compatible economy plugin.
+    # - "eco give %player% 500;f"

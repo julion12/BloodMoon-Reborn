@@ -1,0 +1,7 @@
+# Merge this key into each BloodMoon world config.yml.
+CommandsOnEnd:
+  - "say [BloodMoon] The Blood Moon has ended in $w;s"
+  - "give @a minecraft:gold_ingot 1;s"
+  - "execute in minecraft:overworld run weather clear;s"
+  - "effect clear %player% minecraft:night_vision;f"
+  - "tellraw %player% {\"text\":\"You survived the Blood Moon!\",\"color\":\"green\"};f"

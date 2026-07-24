@@ -18,8 +18,10 @@ immutable per-player contexts. TAB and other consumers perform only a constant-t
 they never trigger entity, chunk, BossBar, MythicMobs, configuration, or file access.
 
 Ready-to-copy administrative examples are indexed in [`docs/EXAMPLES.md`](EXAMPLES.md). On first
-startup, the self-contained JAR creates `plugins/BloodMoon/README.txt`, `EXAMPLES/`, and `docs/`
-without overwriting existing files. The TAB example's recommended full and compact designs use
-direct dynamic boss lines and require no global TAB condition definitions.
+startup, the self-contained JAR creates only `plugins/BloodMoon/README.txt` and the 17 files in
+`EXAMPLES/`, without overwriting existing files. Complete documentation stays in the official
+GitHub repository; the plugin does not create, update, or delete `plugins/BloodMoon/docs/`.
+The TAB English and Spanish variants use direct dynamic boss lines and require no global TAB
+condition definitions.
 
 Known release gate: **NOT READY for publication.** Player-driven survivor/boss rewards and an actual Mythic boss death still require live manual execution. MythicMobs 5.12.1 enables with Paper 1.21.8, but fails inside its own server-version/NMS initialization on the tested Paper 26.2 build; BloodMoon core remains operational without it. Complete `docs/MANUAL_TEST_CHECKLIST.md` before publishing.

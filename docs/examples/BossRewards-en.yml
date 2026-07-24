@@ -1,0 +1,20 @@
+# Complete boss reward example with English visible text.
+Boss:
+  Mode: VANILLA
+  Rewards:
+    Enabled: false
+    Mode: KILLER
+    RequirePlayerKiller: true
+    RewardOnce: true
+    Commands:
+      - "give %boss_killer% minecraft:diamond 3;s"
+      - "experience add %boss_killer% 250 points;s"
+      - "tellraw %boss_killer% {\"text\":\"Boss Slayer reward received!\",\"color\":\"gold\"};s"
+      - "say %boss_killer% defeated %boss_name% (%boss_type%);s"
+  MythicMobs:
+    Enabled: false
+    InternalName: BloodMoonBoss_EN
+    UseMythicMobsRewards: true
+    RunBloodMoonRewardCommands: false
+    FallbackToVanilla: true
+    # Enable only one reward authority unless duplicate rewards are intentional.

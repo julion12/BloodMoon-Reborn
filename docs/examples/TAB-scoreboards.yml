@@ -1,80 +1,30 @@
-# BloodMoon-Reborn 1.1.0 - TAB scoreboard integration example
+# ==================================================
+# BloodMoon-Reborn
+# TAB Scoreboard Examples
 #
-# Required for placeholders: TAB, PlaceholderAPI, BloodMoon-Reborn.
-# Copy the recommended scoreboards into TAB's existing
-# `scoreboard.scoreboards` map. BloodMoon-Reborn does not require TAB.
+# Choose and copy ONLY ONE version:
 #
-# TAB scoreboards support at most 15 lines. The full design below uses exactly
-# 15. It is the recommended portable variant and needs no `conditions:` block.
-
-scoreboard:
-  enabled: true
-  scoreboards:
-    # RECOMMENDED: direct dynamic boss lines, highest priority.
-    blood-moon-full:
-      display-condition: "%bloodmoon_active%=true;permission:bloodmoon.scoreboard.full"
-      title: "&4&lLUNA DE SANGRE"
-      lines:
-        - "&7Jugador: &f%player%"
-        - "&7Mundo: &f%bloodmoon_world%"
-        - "&7Tiempo: &c%bloodmoon_time_remaining_formatted%"
-        - "&7Estado: &c%bloodmoon_active_formatted%"
-        - "&7Participación: &a%bloodmoon_survivor_status%"
-        - ""
-        - "&7Participantes: &f%bloodmoon_participants_current%"
-        - "&7Caídos: &c%bloodmoon_unique_deaths%"
-        - "&7Muertes: &4%bloodmoon_death_count%"
-        - "&7Supervivientes: &a%bloodmoon_survivors_current%"
-        - ""
-        - "%bloodmoon_boss_display_line_1%"
-        - "%bloodmoon_boss_display_line_2%"
-        - "%bloodmoon_boss_display_line_3%"
-        - "&8&m----------------"
-
-    # Compact fallback for players without bloodmoon.scoreboard.full.
-    blood-moon-compact:
-      display-condition: "%bloodmoon_active%=true"
-      title: "&4&lLUNA DE SANGRE"
-      lines:
-        - "&7Tiempo: &c%bloodmoon_time_remaining_formatted%"
-        - "&7Caídos: &c%bloodmoon_unique_deaths%"
-        - "&7Vivos: &a%bloodmoon_survivors_current%"
-        - "%bloodmoon_boss_display_line_1%"
-        - "%bloodmoon_boss_display_line_2%"
-        - "%bloodmoon_boss_display_line_3%"
-
-    # Optional lobby/history design. Change `lobby` to the real lobby world.
-    blood-moon-history:
-      display-condition: "%world%=lobby"
-      title: "&4&lÚLTIMA LUNA"
-      lines:
-        - "&7Mundo: &f%bloodmoon_last_event_world%"
-        - "&7Duración: &f%bloodmoon_last_event_duration_formatted%"
-        - "&7Participantes: &f%bloodmoon_last_event_participants%"
-        - "&7Caídos: &f%bloodmoon_last_event_unique_deaths%"
-        - "&7Supervivientes: &f%bloodmoon_last_event_survivors%"
-        - "&7Boss: &f%bloodmoon_last_boss_name%"
-        - ""
-        - "&7Eventos: &f%bloodmoon_total_events%"
-        - "&7Bosses derrotados: &f%bloodmoon_total_bosses_defeated%"
-
-    # Normal fallback must remain after the Blood Moon designs.
-    normal:
-      title: "&6&lMI SERVIDOR"
-      lines:
-        - "&7Jugador: &f%player%"
-        - "&7Mundo: &f%world%"
-        - "&7Online: &f%online%"
-        - ""
-        - "&aSin Luna de Sangre"
-
-# ADVANCED OPTIONAL ALTERNATIVE
-# Administrators who need custom conditional composition can merge this map into
-# TAB's single global `conditions:` section. The recommended designs above do
-# not reference these values and work without this section.
-conditions:
-  bloodmoon-boss-alive:
-    conditions:
-      - "%bloodmoon_boss_state%=ALIVE"
-    true: "&c%bloodmoon_boss_name% &7- &f%bloodmoon_boss_health_formatted%"
-    false: ""
+# - TAB-scoreboards-en.yml
+# - TAB-scoreboards-es.yml
+#
+# Do not copy both examples at the same time.
+#
+# Both versions use the same BloodMoon placeholders.
+# Only the visible language changes.
+# The dynamic boss lines follow BloodMoon's configured language.
+# ==================================================
+#
+# BloodMoon-Reborn
+# Ejemplos de scoreboard para TAB
+#
+# Seleccione y copie SOLO UNA versión:
+#
+# - TAB-scoreboards-en.yml
+# - TAB-scoreboards-es.yml
+#
+# No copie ambos ejemplos al mismo tiempo.
+#
+# Ambas versiones utilizan los mismos placeholders de BloodMoon.
+# Únicamente cambia el idioma visible.
+# Las líneas dinámicas del boss respetan el idioma configurado en BloodMoon.
+# ==================================================

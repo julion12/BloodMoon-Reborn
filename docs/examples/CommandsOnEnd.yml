@@ -1,7 +1,11 @@
-# Copy or merge this key into each BloodMoon world config.yml.
-# ;s runs once as console. ;f runs as console per player. ;p runs as each player.
-CommandsOnEnd:
-  - "say [BloodMoon] La Luna de Sangre terminó en $w;s"
-  - "execute in minecraft:overworld run weather clear;s"
-  - "effect clear %player% minecraft:night_vision;f"
-  - "me ha sobrevivido a la Luna de Sangre;p"
+# BloodMoon-Reborn - CommandsOnEnd examples
+#
+# Choose and merge ONLY ONE version into each world config.yml:
+# - CommandsOnEnd-en.yml (English visible messages)
+# - CommandsOnEnd-es.yml (mensajes visibles en español)
+#
+# Each variant includes a final announcement, a global reward, console
+# commands, and a survivor message. Do not merge both lists.
+#
+# Cada variante incluye anuncio final, recompensa global, comandos de consola
+# y mensaje para supervivientes. No combine ambas listas.

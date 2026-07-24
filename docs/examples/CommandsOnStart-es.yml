@@ -1,0 +1,10 @@
+# Combine esta clave con el config.yml de cada mundo de BloodMoon.
+# ;s ejecuta una vez en consola, ;f por jugador en consola y ;p como cada jugador.
+CommandsOnStart:
+  - "say [BloodMoon] La Luna de Sangre comenzó en %world%;s"
+  - "title @a title {\"text\":\"LUNA DE SANGRE\",\"color\":\"dark_red\",\"bold\":true};s"
+  - "title @a subtitle {\"text\":\"Sobrevive hasta el amanecer\",\"color\":\"red\"};s"
+  - "execute in minecraft:overworld run weather thunder;s"
+  - "effect give %player% minecraft:night_vision 10 0 true;f"
+  - "tellraw %player% {\"text\":\"La noche te observa.\",\"color\":\"red\"};f"
+  - "playsound minecraft:entity.wither.spawn master $p;p"

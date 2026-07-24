@@ -1,0 +1,24 @@
+# Copy this scoreboard into TAB's existing scoreboard.scoreboards section.
+# Requires PlaceholderAPI and the BloodMoon expansion.
+scoreboard:
+  enabled: true
+  scoreboards:
+    blood-moon:
+      display-condition: "%bloodmoon_active%=true"
+      title: "&4&lBLOOD MOON"
+      lines:
+        - "&7Player: &f%player%"
+        - "&7World: &f%bloodmoon_world%"
+        - "&7Time: &c%bloodmoon_time_remaining_formatted%"
+        - "&7Status: &c%bloodmoon_active_formatted%"
+        - "&7Participation: &a%bloodmoon_survivor_status%"
+        - ""
+        - "&7Participants: &f%bloodmoon_participants_current%"
+        - "&7Fallen: &c%bloodmoon_unique_deaths%"
+        - "&7Deaths: &4%bloodmoon_death_count%"
+        - "&7Survivors: &a%bloodmoon_survivors_current%"
+        - ""
+        - "%bloodmoon_boss_display_line_1%"
+        - "%bloodmoon_boss_display_line_2%"
+        - "%bloodmoon_boss_display_line_3%"
+        - "&8&m----------------"

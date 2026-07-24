@@ -4,11 +4,12 @@ World settings remain in `plugins/BloodMoon/<world>/config.yml`. All 1.0.1 keys 
 
 ## Bundled administrator files
 
-At startup the plugin creates only missing files under `plugins/BloodMoon/`: `README.txt`, all
-seven files in `EXAMPLES/`, and the administrator guides in `docs/`. Resources come from
-`distribution/` inside the installed JAR; runtime never depends on the source repository.
-Existing files and timestamps are left unchanged. A future upgrade therefore adds new guide files
-but preserves every local edit. `docs/VERSION.txt` identifies the bundled documentation generation.
+At startup the plugin creates only missing administrative files under `plugins/BloodMoon/`:
+`README.txt` and the 17 files in `EXAMPLES/`. Resources come from `distribution/` inside the
+installed JAR. Existing files and timestamps are left unchanged, so future upgrades add new or
+manually deleted examples while preserving every local edit. Extensive documentation is available
+only in the official GitHub repository. The plugin no longer creates or updates
+`plugins/BloodMoon/docs/`; a directory left by an earlier development build remains untouched.
 An individual copy failure logs a warning and does not prevent the plugin from enabling.
 
 ## Language
@@ -47,7 +48,8 @@ CommandsOnEnd:
 
 Commands can invoke effects, sounds, economy, permissions, or other plugins. Those plugins remain optional; for example, `eco` works only when a compatible economy command is installed.
 
-Ready-to-merge examples: [`CommandsOnStart.yml`](examples/CommandsOnStart.yml) and [`CommandsOnEnd.yml`](examples/CommandsOnEnd.yml).
+Choose one language variant through the [`CommandsOnStart.yml`](examples/CommandsOnStart.yml) and
+[`CommandsOnEnd.yml`](examples/CommandsOnEnd.yml) bilingual indexes.
 
 ## Survivor rewards
 
@@ -71,7 +73,8 @@ SurvivorRewards:
 
 These commands run from the console for each eligible player because they use `;f`. Players who die are disqualified when `DisqualifyOnDeath` is true. UUID tracking prevents reconnects, world changes, reloads, or name changes from duplicating a reward.
 
-Ready-to-merge example: [`SurvivorRewards.yml`](examples/SurvivorRewards.yml).
+Choose one complete language variant through the
+[`SurvivorRewards.yml`](examples/SurvivorRewards.yml) bilingual index.
 
 ## Boss selection, vanilla bar, and rewards
 
@@ -115,7 +118,8 @@ Audience modes:
 
 Vanilla reward commands are additional to the boss's legacy item/experience drops. Rewards remain off until `Boss.Rewards.Enabled` is explicitly set to `true`.
 
-Ready-to-merge example: [`BossRewards.yml`](examples/BossRewards.yml).
+Choose one complete language variant through the
+[`BossRewards.yml`](examples/BossRewards.yml) bilingual index.
 
 For MythicMobs, `InternalName` must exactly match the mob ID. The Mythic entity's resolved `Display` is used in arrival/death messages; `ZombieBossName` remains exclusive to the vanilla boss. `UseMythicMobsRewards` retains Mythic drops, while `RunBloodMoonRewardCommands` adds the commands above. Enabling both can intentionally duplicate value. `FallbackToVanilla` uses the old boss when MythicMobs or the configured mob is unavailable.
 

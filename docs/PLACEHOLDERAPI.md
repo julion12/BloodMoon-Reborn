@@ -113,6 +113,11 @@ An offline or missing player receives safe inactive/no-boss/not-participating va
 
 ## TAB scoreboard example
 
-Use the real, YAML-validated [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml). Its recommended full and compact designs use the three direct display lines and require no global TAB conditions. An advanced optional condition remains separate. Merge maps into TAB's existing configuration; do not duplicate global sections.
+Use [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml) as the bilingual index, then
+choose exactly one YAML-validated functional file:
+[`TAB-scoreboards-en.yml`](examples/TAB-scoreboards-en.yml) or
+[`TAB-scoreboards-es.yml`](examples/TAB-scoreboards-es.yml). Both use the same placeholders and
+the three direct boss display lines without `%condition:*%` placeholders. Merge only the selected
+map into TAB's existing configuration; do not duplicate global sections.
 
 TAB and PlaceholderAPI must be installed separately by the administrator. BloodMoon-Reborn neither downloads nor controls TAB. See the official [PlaceholderAPI internal-expansion guide](https://wiki.placeholderapi.com/developers/creating-a-placeholderexpansion/) and [TAB scoreboard guide](https://github.com/NEZNAMY/TAB/wiki/Feature-guide%3A-Scoreboard).

@@ -1,0 +1,7 @@
+# Combine esta clave con el config.yml de cada mundo de BloodMoon.
+CommandsOnEnd:
+  - "say [BloodMoon] La Luna de Sangre terminó en $w;s"
+  - "give @a minecraft:gold_ingot 1;s"
+  - "execute in minecraft:overworld run weather clear;s"
+  - "effect clear %player% minecraft:night_vision;f"
+  - "tellraw %player% {\"text\":\"¡Sobreviviste a la Luna de Sangre!\",\"color\":\"green\"};f"
