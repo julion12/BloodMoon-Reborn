@@ -61,6 +61,12 @@ public final class LocaleDefaults {
         values.put("PlaceholderBossStateNotSpawned", "Not spawned yet");
         values.put("PlaceholderBossStateAlive", "Alive");
         values.put("PlaceholderBossStateDefeated", "Defeated");
+        values.put("PlaceholderBossDisplayNotSpawned", "&7Boss: &8Not spawned yet");
+        values.put("PlaceholderBossDisplayName", "&7Boss: &c%boss_name%");
+        values.put("PlaceholderBossDisplayDefeatedName", "&7Boss: &a%boss_name%");
+        values.put("PlaceholderBossDisplayType", "&7Type: &f%boss_type%");
+        values.put("PlaceholderBossDisplayHealth", "&7Health: &c%boss_health%");
+        values.put("PlaceholderBossDisplayDefeated", "&7Status: &aDefeated");
         values.put("BloodMoonStatus", "&fSession %session_uuid%: %eligible_count%/%participant_count% participants are currently eligible.");
         values.put("BloodMoonSurvivorsHeader", "&fEligible Blood Moon survivors in %world%:");
         values.put("BloodMoonSessionNotFound", "&fThere is no active Blood Moon session in %world%.");

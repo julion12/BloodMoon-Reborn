@@ -10,6 +10,7 @@ public final class BloodMoonPlaceholderResolver {
             "active", "active_formatted", "world", "time_remaining_seconds", "time_remaining_formatted",
             "boss_alive", "boss_name", "boss_type", "boss_health", "boss_max_health",
             "boss_health_percent", "boss_health_formatted", "boss_state", "boss_state_formatted",
+            "boss_display_line_1", "boss_display_line_2", "boss_display_line_3",
             "participating", "participation_seconds", "participation_formatted",
             "survivor_eligible", "survivor_status", "death_count", "unique_deaths",
             "participants_current", "survivors_current", "total_events", "total_death_events",
@@ -50,6 +51,9 @@ public final class BloodMoonPlaceholderResolver {
                     ? healthPercent(boss.health(), boss.maximumHealth()) : 0) + "%";
             case "boss_state" -> bossState.name();
             case "boss_state_formatted" -> formattedBossState(bossState, labels);
+            case "boss_display_line_1" -> bossDisplayLine(1, bossState, boss, labels);
+            case "boss_display_line_2" -> bossDisplayLine(2, bossState, boss, labels);
+            case "boss_display_line_3" -> bossDisplayLine(3, bossState, boss, labels);
             case "participating" -> Boolean.toString(player.participating());
             case "participation_seconds" -> Long.toString(Math.max(0, player.participationSeconds()));
             case "participation_formatted" -> formatDuration(player.participationSeconds());
@@ -116,6 +120,32 @@ public final class BloodMoonPlaceholderResolver {
             case DEFEATED -> labels.bossStateDefeated();
             case NONE -> labels.bossStateNone();
         };
+    }
+
+    private static String bossDisplayLine(int line, BossSessionState state, BossPlaceholderState boss,
+                                          PlaceholderLabels labels) {
+        return switch (state) {
+            case NONE -> "";
+            case NOT_SPAWNED -> line == 1 ? labels.bossDisplayNotSpawned() : "";
+            case ALIVE -> switch (line) {
+                case 1 -> render(labels.bossDisplayName(), "%boss_name%",
+                        safe(boss.name(), labels.noBoss()));
+                case 2 -> render(labels.bossDisplayType(), "%boss_type%", safe(boss.type(), "NONE"));
+                case 3 -> render(labels.bossDisplayHealth(), "%boss_health%",
+                        healthPercent(boss.health(), boss.maximumHealth()) + "%");
+                default -> "";
+            };
+            case DEFEATED -> switch (line) {
+                case 1 -> render(labels.bossDisplayDefeatedName(), "%boss_name%",
+                        safe(boss.name(), labels.noBoss()));
+                case 2 -> labels.bossDisplayDefeated();
+                default -> "";
+            };
+        };
+    }
+
+    private static String render(String template, String token, String value) {
+        return safe(template, "").replace(token, value);
     }
 
     private static boolean hasBossIdentity(BossSessionState state) {

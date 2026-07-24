@@ -79,7 +79,10 @@ public final class PlaceholderStateService {
                 locale("PlaceholderNone"), locale("PlaceholderEligible"), locale("PlaceholderDisqualified"),
                 locale("PlaceholderNotParticipating"), locale("PlaceholderNoBoss"),
                 locale("PlaceholderBossStateNone"), locale("PlaceholderBossStateNotSpawned"),
-                locale("PlaceholderBossStateAlive"), locale("PlaceholderBossStateDefeated"));
+                locale("PlaceholderBossStateAlive"), locale("PlaceholderBossStateDefeated"),
+                locale("PlaceholderBossDisplayNotSpawned"), locale("PlaceholderBossDisplayName"),
+                locale("PlaceholderBossDisplayDefeatedName"), locale("PlaceholderBossDisplayType"),
+                locale("PlaceholderBossDisplayHealth"), locale("PlaceholderBossDisplayDefeated"));
     }
 
     private String locale(String key) { return plugin.getLocaleReader().GetLocalePlainString(key); }
