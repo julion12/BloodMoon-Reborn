@@ -229,7 +229,9 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         for (UUID mythicBossId : new ArrayList<>(mythicBosses.keySet())) {
             administrativelyRemovedBosses.add(mythicBossId);
             Bloodmoon.GetInstance().getMythicMobs().remove(mythicBossId);
+            forgetBossLifecycle(mythicBossId);
         }
+        removedBossIds.forEach(this::forgetBossLifecycle);
         mythicBosses.clear();
         placeholderBosses.clear();
         currentPlaceholderBossId = null;
@@ -441,6 +443,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         if (config.GetRunBloodMoonRewardCommandsForMythic()) {
             runBossRewardCommands(mythicBossName, "MYTHICMOBS", entity, killer);
         }
+        forgetBossLifecycle(entity.getUniqueId());
     }
 
     public void AddToBlacklist (LivingEntity entity)
@@ -932,6 +935,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 Bloodmoon.GetInstance().getStatisticsService().recordBossDefeated(firstDefeat);
                 untrackPlaceholderBoss(entity.getUniqueId());
                 bossIterator.remove();
+                forgetBossLifecycle(entity.getUniqueId());
                 return;
             }
         }
@@ -1094,7 +1098,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     @Override
     public void close ()
     {
-        if (bosses.isEmpty()) return; //Nothing to do
+        if (bosses.isEmpty() && mythicBosses.isEmpty()) return; //Nothing to do
 
         KillBosses(false, false);
         world.save();
@@ -1111,9 +1115,16 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     private Player resolveBossKiller(LivingEntity boss) {
         Player killer = boss.getKiller();
+        UUID playerId = bossDamagers.remove(boss.getUniqueId());
         if (killer != null) return killer;
-        UUID playerId = bossDamagers.get(boss.getUniqueId());
         return playerId == null ? null : Bukkit.getPlayer(playerId);
+    }
+
+    private void forgetBossLifecycle(UUID bossId) {
+        rewardedBosses.remove(bossId);
+        administrativelyRemovedBosses.remove(bossId);
+        historicallyDefeatedBosses.remove(bossId);
+        bossDamagers.remove(bossId);
     }
 
     private void runBossRewardCommands(String bossName, String bossType, LivingEntity bossHost, Player killer) {
