@@ -27,9 +27,16 @@ class LocaleCatalogTest {
     }
 
     @Test void legacyLocalesRemainHighestPriority() {
-        LocaleCatalog catalog = new LocaleCatalog(Map.of("ZombieBossName", "el duro"),
-                Map.of("ZombieBossName", "El Duro"), Map.of("ZombieBossName", "The Tough One"));
+        LocaleCatalog catalog = new LocaleCatalog(Map.of(
+                        "ZombieBossName", "el duro",
+                        "PlaceholderBossDisplayDefeated", "&7Estado: &aVencido"),
+                Map.of("ZombieBossName", "El Duro",
+                        "PlaceholderBossDisplayDefeated", "&7Estado: &aDerrotado"),
+                Map.of("ZombieBossName", "The Tough One",
+                        "PlaceholderBossDisplayDefeated", "&7Status: &aDefeated"));
         assertEquals("el duro", catalog.get("ZombieBossName").orElseThrow());
+        assertEquals("&7Estado: &aVencido",
+                catalog.get("PlaceholderBossDisplayDefeated").orElseThrow());
     }
 
     private static Map<String, Object> loadResource(String name) throws Exception {

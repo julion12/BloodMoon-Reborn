@@ -10,7 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class BloodMoonPlaceholderResolverTest {
     private static final PlaceholderLabels EN = new PlaceholderLabels("Active", "Inactive", "None", "Eligible",
             "Disqualified", "Not participating", "Not spawned yet",
-            "No active event", "Not spawned yet", "Alive", "Defeated");
+            "No active event", "Not spawned yet", "Alive", "Defeated",
+            "&7Boss: &8Not spawned yet", "&7Boss: &c%boss_name%",
+            "&7Boss: &a%boss_name%", "&7Type: &f%boss_type%",
+            "&7Health: &c%boss_health%", "&7Status: &aDefeated");
 
     @Test void activeAndWorldAreContextual() {
         assertAll(() -> assertEquals("true", resolve(active(), "active")),
@@ -85,6 +88,48 @@ class BloodMoonPlaceholderResolverTest {
                 () -> assertEquals("0%", resolve(defeated, "boss_health_formatted")));
     }
 
+    @Test void displayLinesFollowEveryNarrativeStateWithoutUnresolvedTokens() {
+        PlaceholderContext notSpawned = withBossState(BossPlaceholderState.none(), BossSessionState.NOT_SPAWNED);
+        PlaceholderContext alive = withBoss(new BossPlaceholderState(true, "Crimson King", "MYTHICMOBS", 300, 400));
+        PlaceholderContext defeated = withBossState(
+                new BossPlaceholderState(false, "Crimson King", "MYTHICMOBS", 0, 0),
+                BossSessionState.DEFEATED);
+        assertAll(
+                () -> assertEquals("", resolve(inactive(), "boss_display_line_1")),
+                () -> assertEquals("", resolve(inactive(), "boss_display_line_2")),
+                () -> assertEquals("", resolve(inactive(), "boss_display_line_3")),
+                () -> assertEquals("&7Boss: &8Not spawned yet", resolve(notSpawned, "boss_display_line_1")),
+                () -> assertEquals("", resolve(notSpawned, "boss_display_line_2")),
+                () -> assertEquals("", resolve(notSpawned, "boss_display_line_3")),
+                () -> assertEquals("&7Boss: &cCrimson King", resolve(alive, "boss_display_line_1")),
+                () -> assertEquals("&7Type: &fMYTHICMOBS", resolve(alive, "boss_display_line_2")),
+                () -> assertEquals("&7Health: &c75%", resolve(alive, "boss_display_line_3")),
+                () -> assertEquals("&7Boss: &aCrimson King", resolve(defeated, "boss_display_line_1")),
+                () -> assertEquals("&7Status: &aDefeated", resolve(defeated, "boss_display_line_2")),
+                () -> assertEquals("", resolve(defeated, "boss_display_line_3")));
+        for (int line = 1; line <= 3; line++) {
+            assertFalse(resolve(alive, "boss_display_line_" + line).contains("%boss_"));
+        }
+    }
+
+    @Test void displayLinesUseLiveVanillaHealthAndConfigurableLocalizedTemplates() {
+        PlaceholderLabels es = new PlaceholderLabels("Activa", "Inactiva", "Ninguno", "Elegible",
+                "Descalificado", "No participa", "Sin boss", "Sin evento", "Aún no aparece",
+                "Vivo", "Derrotado", "&7Jefe: &8Pendiente", "&7Jefe: &c%boss_name%",
+                "&7Jefe: &a%boss_name%", "&7Clase: &f%boss_type%",
+                "&7Vida: &c%boss_health%", "&7Estado: &aVencido");
+        PlaceholderContext first = new PlaceholderContext(true, "world", 90,
+                new BossPlaceholderState(true, "El Implacable", "VANILLA", 90, 120),
+                BossSessionState.ALIVE, PlayerPlaceholderState.none(), SessionPlaceholderState.none(), es);
+        PlaceholderContext changed = new PlaceholderContext(true, "world", 90,
+                new BossPlaceholderState(true, "El Implacable", "VANILLA", 30, 120),
+                BossSessionState.ALIVE, PlayerPlaceholderState.none(), SessionPlaceholderState.none(), es);
+        assertAll(() -> assertEquals("&7Jefe: &cEl Implacable", resolve(first, "boss_display_line_1")),
+                () -> assertEquals("&7Clase: &fVANILLA", resolve(first, "boss_display_line_2")),
+                () -> assertEquals("&7Vida: &c75%", resolve(first, "boss_display_line_3")),
+                () -> assertEquals("&7Vida: &c25%", resolve(changed, "boss_display_line_3")));
+    }
+
     @Test void participationAndEligibilityAreContextual() {
         PlaceholderContext eligible = withPlayer(new PlayerPlaceholderState(true, 125, true, false));
         PlaceholderContext disqualified = withPlayer(new PlayerPlaceholderState(true, 10, false, true));
@@ -150,7 +195,8 @@ class BloodMoonPlaceholderResolverTest {
                 "boss_max_health", "boss_health_percent", "boss_health_formatted", "participating",
                 "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status",
                 "death_count", "unique_deaths", "participants_current", "survivors_current",
-                "boss_state", "boss_state_formatted", "total_events", "total_death_events",
+                "boss_state", "boss_state_formatted", "boss_display_line_1", "boss_display_line_2",
+                "boss_display_line_3", "total_events", "total_death_events",
                 "total_unique_deaths", "total_bosses_spawned", "total_bosses_defeated",
                 "last_event_world", "last_event_duration_seconds", "last_event_duration_formatted",
                 "last_event_death_count", "last_event_unique_deaths", "last_event_participants",

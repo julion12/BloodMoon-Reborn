@@ -10,6 +10,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,18 +41,25 @@ class YamlExamplesTest {
         }
     }
 
-    @Test void tabExampleContainsAllReadyToCopyDesignsAndDynamicConditions() throws Exception {
+    @Test void tabRecommendedDesignUsesDirectBossLinesWithoutConditions() throws Exception {
         Path file = Path.of("docs/examples/TAB-scoreboards.yml");
         String source = Files.readString(file);
         Map<?, ?> root = assertInstanceOf(Map.class, new Yaml().load(source));
         Map<?, ?> scoreboard = assertInstanceOf(Map.class, root.get("scoreboard"));
         Map<?, ?> designs = assertInstanceOf(Map.class, scoreboard.get("scoreboards"));
+        Map<?, ?> recommended = assertInstanceOf(Map.class, designs.get("blood-moon-full"));
+        List<?> lines = assertInstanceOf(List.class, recommended.get("lines"));
         assertAll(() -> assertTrue(designs.containsKey("normal")),
                 () -> assertTrue(designs.containsKey("blood-moon-full")),
                 () -> assertTrue(designs.containsKey("blood-moon-compact")),
                 () -> assertTrue(designs.containsKey("blood-moon-history")),
                 () -> assertTrue(source.contains("display-condition: \"%bloodmoon_active%=true\"")),
                 () -> assertTrue(source.contains("%bloodmoon_boss_state%")),
+                () -> assertTrue(lines.contains("%bloodmoon_boss_display_line_1%")),
+                () -> assertTrue(lines.contains("%bloodmoon_boss_display_line_2%")),
+                () -> assertTrue(lines.contains("%bloodmoon_boss_display_line_3%")),
+                () -> assertFalse(lines.stream().anyMatch(line -> line.toString().contains("%condition:"))),
+                () -> assertEquals(15, lines.size()),
                 () -> assertTrue(source.contains("%bloodmoon_death_count%")),
                 () -> assertTrue(source.contains("%bloodmoon_unique_deaths%")),
                 () -> assertTrue(source.contains("%bloodmoon_participants_current%")),

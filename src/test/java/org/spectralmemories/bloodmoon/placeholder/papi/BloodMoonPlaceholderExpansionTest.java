@@ -14,7 +14,10 @@ class BloodMoonPlaceholderExpansionTest {
     private static BloodMoonPlaceholderExpansion expansion() {
         PlaceholderLabels labels = new PlaceholderLabels("Active", "Inactive", "None", "Eligible",
                 "Disqualified", "Not participating", "Not spawned yet",
-                "No active event", "Not spawned yet", "Alive", "Defeated");
+                "No active event", "Not spawned yet", "Alive", "Defeated",
+                "&7Boss: &8Not spawned yet", "&7Boss: &c%boss_name%",
+                "&7Boss: &a%boss_name%", "&7Type: &f%boss_type%",
+                "&7Health: &c%boss_health%", "&7Status: &aDefeated");
         return new BloodMoonPlaceholderExpansion("1.1.0", player -> PlaceholderContext.inactive(labels));
     }
 
@@ -34,6 +37,9 @@ class BloodMoonPlaceholderExpansionTest {
                 () -> assertEquals("0", expansion().onRequest(null, "unique_deaths")),
                 () -> assertEquals("0", expansion().onRequest(null, "participants_current")),
                 () -> assertEquals("0", expansion().onRequest(null, "survivors_current")),
+                () -> assertEquals("", expansion().onRequest(null, "boss_display_line_1")),
+                () -> assertEquals("", expansion().onRequest(null, "boss_display_line_2")),
+                () -> assertEquals("", expansion().onRequest(null, "boss_display_line_3")),
                 () -> assertNull(expansion().onRequest(null, "unknown")));
     }
 
@@ -50,7 +56,10 @@ class BloodMoonPlaceholderExpansionTest {
     @Test void everyPublicPlaceholderResolvesThroughPlaceholderApiAdapter() {
         PlaceholderLabels labels = new PlaceholderLabels("Active", "Inactive", "None", "Eligible",
                 "Disqualified", "Not participating", "Not spawned yet",
-                "No active event", "Not spawned yet", "Alive", "Defeated");
+                "No active event", "Not spawned yet", "Alive", "Defeated",
+                "&7Boss: &8Not spawned yet", "&7Boss: &c%boss_name%",
+                "&7Boss: &a%boss_name%", "&7Type: &f%boss_type%",
+                "&7Health: &c%boss_health%", "&7Status: &aDefeated");
         PlaceholderContext context = new PlaceholderContext(true, "world", 60,
                 new BossPlaceholderState(true, "Boss", "VANILLA", 20, 40),
                 BossSessionState.ALIVE, new PlayerPlaceholderState(true, 30, true, false),
@@ -61,7 +70,8 @@ class BloodMoonPlaceholderExpansionTest {
                 "boss_max_health", "boss_health_percent", "boss_health_formatted", "participating",
                 "participation_seconds", "participation_formatted", "survivor_eligible", "survivor_status",
                 "death_count", "unique_deaths", "participants_current", "survivors_current",
-                "boss_state", "boss_state_formatted", "total_events", "total_death_events",
+                "boss_state", "boss_state_formatted", "boss_display_line_1", "boss_display_line_2",
+                "boss_display_line_3", "total_events", "total_death_events",
                 "total_unique_deaths", "total_bosses_spawned", "total_bosses_defeated",
                 "last_event_world", "last_event_duration_seconds", "last_event_duration_formatted",
                 "last_event_death_count", "last_event_unique_deaths", "last_event_participants",
