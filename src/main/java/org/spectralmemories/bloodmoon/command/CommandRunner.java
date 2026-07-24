@@ -50,7 +50,8 @@ public final class CommandRunner {
                 if (parsed.mode() == CommandExecutionMode.PLAYER_FOR_EACH_PLAYER) player.performCommand(command);
                 else dispatchConsole(command);
             } catch (RuntimeException exception) {
-                plugin.getLogger().log(Level.SEVERE, "Configured command failed for " + player.getUniqueId() + ": " + command, exception);
+                plugin.getLogger().log(Level.SEVERE, "Configured command '" + commandLabel(command)
+                        + "' failed for " + player.getUniqueId(), exception);
             }
         }
     }
@@ -58,11 +59,18 @@ public final class CommandRunner {
     private void dispatchConsole(String command) {
         try {
             if (!Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)) {
-                plugin.getLogger().warning("Configured command returned false: " + command);
+                plugin.getLogger().warning("Configured command '" + commandLabel(command) + "' returned false");
             }
         } catch (RuntimeException exception) {
-            plugin.getLogger().log(Level.SEVERE, "Configured command failed: " + command, exception);
+            plugin.getLogger().log(Level.SEVERE, "Configured command '" + commandLabel(command) + "' failed", exception);
         }
+    }
+
+    static String commandLabel(String command) {
+        if (command == null || command.isBlank()) return "<empty>";
+        String trimmed = command.trim();
+        int separator = trimmed.indexOf(' ');
+        return separator < 0 ? trimmed : trimmed.substring(0, separator);
     }
 
     public static String render(String template, World world, BloodMoonSession session, Player player, Map<String, ?> extras) {

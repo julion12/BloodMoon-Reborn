@@ -5,6 +5,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommandParserTest {
+    @Test void failureLogLabelDoesNotExposeCommandArguments() {
+        String command = "webhook send secret-token-value";
+
+        assertEquals("webhook", CommandRunner.commandLabel(command));
+        assertFalse(CommandRunner.commandLabel(command).contains("secret-token-value"));
+    }
+
     @Test void rejectsNullAndEmptyCommands() {
         assertTrue(CommandParser.parse(null, CommandExecutionMode.SERVER_ONCE).isEmpty());
         assertTrue(CommandParser.parse(" / ", CommandExecutionMode.SERVER_ONCE).isEmpty());
