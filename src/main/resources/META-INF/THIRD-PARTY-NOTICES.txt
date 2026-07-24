@@ -8,6 +8,14 @@ The complete license is included as META-INF/APACHE-LICENSE-2.0.txt.
 
 SQLAccess helper
 Package: org.spectralmemories.sqlaccess
-This helper was distributed with the original BloodMoon project by
-SpectralMemories. No separate license metadata is present in the bundled
-binary. It is retained because the runtime cache layer uses it directly.
+Public release: SQLAccess 2020-01-26
+Author: SpectralMemories
+Project: https://gitlab.com/SpectralMemories/SQLAccess
+Resource: https://www.spigotmc.org/resources/sqlaccess.74666/
+License: zlib, as distributed in the original BloodMoon source archive
+Copyright (c) 2020 SpectralMemories / Java
+The original BloodMoon archive contains this exact 5,474-byte binary together
+with the project's zlib LICENSE. The SQLAccess resource instructions require
+the helper to be included in the final plugin JAR. The binary itself has no
+manifest, Maven metadata, LICENSE, NOTICE, or version file. It is unmodified
+and retained because the runtime cache layer uses it directly.
