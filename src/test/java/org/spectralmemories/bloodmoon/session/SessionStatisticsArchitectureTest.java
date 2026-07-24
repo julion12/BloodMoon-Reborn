@@ -40,7 +40,11 @@ class SessionStatisticsArchitectureTest {
         assertAll(() -> assertFalse(store.contains("totalDeathEvents")),
                 () -> assertFalse(store.contains("uniqueDeadPlayers")),
                 () -> assertFalse(store.contains("currentParticipants")),
-                () -> assertFalse(store.contains("currentSurvivors")));
+                () -> assertFalse(store.contains("currentSurvivors")),
+                () -> assertFalse(store.contains(".participants")),
+                () -> assertFalse(store.contains(".deaths")),
+                () -> assertFalse(store.contains(".rewarded")),
+                () -> assertFalse(store.contains("playerId()")));
     }
 
     private String read(String path) throws IOException {

@@ -40,9 +40,6 @@ public final class SessionStore {
             yaml.set(root + ".session", session.sessionId().toString());
             yaml.set(root + ".world", session.worldName());
             yaml.set(root + ".started", session.startedAt().toString());
-            yaml.set(root + ".participants", session.participants().stream().map(p -> p.playerId().toString()).toList());
-            yaml.set(root + ".deaths", session.participants().stream().filter(BloodMoonSession.Participant::died).map(p -> p.playerId().toString()).toList());
-            yaml.set(root + ".rewarded", session.participants().stream().filter(BloodMoonSession.Participant::rewarded).map(p -> p.playerId().toString()).toList());
         }
         try {
             yaml.save(file);

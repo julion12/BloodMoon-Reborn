@@ -14,7 +14,7 @@ With defaults:
 
 Set `DisqualifyOnWorldLeave` or `DisqualifyOnDisconnect` to make those actions permanent disqualifiers. When `RequireOnlineAtEnd` is false, offline participants can be eligible logically, but player-targeted commands require an online Bukkit player and are therefore not dispatched until an external/offline-capable command design is added.
 
-Natural and manual complete endings evaluate rewards. Plugin disable, crash recovery, or uncertain/incomplete state does not grant rewards. `sessions.yml` is a crash marker; an incomplete file found at startup is archived as `sessions.discarded-<timestamp>.yml` without rewards.
+Natural and manual complete endings evaluate rewards. Plugin disable, crash recovery, or uncertain/incomplete state does not grant rewards. `sessions.yml` is a crash marker containing only event metadata (session ID, world name, and start time), never player UUIDs or reward/death lists. An incomplete file found at startup is archived as `sessions.discarded-<timestamp>.yml` without rewards.
 
 The active `%bloodmoon_survivors_current%` counter is updated immediately when a registered participant first dies or is disqualified. At normal completion, its final value becomes `lastEventSurvivors` in `statistics.yml`; aborted/incomplete sessions never replace the last completed-event snapshot.
 
