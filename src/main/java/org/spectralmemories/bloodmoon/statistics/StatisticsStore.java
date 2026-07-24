@@ -1,5 +1,6 @@
 package org.spectralmemories.bloodmoon.statistics;
 
+import org.spectralmemories.bloodmoon.config.SafeYaml;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public final class StatisticsStore {
 
     private final Path file;
     private final Logger logger;
-    private final Yaml yaml = new Yaml();
+    private final Yaml yaml = SafeYaml.create();
 
     public StatisticsStore(Path file, Logger logger) {
         this.file = file;

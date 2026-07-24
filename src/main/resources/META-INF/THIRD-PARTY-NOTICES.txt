@@ -1,0 +1,13 @@
+BloodMoon-Reborn 1.1.0 - Third-party notices
+
+SnakeYAML 2.6
+Copyright (c) 2008-present, SnakeYAML contributors
+License: Apache License, Version 2.0
+Project: https://bitbucket.org/snakeyaml/snakeyaml
+The complete license is included as META-INF/APACHE-LICENSE-2.0.txt.
+
+SQLAccess helper
+Package: org.spectralmemories.sqlaccess
+This helper was distributed with the original BloodMoon project by
+SpectralMemories. No separate license metadata is present in the bundled
+binary. It is retained because the runtime cache layer uses it directly.

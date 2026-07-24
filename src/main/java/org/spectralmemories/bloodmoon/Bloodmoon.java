@@ -11,6 +11,7 @@ import org.spectralmemories.sqlaccess.SQLAccess;
 import org.spectralmemories.sqlaccess.SQLField;
 import org.spectralmemories.sqlaccess.SQLTable;
 import org.spectralmemories.bloodmoon.config.ConfigMigrator;
+import org.spectralmemories.bloodmoon.config.SafeYaml;
 import org.spectralmemories.bloodmoon.session.SessionCoordinator;
 import org.spectralmemories.bloodmoon.integration.MythicMobsBridge;
 import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
@@ -19,7 +20,6 @@ import org.spectralmemories.bloodmoon.placeholder.PlaceholderIntegration;
 import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
 import org.spectralmemories.bloodmoon.statistics.HistoricalStatisticsService;
 import org.spectralmemories.bloodmoon.distribution.AdministratorGuideInstaller;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
@@ -228,7 +228,7 @@ public final class Bloodmoon extends JavaPlugin
         }
         try (InputStream input = getResource(resourcePath)) {
             if (input == null) return;
-            Object loaded = new Yaml().load(input);
+            Object loaded = SafeYaml.create().load(input);
             if (!(loaded instanceof Map<?, ?> map)) return;
             Map<String, Object> bundled = new java.util.LinkedHashMap<>();
             map.forEach((key, value) -> {
@@ -406,9 +406,6 @@ public final class Bloodmoon extends JavaPlugin
             getCommand("bloodmoon").setExecutor(commandExecutor);
             getCommand("bloodmoon").setTabCompleter(commandExecutor);
         }
-
-
-        if (getCommand("testsuite") != null) getCommand("testsuite").setExecutor(new TestCommandExecutor());
 
         CheckOlderConfigs();
     }

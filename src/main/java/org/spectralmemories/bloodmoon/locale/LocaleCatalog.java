@@ -1,6 +1,6 @@
 package org.spectralmemories.bloodmoon.locale;
 
-import org.yaml.snakeyaml.Yaml;
+import org.spectralmemories.bloodmoon.config.SafeYaml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +38,7 @@ public final class LocaleCatalog {
     public static Map<String, Object> load(Path file) throws IOException {
         if (file == null || !Files.isRegularFile(file)) return Collections.emptyMap();
         try (InputStream input = Files.newInputStream(file)) {
-            Object loaded = new Yaml().load(input);
+            Object loaded = SafeYaml.create().load(input);
             if (!(loaded instanceof Map<?, ?> map)) return Collections.emptyMap();
             Map<String, Object> result = new LinkedHashMap<>();
             map.forEach((key, value) -> {

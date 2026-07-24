@@ -1,6 +1,7 @@
 name: BloodMoon
 version: 1.1.0
 main: org.spectralmemories.bloodmoon.Bloodmoon
+load: POSTWORLD
 softdepend:
   - "Multiverse-Core"
   - "WorldGuard"
@@ -9,17 +10,13 @@ softdepend:
 api-version: 1.21
 authors: [SpectralMemories]
 contributors: [JulioN12]
-description: A BloodMoon shines every couple of nights
+website: https://github.com/julion12/BloodMoon-Reborn
+description: Configurable per-world Blood Moon events for Paper and Purpur
 commands:
   bloodmoon:
-    description: Base command. Should be followed by either show, start, stop or reload
+    description: Controls Blood Moon status, lifecycle, hordes, bosses, and reload
+    usage: /bloodmoon <show|status|start|stop|reload|survivors|spawnzombieboss|spawnhorde|killbosses>
     permission: "bloodmoon.bloodmoon"
-    permission-message: "You do not have the permission to do this"
-  #Uncomment this section to unlock the testsuite command. Official releases will obviously pass all tests, but if you want to
-  #Run them yourself, knock yourself out!
-  testsuite:
-    description: Runs the integrated test suite. Usually only developers use this, there is however little harm to do it yourself. Test results will be in the BloodMoon folder
-    permission: "bloodmoon.testsuite"
     permission-message: "You do not have the permission to do this"
 permissions:
   bloodmoon.bloodmoon:
@@ -46,7 +43,3 @@ permissions:
   bloodmoon.spawnhorde:
     description: Allows to spawn a horde
     default: op
-  #Required for the testsuite command
-  #bloodmoon.testsuite:
-  #  description: Allows to run the testsuite command. You most likely don't need this
-  #  default: op

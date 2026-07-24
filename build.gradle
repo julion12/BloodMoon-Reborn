@@ -39,6 +39,10 @@ processResources {
         include '*.yml', '*.txt'
         into 'distribution/EXAMPLES'
     }
+    from('LICENSE') {
+        into 'META-INF'
+        rename 'LICENSE', 'BloodMoon-Reborn-LICENSE.txt'
+    }
 }
 
 dependencies {
@@ -50,8 +54,9 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.12.3'
 
-    implementation 'org.yaml:snakeyaml:1.23'
-    implementation 'org.jetbrains:annotations:18.0.0'
+    implementation 'org.yaml:snakeyaml:2.6'
+    compileOnly 'org.jetbrains:annotations:18.0.0'
+    testCompileOnly 'org.jetbrains:annotations:18.0.0'
 
     implementation(files('libs/SQLAccess.jar'))
 

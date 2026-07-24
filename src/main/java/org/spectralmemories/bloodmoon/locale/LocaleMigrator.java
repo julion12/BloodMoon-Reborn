@@ -1,7 +1,7 @@
 package org.spectralmemories.bloodmoon.locale;
 
 import org.spectralmemories.bloodmoon.config.SemanticVersion;
-import org.yaml.snakeyaml.Yaml;
+import org.spectralmemories.bloodmoon.config.SafeYaml;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +29,7 @@ public final class LocaleMigrator {
     public static MigrationResult migrate(Path file, Clock clock) throws IOException {
         String original = Files.readString(file, StandardCharsets.UTF_8);
         try {
-            new Yaml().load(original);
+            SafeYaml.create().load(original);
         } catch (RuntimeException exception) {
             throw new IOException("Invalid legacy locale YAML; original file preserved", exception);
         }
@@ -49,7 +49,7 @@ public final class LocaleMigrator {
     public static MigrationResult migrateCatalog(Path file, Map<String, Object> bundled, Clock clock) throws IOException {
         String original = Files.readString(file, StandardCharsets.UTF_8);
         try {
-            new Yaml().load(original);
+            SafeYaml.create().load(original);
         } catch (RuntimeException exception) {
             throw new IOException("Invalid bundled locale YAML; original file preserved", exception);
         }
@@ -120,7 +120,7 @@ public final class LocaleMigrator {
 
     private static Map<String, Object> parse(String source) {
         try {
-            Object loaded = new Yaml().load(source);
+            Object loaded = SafeYaml.create().load(source);
             if (!(loaded instanceof Map<?, ?> map)) return Collections.emptyMap();
             Map<String, Object> result = new LinkedHashMap<>();
             map.forEach((key, value) -> {

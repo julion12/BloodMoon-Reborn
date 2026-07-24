@@ -2,7 +2,7 @@ package org.spectralmemories.bloodmoon;
 
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.yaml.snakeyaml.Yaml;
+import org.spectralmemories.bloodmoon.config.SafeYaml;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -310,7 +310,7 @@ public class ConfigReader implements Closeable
     public boolean TryRefreshConfigs ()
     {
         try (InputStream inputStream = new FileInputStream(configFile)) {
-            Object loaded = new Yaml().load(inputStream);
+            Object loaded = SafeYaml.create().load(inputStream);
             Map<String, Object> candidate = loaded instanceof Map<?, ?> map
                     ? new HashMap<>((Map<String, Object>) map) : new HashMap<>();
             cache = candidate;
