@@ -145,7 +145,15 @@ ignored evidence paths are indexed in `RELEASE_VALIDATION_EVIDENCE_1.1.0.md`.
 - PASS: survivor/death, late join exclusion, reconnect, other-world, offline-at-end, abort without
   payout, vanilla credited/admin/live-at-end policy, English Mythic reward isolation, history,
   and migration/idempotence.
+- PASS — owner verified, evidence pending: in-game vanilla boss scoreboard, MythicMobs boss
+  scoreboard, visible boss states/updates, final event rewards, configured end commands, and normal
+  event closure. No version, language, capture, log, hash, or exact configuration is inferred.
 - FAIL: restart during an active nighttime event is safely aborted, but startup immediately creates
   a new zero-participant event; with `IncludeLateJoiners: false`, reconnecting players cannot join.
-- NOT RUN: graphical TAB EN/ES, full Spanish lifecycle, full Phase-2 Paper/Purpur 26.2 lifecycle.
+- NOT RUN: separate TAB/locale English review, separate TAB/locale Spanish review, full Spanish
+  lifecycle, and full Phase-2 Paper/Purpur 26.2 lifecycle.
 - NOT APPLICABLE: native Vault/economy balance tests; 1.1.0 exposes command rewards, not a Vault API.
+
+The owner verification covers only the behavior named above. It does not replace the formal
+dead-player exclusion, duplicate-delivery, history-after-restart, 1.0.1 migration, separate
+English/Spanish, or 26.2 rows.

@@ -36,5 +36,7 @@ the author's public resource instructions. One reward-message color bug was fixe
 
 Known release gate: **NOT READY FOR RELEASE CANDIDATE.** A same-night restart automatically starts
 a new zero-participant session before players reconnect; with late joiners disabled, that session
-cannot reward them. Graphical TAB/locale captures, the Spanish live walkthrough, and the full 26.2
-Phase-2 lifecycle also remain unexecuted. MythicMobs 5.12.1 remains unsupported on 26.2.
+cannot reward them. The project owner separately verified real in-game vanilla/Mythic scoreboards,
+boss-state updates, final rewards, end commands, and normal event closure; formal evidence is still
+pending. Separate English/Spanish review and the full 26.2 Phase-2 lifecycle remain unexecuted.
+MythicMobs 5.12.1 remains unsupported on 26.2.

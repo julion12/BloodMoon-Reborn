@@ -177,7 +177,8 @@ join policy, disconnect/world-leave policy, minimum participation, completion-on
 rewards, once-per-session protection, abort/crash no-payout, boss UUID once protection,
 administrative removal, Mythic/vanilla reward isolation, missing Mythic fallback, offline/null
 players, and reload ownership. Commands are administrator-trusted Bukkit commands, not OS shell
-commands. Manual real-player reward delivery remains a release gate; it is not marked PASS.
+commands. At the time of this Phase-1 snapshot, manual real-player reward delivery had not yet
+been incorporated into the audit; the Phase-2 addendum below supersedes that pending classification.
 
 ## 14. Active and historical statistics
 
@@ -302,13 +303,14 @@ Paper 1.21.8 build 60, Java 21.0.11, new path containing spaces, only BloodMoon:
 - integration run loaded BloodMoon, PAPI 2.12.3, MythicMobs 5.12.1, TAB 5.3.2, registered the
   BloodMoon expansion once, reloaded TAB/BloodMoon, and stopped with zero selected error matches.
 
-## 25. Pending manual tests
+## 25. Phase-1 pending manual tests snapshot
 
-Still pending: real survivor reward, dead-player exclusion, vanilla boss reward, Mythic boss
+At the close of Phase 1, the following were still pending: real survivor reward, dead-player exclusion, vanilla boss reward, Mythic boss
 reward, duplicate prevention, completed-event history, history after restart, graphical TAB
 review, complete English review, complete Spanish review, Paper/Purpur 26.2 deployment walkthrough,
 and migration from an unmodified user-owned 1.0.1 installation. Preparation, steps, expected
-result, evidence, and PASS/FAIL criteria are explicit in `MANUAL_TEST_CHECKLIST.md`.
+result, evidence, and PASS/FAIL criteria are explicit in `MANUAL_TEST_CHECKLIST.md`. This historical
+list is superseded by the Phase-2 addendum, including the owner's manual PASS results.
 
 ## 26. Blockers
 
@@ -367,6 +369,12 @@ Mythic reward isolation, historical snapshots, and a tag-built 1.0.1 migration. 
 fixes a reproduced literal legacy color code in survivor messages. The exact evidence index is
 `RELEASE_VALIDATION_EVIDENCE_1.1.0.md`.
 
+The project owner additionally confirmed earlier real in-game PASS results for vanilla and
+MythicMobs scoreboards, visible boss states/updates, final rewards, configured end commands, and
+normal event closure. They are classified **PASS — owner verified, evidence pending** because no
+captures, logs, versions, language, hashes, or exact configuration were supplied.
+
 Status remains **NOT READY FOR RELEASE CANDIDATE**. Same-night restart creates a new empty session
-before reconnecting players can register when late joiners are disabled. Graphical TAB EN/ES,
-the full Spanish live flow, and the full Phase-2 26.2 lifecycle are also NOT RUN.
+before reconnecting players can register when late joiners are disabled. Separate English and
+Spanish review and the full Phase-2 26.2 lifecycle are also NOT RUN. The owner-verified shared
+scoreboard and normal-completion behavior is not classified as NOT RUN.

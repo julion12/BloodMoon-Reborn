@@ -121,7 +121,7 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 
 ## Release gate
 
-### Final pre-RC audit
+### Final pre-RC audit — Phase-1 snapshot
 
 | Check | Result | Evidence |
 | --- | --- | --- |
@@ -138,6 +138,9 @@ RC promotion remains blocked by the unconfirmed SQLAccess licensing metadata and
 player/manual checks that the project checklist explicitly requires before changing `NOT READY`.
 MythicMobs 5.12.1 also remains upstream-incompatible with the tested Paper 26.2 build.
 
+The Phase-2 addendum below supersedes the pending/manual and SQLAccess classifications in this
+Phase-1 snapshot.
+
 ## Phase-2 functional validation addendum — 2026-07-24
 
 | Check | Result | Evidence |
@@ -150,9 +153,17 @@ MythicMobs 5.12.1 also remains upstream-incompatible with the tested Paper 26.2 
 | Historical statistics and shutdown persistence | PASS | Consecutive snapshots and post-shutdown files retained; restart behavior caveat above |
 | Tag-built 1.0.1 migration | PASS | Values/cache/docs preserved; one backup/section; second boot idempotent |
 | Survivor message colors | PASS (automated after live failure) | Live literal `&a` reproduced; regression test added and 131-test suite passes |
-| TAB visual EN/ES | NOT RUN | Servers/examples prepared; no graphical captures |
+| TAB vanilla boss visibility and updates | PASS — owner verified, evidence pending | Real in-game behavior confirmed by project owner; no captures, logs, version, or language supplied |
+| TAB MythicMobs boss visibility and updates | PASS — owner verified, evidence pending | Real in-game behavior confirmed by project owner; no captures, logs, version, or language supplied |
+| Final event rewards | PASS — owner verified, evidence pending | Project owner confirmed final reward delivery; exact recipient/configuration evidence pending |
+| Configured commands at event end | PASS — owner verified, evidence pending | Project owner confirmed execution; exact commands and logs pending |
+| Normal event closing flow | PASS — owner verified, evidence pending | Project owner confirmed general event completion; restart/crash cases excluded |
+| TAB/locale English-specific review | NOT RUN | Owner verification did not identify language or cover the separate EN checklist |
+| TAB/locale Spanish-specific review | NOT RUN | Owner verification did not identify language or cover the separate ES checklist |
 | Full Spanish live lifecycle | NOT RUN | Prepared only |
 | Full Paper/Purpur 26.2 Phase-2 lifecycle | NOT RUN | Earlier core smoke is not counted as this full walkthrough |
 
 **Phase-2 status: NOT READY FOR RELEASE CANDIDATE.** SQLAccess is no longer a blocker. The
-same-night restart failure and unexecuted graphical/language/26.2 rows remain release gates.
+same-night restart failure and unexecuted language-specific/26.2 rows remain release gates.
+Shared vanilla/Mythic scoreboard behavior, final rewards, configured end commands, and normal event
+closure are PASS by owner verification; only their documentary evidence remains pending.
