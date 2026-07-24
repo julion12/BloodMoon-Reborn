@@ -7,6 +7,8 @@ import org.spectralmemories.bloodmoon.session.BossSessionState;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,13 +46,49 @@ class BloodMoonPlaceholderExpansionTest {
     }
 
     @Test void nonNullOfflinePlayerNeverDereferencesAnOnlinePlayer() {
+        UUID playerId = UUID.randomUUID();
         OfflinePlayer offline = (OfflinePlayer) Proxy.newProxyInstance(
                 OfflinePlayer.class.getClassLoader(), new Class<?>[]{OfflinePlayer.class},
-                (proxy, method, args) -> method.getName().equals("isOnline") ? false : null);
+                (proxy, method, args) -> {
+                    if (method.getName().equals("getUniqueId")) return playerId;
+                    if (method.getName().equals("isOnline") || method.getName().equals("getPlayer")) {
+                        throw new AssertionError("unsafe OfflinePlayer access: " + method.getName());
+                    }
+                    return null;
+                });
         assertAll(() -> assertEquals("0", expansion().onRequest(offline, "death_count")),
                 () -> assertEquals("0", expansion().onRequest(offline, "unique_deaths")),
                 () -> assertEquals("0", expansion().onRequest(offline, "participants_current")),
                 () -> assertEquals("0", expansion().onRequest(offline, "survivors_current")));
+    }
+
+    @Test void allPublicRequestsResolveFromAnAsyncExecutor() throws Exception {
+        UUID playerId = UUID.randomUUID();
+        PlaceholderLabels labels = new PlaceholderLabels("Active", "Inactive", "None", "Eligible",
+                "Disqualified", "Not participating", "Not spawned yet",
+                "No active event", "Not spawned yet", "Alive", "Defeated",
+                "&7Boss: &8Not spawned yet", "&7Boss: &c%boss_name%",
+                "&7Boss: &a%boss_name%", "&7Type: &f%boss_type%",
+                "&7Health: &c%boss_health%", "&7Status: &aDefeated");
+        PlaceholderContext context = new PlaceholderContext(true, "world", 60,
+                new BossPlaceholderState(true, "Boss", "MYTHICMOBS", 20, 40),
+                BossSessionState.ALIVE, new PlayerPlaceholderState(true, 30, true, false),
+                new SessionPlaceholderState(5, 3, 8, 6), labels);
+        BloodMoonPlaceholderExpansion expansion =
+                new BloodMoonPlaceholderExpansion("1.1.0", id -> id == null
+                        ? PlaceholderContext.inactive(labels) : context);
+        OfflinePlayer offline = (OfflinePlayer) Proxy.newProxyInstance(
+                OfflinePlayer.class.getClassLoader(), new Class<?>[]{OfflinePlayer.class},
+                (proxy, method, args) -> method.getName().equals("getUniqueId") ? playerId : null);
+        var executor = Executors.newFixedThreadPool(4);
+        try {
+            for (String identifier : BloodMoonPlaceholderResolver.identifiers()) {
+                assertNotNull(executor.submit(() -> expansion.onRequest(offline, identifier)).get(),
+                        identifier);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     @Test void everyPublicPlaceholderResolvesThroughPlaceholderApiAdapter() {

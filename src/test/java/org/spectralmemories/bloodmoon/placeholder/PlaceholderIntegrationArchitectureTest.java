@@ -29,14 +29,42 @@ class PlaceholderIntegrationArchitectureTest {
 
     @Test void requestPathContainsNoDiskScanSchedulerCommandOrGlobalEntityTraversal() throws IOException {
         String service = read("src/main/java/org/spectralmemories/bloodmoon/placeholder/PlaceholderStateService.java");
+        String store = read("src/main/java/org/spectralmemories/bloodmoon/placeholder/PlaceholderSnapshotStore.java");
         String resolver = read("src/main/java/org/spectralmemories/bloodmoon/placeholder/BloodMoonPlaceholderResolver.java");
-        String requestPath = service + resolver;
+        String expansion = read("src/main/java/org/spectralmemories/bloodmoon/placeholder/papi/BloodMoonPlaceholderExpansion.java");
+        String requestPath = service + store + resolver + expansion;
         assertAll(() -> assertFalse(requestPath.contains("java.nio.file")),
                 () -> assertFalse(requestPath.contains("Yaml")),
                 () -> assertFalse(requestPath.contains(".participants()")),
+                () -> assertFalse(requestPath.contains("Bukkit.getEntity")),
+                () -> assertFalse(requestPath.contains(".getWorld()")),
+                () -> assertFalse(requestPath.contains(".getPlayer()")),
+                () -> assertFalse(requestPath.contains(".isOnline()")),
                 () -> assertFalse(requestPath.contains("getLivingEntities")),
                 () -> assertFalse(requestPath.contains("getScheduler")),
+                () -> assertFalse(requestPath.contains("runTask")),
                 () -> assertFalse(requestPath.contains("dispatchCommand")));
+    }
+
+    @Test void bossEntityAccessIsConfinedToMainThreadSnapshotPublication() throws IOException {
+        String actuator = read("src/main/java/org/spectralmemories/bloodmoon/BloodmoonActuator.java");
+        String publisher = read("src/main/java/org/spectralmemories/bloodmoon/snapshot/PlaceholderSnapshotPublisher.java");
+        assertAll(() -> assertFalse(actuator.contains("Bukkit.getEntity(")),
+                () -> assertTrue(actuator.contains("AtomicReference<BossPlaceholderSnapshot>")),
+                () -> assertTrue(actuator.contains("refreshBossPlaceholderSnapshotOnMainThread")),
+                () -> assertTrue(publisher.contains("Bukkit.isPrimaryThread()")),
+                () -> assertTrue(publisher.contains("publishFromMainThread")),
+                () -> assertFalse(publisher.contains("runTask")));
+    }
+
+    @Test void bossLifecyclePublishesEveryNarrativeTransition() throws IOException {
+        String actuator = read("src/main/java/org/spectralmemories/bloodmoon/BloodmoonActuator.java");
+        assertAll(() -> assertTrue(actuator.contains("bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.notSpawned())")),
+                () -> assertTrue(actuator.contains("bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.alive(")),
+                () -> assertTrue(actuator.contains("bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.defeated(")),
+                () -> assertTrue(actuator.contains("bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.none())")),
+                () -> assertTrue(actuator.contains("onBossRegainHealth(EntityRegainHealthEvent event)")),
+                () -> assertTrue(actuator.contains("if (session != null) session.bossRemoved(currentPlaceholderBossId)")));
     }
 
     private String read(String path) throws IOException { return Files.readString(root.resolve(path)); }
