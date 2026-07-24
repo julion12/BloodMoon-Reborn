@@ -18,22 +18,22 @@ public final class AdministratorGuideInstaller {
     private static final List<ResourceFile> MANIFEST = List.of(
             file("README.txt"),
             file("EXAMPLES/TAB-scoreboards.yml"),
+            file("EXAMPLES/TAB-scoreboards-en.yml"),
+            file("EXAMPLES/TAB-scoreboards-es.yml"),
             file("EXAMPLES/CommandsOnStart.yml"),
+            file("EXAMPLES/CommandsOnStart-en.yml"),
+            file("EXAMPLES/CommandsOnStart-es.yml"),
             file("EXAMPLES/CommandsOnEnd.yml"),
+            file("EXAMPLES/CommandsOnEnd-en.yml"),
+            file("EXAMPLES/CommandsOnEnd-es.yml"),
             file("EXAMPLES/SurvivorRewards.yml"),
+            file("EXAMPLES/SurvivorRewards-en.yml"),
+            file("EXAMPLES/SurvivorRewards-es.yml"),
             file("EXAMPLES/BossRewards.yml"),
+            file("EXAMPLES/BossRewards-en.yml"),
+            file("EXAMPLES/BossRewards-es.yml"),
             file("EXAMPLES/PlaceholderAPI-examples.txt"),
-            file("EXAMPLES/MythicMobs-BloodMoonBoss.yml"),
-            file("docs/VERSION.txt"),
-            file("docs/COMPATIBILITY.md"),
-            file("docs/CONFIGURATION.md"),
-            file("docs/EXAMPLES.md"),
-            file("docs/MANUAL_TEST_CHECKLIST.md"),
-            file("docs/MIGRATION.md"),
-            file("docs/MYTHICMOBS.md"),
-            file("docs/PLACEHOLDERAPI.md"),
-            file("docs/PLACEHOLDERS.md"),
-            file("docs/SURVIVOR_REWARDS.md"));
+            file("EXAMPLES/MythicMobs-BloodMoonBoss.yml"));
 
     private final Path dataFolder;
     private final ResourceProvider resources;

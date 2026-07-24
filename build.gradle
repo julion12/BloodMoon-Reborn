@@ -36,16 +36,8 @@ tasks.withType(JavaCompile).configureEach {
 
 processResources {
     from('docs/examples') {
-        include 'TAB-scoreboards.yml', 'CommandsOnStart.yml', 'CommandsOnEnd.yml',
-                'SurvivorRewards.yml', 'BossRewards.yml', 'PlaceholderAPI-examples.txt',
-                'MythicMobs-BloodMoonBoss.yml'
+        include '*.yml', '*.txt'
         into 'distribution/EXAMPLES'
-    }
-    from('docs') {
-        include 'COMPATIBILITY.md', 'CONFIGURATION.md', 'EXAMPLES.md',
-                'MANUAL_TEST_CHECKLIST.md', 'MIGRATION.md', 'MYTHICMOBS.md',
-                'PLACEHOLDERAPI.md', 'PLACEHOLDERS.md', 'SURVIVOR_REWARDS.md'
-        into 'distribution/docs'
     }
 }
 

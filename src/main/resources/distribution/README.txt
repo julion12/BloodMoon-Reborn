@@ -1,43 +1,48 @@
 BloodMoon-Reborn 1.1.0
 ======================
 
-BloodMoon-Reborn continues SpectralMemories' BloodMoon plugin with per-world
-events, stronger mobs, optional survivor/boss rewards, boss state, session
-statistics, and safe server-wide historical totals.
+ENGLISH
+-------
 
-QUICK START
+Welcome to BloodMoon-Reborn, the maintained continuation of SpectralMemories'
+BloodMoon plugin. It provides configurable Blood Moon events per world,
+stronger mobs, bosses, rewards, and PlaceholderAPI statistics.
 
 - World configuration: plugins/BloodMoon/<world>/config.yml
-- Language selector: plugins/BloodMoon/locales.yml (Language: en or es)
-- Ready-to-review examples: plugins/BloodMoon/EXAMPLES/
-- Administrator guides: plugins/BloodMoon/docs/
+- Language selection and visible messages: plugins/BloodMoon/locales.yml
+- Historical statistics: plugins/BloodMoon/statistics.yml
+- Ready-to-copy files: plugins/BloodMoon/EXAMPLES/
 
-OPTIONAL INTEGRATIONS
+Files ending in -en use English visible text. Files ending in -es use Spanish
+visible text. When an index offers both variants, choose and copy ONLY ONE.
 
-- PlaceholderAPI exposes the internal "bloodmoon" expansion.
-- MythicMobs can provide the configured Blood Moon boss.
-- TAB can use the scoreboard example. BloodMoon-Reborn does not require TAB.
+PlaceholderAPI and MythicMobs are optional integrations. TAB examples are
+provided for servers that use TAB together with PlaceholderAPI.
 
-SUPPORTED RUNTIME
+Complete documentation:
+https://github.com/julion12/BloodMoon-Reborn
 
-- Paper or Purpur 1.21.4 through 26.2 as documented in COMPATIBILITY.md.
-- Java 21 for Minecraft 1.21.x; Java 25 for Minecraft 26.1+.
+ESPAÑOL
+-------
 
-MAIN COMMANDS
+Bienvenido a BloodMoon-Reborn, la continuación mantenida del plugin BloodMoon
+de SpectralMemories. Proporciona eventos de Luna de Sangre configurables por
+mundo, criaturas reforzadas, bosses, recompensas y estadísticas PlaceholderAPI.
 
-/bloodmoon show
-/bloodmoon start
-/bloodmoon stop
-/bloodmoon reload
-/bloodmoon survivors
-/bloodmoon spawnzombieboss
-/bloodmoon killbosses
+- Configuración por mundo: plugins/BloodMoon/<mundo>/config.yml
+- Selección de idioma y mensajes visibles: plugins/BloodMoon/locales.yml
+- Estadísticas históricas: plugins/BloodMoon/statistics.yml
+- Archivos listos para copiar: plugins/BloodMoon/EXAMPLES/
 
-Review every example before merging it into an active YAML file. Preserve the
-existing indentation and never paste a second top-level section with the same
-name over an existing configuration.
+Los archivos terminados en -en utilizan texto visible en inglés. Los archivos
+terminados en -es utilizan texto visible en español. Cuando un índice ofrezca
+ambas variantes, elija y copie SOLO UNA.
 
-Repository: https://github.com/julion12/BloodMoon-Reborn
+PlaceholderAPI y MythicMobs son integraciones opcionales. Se incluyen ejemplos
+para servidores que utilizan TAB junto con PlaceholderAPI.
+
+Documentación completa:
+https://github.com/julion12/BloodMoon-Reborn
 
 Original author: SpectralMemories
-Maintenance: JulioN12
+Maintained by: JulioN12
