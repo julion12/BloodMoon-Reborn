@@ -2,6 +2,15 @@
 
 World settings remain in `plugins/BloodMoon/<world>/config.yml`. All 1.0.1 keys remain valid. New rewards are disabled by default.
 
+## Bundled administrator files
+
+At startup the plugin creates only missing files under `plugins/BloodMoon/`: `README.txt`, all
+seven files in `EXAMPLES/`, and the administrator guides in `docs/`. Resources come from
+`distribution/` inside the installed JAR; runtime never depends on the source repository.
+Existing files and timestamps are left unchanged. A future upgrade therefore adds new guide files
+but preserves every local edit. `docs/VERSION.txt` identifies the bundled documentation generation.
+An individual copy failure logs a warning and does not prevent the plugin from enabling.
+
 ## Language
 
 New installations receive `locales/en.yml` and `locales/es.yml`. Select a language in the compatibility file `plugins/BloodMoon/locales.yml`:
@@ -112,7 +121,7 @@ For MythicMobs, `InternalName` must exactly match the mob ID. The Mythic entity'
 
 ## PlaceholderAPI labels
 
-PlaceholderAPI support has no per-world enable switch: installing the optional plugin registers the internal `bloodmoon` expansion. The formatted values come from `PlaceholderActive`, `PlaceholderInactive`, `PlaceholderNone`, `PlaceholderEligible`, `PlaceholderDisqualified`, `PlaceholderNotParticipating`, `PlaceholderNoBoss`, and the four `PlaceholderBossState*` keys in the selected locale. English fallback and customized legacy `locales.yml` overrides apply immediately after `/bloodmoon reload`. Boolean and technical state placeholders remain unlocalized. See [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).
+PlaceholderAPI support has no per-world enable switch: installing the optional plugin registers the internal `bloodmoon` expansion. The formatted values come from `PlaceholderActive`, `PlaceholderInactive`, `PlaceholderNone`, `PlaceholderEligible`, `PlaceholderDisqualified`, `PlaceholderNotParticipating`, `PlaceholderNoBoss`, the four `PlaceholderBossState*` keys, and `PlaceholderBossDisplayNotSpawned`, `PlaceholderBossDisplayName`, `PlaceholderBossDisplayDefeatedName`, `PlaceholderBossDisplayType`, `PlaceholderBossDisplayHealth`, and `PlaceholderBossDisplayDefeated`. English fallback and customized legacy `locales.yml` overrides apply immediately after `/bloodmoon reload`. Boolean and technical state placeholders remain unlocalized. See [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).
 
 ## Historical statistics
 

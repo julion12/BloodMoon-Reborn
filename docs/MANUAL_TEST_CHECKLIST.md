@@ -73,10 +73,15 @@ Use Paper/Purpur 1.21.8, PlaceholderAPI, and a real connected player. TAB is opt
 11. Run `/papi reload`; confirm `%bloodmoon_active%` still resolves because the expansion persists.
 12. Corrupt a disposable copy of `statistics.yml`, restart, and confirm one `statistics.corrupt-*.yml` copy, a clear warning, safe defaults, and successful enable.
 13. Remove PlaceholderAPI and restart; confirm BloodMoon lifecycle, boss state tracking, statistics writes, reload, and shutdown still work.
+14. Parse `boss_display_line_1`, `_line_2`, and `_line_3` in `NONE`, `NOT_SPAWNED`,
+    `ALIVE`, and `DEFEATED`; confirm 0/1/3/2 non-empty localized lines, resolved values, and
+    legacy `&` color codes.
 
 ## 7. TAB visual validation
 
-Use the exact [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml), merged into an existing TAB configuration without duplicate global sections.
+Use the recommended section from [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml),
+merged into an existing TAB configuration without duplicate global sections. It must work without
+copying the optional advanced `conditions:` map.
 
 1. Run `/tab reload` and confirm no parse/condition warnings.
 2. Outside an event, confirm the normal design; in the configured lobby, confirm the optional historical design when it has priority.
@@ -86,6 +91,16 @@ Use the exact [`examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml), me
 6. Defeat it and confirm retained name plus localized “Derrotado”, with no `0%` health line.
 7. Grant/remove `bloodmoon.scoreboard.full` and confirm the full/compact selection behaves as documented.
 8. Verify all designs stay within 15 visible lines and inspect flicker/line transitions with a real client.
+
+## 8. Bundled administrator guide
+
+1. Start a clean Paper/Purpur 1.21.8 server with only the final BloodMoon JAR.
+2. Confirm `README.txt`, all seven `EXAMPLES/` files, `docs/VERSION.txt`, and the administrator
+   guides appear beneath `plugins/BloodMoon/`.
+3. Edit one extracted file, restart, and confirm its bytes and timestamp remain unchanged.
+4. Remove one guide, restart, and confirm only that missing guide is restored.
+5. Repeat from a server path containing spaces.
+6. Obstruct one documentation target; confirm a clear warning and normal plugin enable.
 
 ## Sign-off
 

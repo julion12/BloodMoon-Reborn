@@ -7,8 +7,8 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 100 tests, 0 failures, including the original 19 |
-| Local artifact build | PASSED | JDK 21 artifact is 518,283 bytes; SHA-256 `98facbcc7da306b2f26557992089cf7504f55438abfcffe8708b7b249d75fb3f` |
+| JUnit suite | PASSED | 110 tests, 0 failures, including the original 100 |
+| Local artifact build | PASSED | JDK 21 artifact is 551,306 bytes; SHA-256 `ee1de09fea8b9c8a12d5dbb973626e9e9929144a873f9960f4f7411bdc376e30`; two clean builds were byte-identical |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
@@ -95,18 +95,21 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Resolver identifiers and fallbacks | PASSED | Unit tests cover all 38 public identifiers, unknown identifiers, null/offline player, localized fallbacks, boolean stability, time formatting, and safe absent state |
+| Resolver identifiers and fallbacks | PASSED | Unit tests cover all 41 public identifiers, dynamic boss lines, unknown identifiers, null/offline player, localized fallbacks, boolean stability, time formatting, and safe absent state |
 | World/event/player context | PASSED | Unit tests cover active/inactive world snapshots, participation, eligibility, disqualification, non-participation, late-join policy, and reload ownership |
 | Real-time session statistics | PASSED | First/repeated/second-player deaths, unique UUIDs, unregistered-player death, reset, world isolation, participant count, survivor updates, non-negative clamp, inactive zeros, and all four public placeholders |
+| Bundled administrator resources | PASSED | Real JAR manifest, closed extraction list, first/second start, preserve/restore, paths with spaces, UTF-8, YAML, failure isolation, and traversal rejection |
+| Direct boss display lines | PASSED | NONE, NOT_SPAWNED, VANILLA/MYTHIC ALIVE health updates, DEFEATED identity, localization, overrides, null/offline PAPI, and no unresolved tokens |
 | Narrative boss state | PASSED | New session, vanilla/Mythic successful spawn, natural death, identity retention, technical/localized values, coherence with alive/name/type/health, idempotency, and reset |
 | Historical statistics | PASSED | Completed/aborted event policy, death/unique totals, boss success/defeat policy, last-event replacement, non-negative duration, versioned create/load, atomic save/reload, idempotency, and corrupt-file recovery |
 | Integration examples | PASSED | Required TAB file exists and parses; normal/full/compact/history designs, display condition, boss state, live counters, history, and all public PAPI examples are asserted |
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
 | Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; all four session counters are direct O(1) field/set/map-size reads |
-| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Exact final 518,283-byte JAR registered `bloodmoon` once; no-event parses returned `NONE` and numeric `0`; BloodMoon/PAPI reload retained the expansion; the preceding persistence smoke also verified localized fallbacks and restart |
+| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Prior integration smoke registered `bloodmoon` once and retained it across reload; all 41 final identifiers pass the real PAPI adapter tests, but final dynamic ALIVE/DEFEATED values still require a connected player |
 | Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
-| Server without PlaceholderAPI | PASSED | The immediately preceding integration build enabled alone, reloaded, and stopped cleanly on Paper 1.21.8 without missing-class errors; the optional-dependency path is unchanged in the final delta |
+| Server without PlaceholderAPI | PASSED | Exact final 551,306-byte JAR was the sole external plugin, reached `Done` on Paper 1.21.8, extracted guides, and stopped cleanly without missing-class errors |
+| Final JAR guide extraction smoke | PASSED | Clean extraction created all 18 manifest files; restart from a path with spaces preserved an edited README; one deleted example alone was restored; a blocked docs parent logged 10 warnings while the plugin still reached `Done` and disabled cleanly |
 | Connected-player event/boss/world/TAB behavior | MANUAL REQUIRED | No Minecraft player or TAB plugin was connected during the smoke; visual and live-entity checks remain pending |
 | Statistics create/restart/corruption | PASSED | Exact JAR created version 1 defaults, reloaded them after restart, preserved invalid YAML as `statistics.corrupt-*.yml`, logged a clear warning, restored defaults, kept PAPI responsive, and stopped cleanly |
 | Live boss state/completed-event history | MANUAL REQUIRED | VANILLA/MYTHIC ALIVE→DEFEATED, health change, normal event completion, and nonzero persisted history require a connected player; exact steps are in `MANUAL_TEST_CHECKLIST.md` |

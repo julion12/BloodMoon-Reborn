@@ -6,8 +6,15 @@ Upgrade by stopping the server, backing up `plugins/BloodMoon/`, replacing the J
 
 Validation completed against Paper 1.21.4, 1.21.8, 1.21.11, and 26.2 plus Purpur 1.21.8 and 26.2. Core load, commands, lifecycle, reload, crash recovery, and two-world isolation passed. See `docs/TEST_MATRIX.md` for exact builds and evidence.
 
-The optional PlaceholderAPI expansion now exposes 38 O(1) identifiers, including live world/session counters, `boss_state`, and the immutable historical snapshot. Persistent aggregates live in `plugins/BloodMoon/statistics.yml`; writes use a temporary file and atomic replacement, and corrupt input is preserved before safe defaults are restored. No individual player history is stored.
+The optional PlaceholderAPI expansion now exposes 41 O(1) identifiers, including live
+world/session counters, `boss_state`, three localized direct boss display lines, and the immutable
+historical snapshot. Persistent aggregates live in `plugins/BloodMoon/statistics.yml`; writes use a
+temporary file and atomic replacement, and corrupt input is preserved before safe defaults are
+restored. No individual player history is stored.
 
-Ready-to-copy administrative examples are indexed in [`docs/EXAMPLES.md`](EXAMPLES.md). The mandatory [`docs/examples/TAB-scoreboards.yml`](examples/TAB-scoreboards.yml) includes normal, full, compact, and historical designs with dynamic boss-state lines.
+Ready-to-copy administrative examples are indexed in [`docs/EXAMPLES.md`](EXAMPLES.md). On first
+startup, the self-contained JAR creates `plugins/BloodMoon/README.txt`, `EXAMPLES/`, and `docs/`
+without overwriting existing files. The TAB example's recommended full and compact designs use
+direct dynamic boss lines and require no global TAB condition definitions.
 
 Known release gate: **NOT READY for publication.** Player-driven survivor/boss rewards and an actual Mythic boss death still require live manual execution. MythicMobs 5.12.1 enables with Paper 1.21.8, but fails inside its own server-version/NMS initialization on the tested Paper 26.2 build; BloodMoon core remains operational without it. Complete `docs/MANUAL_TEST_CHECKLIST.md` before publishing.

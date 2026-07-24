@@ -1,8 +1,10 @@
 # Ready-to-copy examples
 
-These files are documentation artifacts. BloodMoon-Reborn never copies them into TAB, PlaceholderAPI, MythicMobs, or active world configurations automatically.
+These files are bundled inside the JAR and copied, only when missing, to
+`plugins/BloodMoon/EXAMPLES/`. BloodMoon-Reborn never injects them into TAB, PlaceholderAPI,
+MythicMobs, or active world configurations automatically.
 
-- [TAB-scoreboards.yml](examples/TAB-scoreboards.yml): normal, complete Blood Moon, compact Blood Moon, and optional historical lobby scoreboards with dynamic boss-state conditions.
+- [TAB-scoreboards.yml](examples/TAB-scoreboards.yml): recommended condition-free dynamic boss lines, compact and historical variants, plus a clearly separated advanced optional condition.
 - [CommandsOnStart.yml](examples/CommandsOnStart.yml): verified `;s`, `;f`, `;p`, `$w`, `$p`, and modern placeholder usage.
 - [CommandsOnEnd.yml](examples/CommandsOnEnd.yml): completion announcements, weather, cleanup, and per-player execution.
 - [SurvivorRewards.yml](examples/SurvivorRewards.yml): disabled-by-default item, experience, and optional economy rewards.

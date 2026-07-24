@@ -23,4 +23,8 @@ For active-session command rendering, `%participant_count%` is the registered pa
 
 These internal tokens are not global PlaceholderAPI identifiers and remain intentionally unchanged. Optional public integration uses the collision-safe `%bloodmoon_*%` namespace documented in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md); for example, the public boss name is `%bloodmoon_boss_name%`, not `%boss_name%`. Its real-time session counters are `%bloodmoon_death_count%`, `%bloodmoon_unique_deaths%`, `%bloodmoon_participants_current%`, and `%bloodmoon_survivors_current%`.
 
-The public namespace also exposes `%bloodmoon_boss_state%` / `%bloodmoon_boss_state_formatted%` and server-wide historical values. These are deliberately not injected into configured-command templates: internal command rendering and public PlaceholderAPI remain separate mechanisms. See the complete identifier table and fallbacks in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).
+The public namespace also exposes `%bloodmoon_boss_state%` / `%bloodmoon_boss_state_formatted%`,
+the three already-resolved `%bloodmoon_boss_display_line_1%` through `_line_3%` values, and
+server-wide historical values. These are deliberately not injected into configured-command
+templates: internal command rendering and public PlaceholderAPI remain separate mechanisms.
+See the complete 41-identifier table and fallbacks in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).

@@ -21,6 +21,8 @@
 - Narrative state for the most recently spawned session boss, including localized `boss_state` placeholders.
 - Versioned server-wide historical aggregates and last-completed-event data in atomically replaced `statistics.yml`.
 - Copy-ready TAB, lifecycle-command, survivor-reward, boss-reward, PlaceholderAPI, and MythicMobs examples under `docs/examples/`.
+- Non-destructive first-start extraction of administrator documentation and all seven examples from the self-contained JAR.
+- Localized `%bloodmoon_boss_display_line_1%`, `_line_2`, and `_line_3` placeholders for portable scoreboards.
 
 ### Changed
 
@@ -29,6 +31,7 @@
 - Vanilla bosses now carry a PersistentDataContainer identity marker; legacy named bosses remain recognized during cleanup.
 - Mythic boss messages now use the active/configured Mythic display name while UUID tracking remains unchanged.
 - The historical `/bloodmoon spawnzombieboss` command now spawns the boss selected by `Boss.Mode`; its name and permission remain compatible.
+- The recommended TAB scoreboard now uses direct dynamic boss lines and does not require global conditional placeholders.
 
 ### Fixed
 

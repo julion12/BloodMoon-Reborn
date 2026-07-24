@@ -20,6 +20,16 @@ BOSS
 /papi parse me %bloodmoon_boss_max_health%
 /papi parse me %bloodmoon_boss_health_percent%
 /papi parse me %bloodmoon_boss_health_formatted%
+/papi parse me %bloodmoon_boss_display_line_1%
+/papi parse me %bloodmoon_boss_display_line_2%
+/papi parse me %bloodmoon_boss_display_line_3%
+
+DYNAMIC BOSS LINE EXPECTATIONS
+NONE: line 1="", line 2="", line 3=""
+NOT_SPAWNED: line 1="&7Boss: &8Not spawned yet" (localized), lines 2 and 3=""
+ALIVE: line 1=resolved name, line 2=resolved type, line 3=resolved health percentage
+DEFEATED: line 1=resolved green name, line 2=localized defeated status, line 3=""
+No line returns an unresolved %boss_*% token. Consumers must support legacy & color codes.
 
 PLAYER AND ACTIVE SESSION
 /papi parse me %bloodmoon_participating%

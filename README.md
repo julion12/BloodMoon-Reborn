@@ -18,6 +18,8 @@ Modernization and maintenance: **JulioN12**
 - Complete English and Spanish catalogs with English fallback and legacy `locales.yml` overrides.
 - Optional internal PlaceholderAPI expansion for event, boss, time, participation, survivor state, and O(1) per-world session statistics.
 - Narrative per-session boss state (`NOT_SPAWNED`, `ALIVE`, `DEFEATED`) with localized public output.
+- Three portable, localized boss display lines for PlaceholderAPI consumers, bringing the public total to 41.
+- Administrator guides and all seven examples bundled in the JAR and installed without overwriting local edits.
 - Atomic server-wide historical statistics in `statistics.yml`, without personal player history.
 - Timestamped, idempotent per-world configuration migration from 1.0.1.
 - Crash markers discard incomplete sessions without granting uncertain rewards.
@@ -37,6 +39,10 @@ Completed events contribute aggregate server history and a last-event snapshot. 
 5. Leave rewards disabled until their commands have been reviewed.
 
 Select `Language: en` or `Language: es` in `plugins/BloodMoon/locales.yml`. See [migration](docs/MIGRATION.md), [configuration](docs/CONFIGURATION.md), and [compatibility](docs/COMPATIBILITY.md).
+
+On startup, missing administrator files are copied from the JAR to `plugins/BloodMoon/README.txt`,
+`plugins/BloodMoon/EXAMPLES/`, and `plugins/BloodMoon/docs/`. Existing files are never overwritten;
+upgrades add only newly introduced or manually deleted files.
 
 ## Commands
 
