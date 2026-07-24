@@ -137,3 +137,22 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 RC promotion remains blocked by the unconfirmed SQLAccess licensing metadata and by the real
 player/manual checks that the project checklist explicitly requires before changing `NOT READY`.
 MythicMobs 5.12.1 also remains upstream-incompatible with the tested Paper 26.2 build.
+
+## Phase-2 functional validation addendum — 2026-07-24
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| SQLAccess redistribution | PASS | Exact 5,474-byte binary in original BloodMoon archive; archive zlib LICENSE; author/resource and shading instruction verified |
+| Survivor delivery/exclusions | PASS | Two protocol clients; exact inventory and command counts in Phase-2 evidence |
+| Restart before completion | FAIL | Abort paid zero, but same-night startup opened a new zero-participant session before reconnect |
+| Vanilla boss reward and duplicate prevention | PASS | Exactly one server reward execution; 3 emeralds to killer, zero to other attacker/admin removal/live-at-end |
+| MythicMobs 5.12.1 English | PASS | Real NOT_SPAWNED/ALIVE/DEFEATED lifecycle, exact Mythic-owned reward, no core duplicate/fallback |
+| Historical statistics and shutdown persistence | PASS | Consecutive snapshots and post-shutdown files retained; restart behavior caveat above |
+| Tag-built 1.0.1 migration | PASS | Values/cache/docs preserved; one backup/section; second boot idempotent |
+| Survivor message colors | PASS (automated after live failure) | Live literal `&a` reproduced; regression test added and 131-test suite passes |
+| TAB visual EN/ES | NOT RUN | Servers/examples prepared; no graphical captures |
+| Full Spanish live lifecycle | NOT RUN | Prepared only |
+| Full Paper/Purpur 26.2 Phase-2 lifecycle | NOT RUN | Earlier core smoke is not counted as this full walkthrough |
+
+**Phase-2 status: NOT READY FOR RELEASE CANDIDATE.** SQLAccess is no longer a blocker. The
+same-night restart failure and unexecuted graphical/language/26.2 rows remain release gates.

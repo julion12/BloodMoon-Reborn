@@ -353,3 +353,20 @@ pass after the isolated fixes. Promotion is still blocked because the inherited 
 has no independently confirmed license metadata and because the project's own release gate
 requires real-player reward/history/language/TAB/migration evidence that has not been executed.
 No unexecuted test is represented as passed.
+
+## Phase-2 addendum — 2026-07-24
+
+The Phase-1 SQLAccess blocker is closed as **A. REDISTRIBUTION CONFIRMED**: Git history preserves
+the exact 5,474-byte helper in the original BloodMoon source archive, that archive carries the
+original author's zlib license, and the author's public SQLAccess resource explicitly instructs
+plugin developers to include it in the final JAR. It is unmodified, runtime-shaded, and used by
+`Bloodmoon` and `PeriodicNightCheck`.
+
+Functional protocol-client testing passed survivor exclusions, vanilla boss rewards, English
+Mythic reward isolation, historical snapshots, and a tag-built 1.0.1 migration. Commit `2cd68c1`
+fixes a reproduced literal legacy color code in survivor messages. The exact evidence index is
+`RELEASE_VALIDATION_EVIDENCE_1.1.0.md`.
+
+Status remains **NOT READY FOR RELEASE CANDIDATE**. Same-night restart creates a new empty session
+before reconnecting players can register when late joiners are disabled. Graphical TAB EN/ES,
+the full Spanish live flow, and the full Phase-2 26.2 lifecycle are also NOT RUN.

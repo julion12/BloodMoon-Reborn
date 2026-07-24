@@ -135,3 +135,17 @@ different result is “FAIL”.
 | Spanish language | `Language: es`; fresh and migrated copies | Repeat English sequence | Correct accents/punctuation, resolved tokens, valid colors | Screenshots/chat export and UTF-8 log | PASS with no mojibake/unresolved text; otherwise FAIL |
 | Paper/Purpur 26.2 deployment | Disposable exact deployment builds; Java 25 | Start, reload/status, event lifecycle, stop; test supported integrations only | Core loads and stops cleanly; unsupported Mythic 5.12.1 is not claimed | Exact builds/hashes and complete logs | PASS per platform only with clean core lifecycle; otherwise FAIL |
 | Real 1.0.1 migration | Unmodified user-owned 1.0.1 data and backup | Hash input; start once; restart twice; reload | One backup, preserved values, one 1.1 section, idempotent later starts | Original and backup hashes, before/after config, all logs | PASS only if all preservation/idempotency checks pass; otherwise FAIL |
+
+## Phase-2 execution record — 2026-07-24
+
+Real protocol clients completed survivor, vanilla boss, and English Mythic boss tests. A real
+1.0.1 JAR built from tag `v1.0.1` completed migration and a second 1.1.0 boot. Exact outcomes and
+ignored evidence paths are indexed in `RELEASE_VALIDATION_EVIDENCE_1.1.0.md`.
+
+- PASS: survivor/death, late join exclusion, reconnect, other-world, offline-at-end, abort without
+  payout, vanilla credited/admin/live-at-end policy, English Mythic reward isolation, history,
+  and migration/idempotence.
+- FAIL: restart during an active nighttime event is safely aborted, but startup immediately creates
+  a new zero-participant event; with `IncludeLateJoiners: false`, reconnecting players cannot join.
+- NOT RUN: graphical TAB EN/ES, full Spanish lifecycle, full Phase-2 Paper/Purpur 26.2 lifecycle.
+- NOT APPLICABLE: native Vault/economy balance tests; 1.1.0 exposes command rewards, not a Vault API.

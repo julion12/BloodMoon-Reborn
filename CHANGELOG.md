@@ -53,5 +53,6 @@
 - Completed and administratively removed bosses retaining lifecycle UUIDs; plugin shutdown now also removes Mythic-only tracked bosses.
 - Crash markers storing player UUID lists; they now retain only session ID, world name, and start time.
 - Failed configured commands exposing their full administrator-supplied arguments in logs.
+- Configurable survivor reward messages showing legacy `&` color codes literally.
 
 No existing configuration key or vanilla boss default was removed or renamed.

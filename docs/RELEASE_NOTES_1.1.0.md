@@ -29,10 +29,12 @@ The final audit upgraded the shaded YAML reader to SnakeYAML 2.6 with safe const
 the internal test command from production, added required license texts, bounded completed boss
 lifecycle tracking, and redacted administrator command arguments from failure logs.
 
-Known release gate: **NOT READY FOR RELEASE CANDIDATE.** Player-driven survivor/boss rewards,
-completed-event history, graphical TAB rendering, and a real 1.0.1 administrative migration still
-require manual execution. MythicMobs 5.12.1 enables with Paper 1.21.8, but fails inside its own
-server-version/NMS initialization on the tested Paper 26.2 build; BloodMoon core remains
-operational without it. The inherited `libs/SQLAccess.jar` also contains no separate license
-metadata, so its distribution status needs confirmation from the rights holder before an RC is
-declared.
+Phase-2 validation executed real protocol-client survivor rewards, vanilla and Mythic boss
+rewards, consecutive history, shutdown handling, and a tag-built 1.0.1 migration. SQLAccess
+redistribution was confirmed from the original exact-binary source archive, its zlib license, and
+the author's public resource instructions. One reward-message color bug was fixed.
+
+Known release gate: **NOT READY FOR RELEASE CANDIDATE.** A same-night restart automatically starts
+a new zero-participant session before players reconnect; with late joiners disabled, that session
+cannot reward them. Graphical TAB/locale captures, the Spanish live walkthrough, and the full 26.2
+Phase-2 lifecycle also remain unexecuted. MythicMobs 5.12.1 remains unsupported on 26.2.

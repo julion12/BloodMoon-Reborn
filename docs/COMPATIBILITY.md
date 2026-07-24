@@ -31,3 +31,8 @@ Build facts:
 - Shaded YAML runtime: SnakeYAML 2.6 with `SafeConstructor`
 - Declared Bukkit `api-version`: 1.21
 - Artifact count: one
+
+Phase-2 functional validation on 2026-07-24 re-confirmed Paper 1.21.8 build 60 with Java 21.0.11,
+PlaceholderAPI 2.12.3, and MythicMobs 5.12.1 using real protocol clients. The separate complete
+Paper/Purpur 26.2 functional walkthrough was not rerun and remains NOT RUN; the earlier core
+load/command/shutdown rows above are not being promoted into a broader functional claim.
