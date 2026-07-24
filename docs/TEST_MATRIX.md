@@ -7,8 +7,8 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 110 tests, 0 failures, including the original 100 |
-| Local artifact build | PASSED | JDK 21 artifact is 551,306 bytes; SHA-256 `ee1de09fea8b9c8a12d5dbb973626e9e9929144a873f9960f4f7411bdc376e30`; two clean builds were byte-identical |
+| JUnit suite | PASSED | 117 tests, 0 failures, including the original 100 |
+| Local artifact build | PASSED | JDK 21 artifact is 558,384 bytes; SHA-256 `6203f1abac11308346925147698faa376a158dcfcffae42794723a5d3074cebe`; two clean builds were byte-identical |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
@@ -106,14 +106,19 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
 | Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; all four session counters are direct O(1) field/set/map-size reads |
-| Paper 1.21.8 + PlaceholderAPI 2.12.3 | PARTIAL PASS | Prior integration smoke registered `bloodmoon` once and retained it across reload; all 41 final identifiers pass the real PAPI adapter tests, but final dynamic ALIVE/DEFEATED values still require a connected player |
+| Async request-path isolation | PASSED | `onRequest` performs one UUID lookup and one atomic map lookup. Concurrent tests execute all 41 identifiers from worker threads while complete vanilla/Mythic snapshots are swapped 10,000 times; no mixed snapshot or Bukkit/entity/world/disk access is allowed by the architecture tests |
+| Boss snapshot lifecycle | PASSED | Main-thread publication covers NOT_SPAWNED, vanilla/Mythic ALIVE, health/max-health/absorption refresh, next-tick damage and healing refresh, invalid/despawn/death DEFEATED retention, and event-end NONE |
+| Paper 1.21.8 + PlaceholderAPI 2.11.6 + TAB 5.3.2 | PASSED | A real protocol client remained connected with the TAB scoreboard enabled for 171 seconds during a vanilla Blood Moon. Boss spawn, health publication, death, and direct placeholder parses completed with 0 `AsyncCatcher`, 0 `Chunk getEntities`, 0 TAB placeholder-thread failures, and 0 BloodMoon warnings/errors |
+| Paper 1.21.8 + MythicMobs 5.12.1 + PlaceholderAPI 2.11.6 + TAB 5.3.2 | PASSED | The documented Mythic boss spawned without vanilla fallback; PAPI reported NOT_SPAWNED → ALIVE → DEFEATED, retained the localized boss identity/type, published real 800 and 750 health snapshots, and produced 0 async catcher, TAB refresh, or BloodMoon warning/error matches |
+| PlaceholderAPI reload ownership | PASSED | The expansion and single 5-tick synchronous publisher remain owned by plugin enable/disable; Blood Moon reload neither loses nor duplicates the active session snapshot |
 | Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
 | Server without PlaceholderAPI | PASSED | Exact final 551,306-byte JAR was the sole external plugin, reached `Done` on Paper 1.21.8, extracted guides, and stopped cleanly without missing-class errors |
 | Final JAR guide extraction smoke | PASSED | Clean extraction created all 18 manifest files; restart from a path with spaces preserved an edited README; one deleted example alone was restored; a blocked docs parent logged 10 warnings while the plugin still reached `Done` and disabled cleanly |
-| Connected-player event/boss/world/TAB behavior | MANUAL REQUIRED | No Minecraft player or TAB plugin was connected during the smoke; visual and live-entity checks remain pending |
+| Connected-player event/boss/world/TAB behavior | PASSED WITH LIMITATION | A connected headless Minecraft protocol client exercised live vanilla and Mythic entities while TAB 5.3.2 performed async refreshes. Placeholder values and server logs were verified; pixel-level visual rendering in a graphical client was not claimed |
 | Statistics create/restart/corruption | PASSED | Exact JAR created version 1 defaults, reloaded them after restart, preserved invalid YAML as `statistics.corrupt-*.yml`, logged a clear warning, restored defaults, kept PAPI responsive, and stopped cleanly |
-| Live boss state/completed-event history | MANUAL REQUIRED | VANILLA/MYTHIC ALIVE→DEFEATED, health change, normal event completion, and nonzero persisted history require a connected player; exact steps are in `MANUAL_TEST_CHECKLIST.md` |
+| Live boss state | PASSED | VANILLA and MYTHICMOBS ALIVE → DEFEATED transitions and live health publication were observed with a connected client |
+| Completed-event historical statistics | MANUAL REQUIRED | This fix intentionally changes only active-session snapshots; a release-candidate history/reward walkthrough remains in `MANUAL_TEST_CHECKLIST.md` |
 
 ## Release gate
 
-**NOT READY for publication.** Core runtime compatibility is demonstrated through Paper/Purpur 26.2, but the critical live Mythic spawn/death/reward test and the player reward scenarios remain manual. Paper 26.2 cannot currently complete the requested MythicMobs 5.12.1 test because that MythicMobs build fails before BloodMoon integration starts. Follow `docs/MANUAL_TEST_CHECKLIST.md` and attach the resulting logs before changing this gate.
+**READY for the async-placeholder correction; NOT READY for publication.** The reported TAB/PlaceholderAPI crash path is fixed and covered by concurrent automated tests plus real connected-client vanilla and Mythic smoke tests. Publication remains blocked by the broader release checklist: player reward delivery and completed-event historical-statistics validation are still manual, and MythicMobs 5.12.1 remains upstream-incompatible with Paper 26.2.

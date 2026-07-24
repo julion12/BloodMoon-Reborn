@@ -2,7 +2,17 @@
 
 BloodMoon-Reborn contains an internal PlaceholderAPI expansion with identifier `bloodmoon`. PlaceholderAPI is optional; no eCloud expansion is required. If PlaceholderAPI is absent, BloodMoon-Reborn follows the same startup and runtime paths without warnings. TAB, DeluxeMenus, hologram plugins, and other consumers are not BloodMoon-Reborn dependencies.
 
-The expansion registers once during `onEnable`, returns `persist() = true` so `/papi reload` retains it, and is not re-registered by `/bloodmoon reload`. Values are read from the current world session, its constant-time counters, the tracked boss UUID/entity, the existing participant record, and an immutable historical snapshot. Requests do not read files, parse YAML, iterate participants, scan world entities, schedule work, or modify state.
+The expansion registers once during `onEnable`, returns `persist() = true` so `/papi reload` retains
+it, and is not re-registered by `/bloodmoon reload`. All 41 values are resolved from one immutable
+context previously published for the player's UUID. Requests are safe from asynchronous consumers
+such as TAB: they do not access Bukkit players, worlds, chunks, entities, BossBars, MythicMobs,
+configuration, files, schedulers, or session collections.
+
+BloodMoon publishes complete contexts atomically from one synchronous refresh task every 5 ticks.
+Boss spawn, death, removal, and event boundaries also publish their narrative transition on the
+main thread. Damage and healing schedule a next-tick health capture because Bukkit damage events
+run before final health is applied; the periodic refresh additionally captures absorption and
+maximum-health changes. No task is created per player, placeholder, or request.
 
 ## Public placeholders
 
@@ -56,7 +66,12 @@ Boolean placeholders deliberately return lowercase `true` or `false` for conditi
 
 Session counters start at zero for every new Blood Moon and exist only in memory while that world's session is active. `death_count` counts every player death event during the Blood Moon; a repeated death increments it again. `unique_deaths` counts distinct player UUIDs. `participants_current` counts registered participants, including initial players and permitted late joiners. `survivors_current` counts registered participants that have neither died nor been disqualified and is clamped at zero. Deaths by players excluded through `IncludeLateJoiners: false` still count as event deaths, but do not add a participant or remove a survivor. Disconnects and world exits update survivor state only when their existing disqualification option is enabled.
 
-`boss_alive` answers only whether the current tracked entity is alive. `boss_state` tells the story of the most recently spawned boss in the session: `NOT_SPAWNED`, `ALIVE`, or `DEFEATED`; outside an event it is `NONE`. A successful later spawn replaces the narrative subject. `DEFEATED` preserves the last name/type and returns zero health. Administrative `killbosses` also closes the narrative as `DEFEATED`, but never increments `total_bosses_defeated`.
+`boss_alive` answers only whether the last main-thread snapshot marked the current tracked entity
+alive. `boss_state` tells the story of the most recently spawned boss in the session:
+`NOT_SPAWNED`, `ALIVE`, or `DEFEATED`; outside an event it is `NONE`. A successful later spawn
+replaces the narrative subject. `DEFEATED` preserves the last name/type and returns zero health.
+Administrative removal and an entity that disappears without a death event close the active
+narrative as `DEFEATED`, but never increment `total_bosses_defeated`. Event end clears it to `NONE`.
 
 The three display lines are already resolved and preserve legacy `&` colors. `NONE` returns three
 empty strings; `NOT_SPAWNED` returns only the localized first line; `ALIVE` returns localized

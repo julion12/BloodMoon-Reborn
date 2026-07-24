@@ -36,6 +36,9 @@
 ### Fixed
 
 - Console `/bloodmoon reload` null-world failure.
+- PlaceholderAPI requests are now safe on asynchronous consumer threads such as TAB's placeholder
+  refresher. Resolution reads atomically published immutable contexts and never looks up Bukkit
+  entities, worlds, chunks, BossBars, configuration, or files.
 - Unsafe legacy command parsing when a suffix was missing or a command was empty.
 - Concurrent modification while removing a defeated boss.
 - Null death-message handling.

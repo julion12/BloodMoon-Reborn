@@ -76,6 +76,11 @@ Use Paper/Purpur 1.21.8, PlaceholderAPI, and a real connected player. TAB is opt
 14. Parse `boss_display_line_1`, `_line_2`, and `_line_3` in `NONE`, `NOT_SPAWNED`,
     `ALIVE`, and `DEFEATED`; confirm 0/1/3/2 non-empty localized lines, resolved values, and
     legacy `&` color codes.
+15. With TAB's asynchronous refresh enabled, keep the Blood Moon scoreboard visible for at least
+    two minutes. Damage and heal vanilla and Mythic bosses, then search the complete `latest.log`
+    for `AsyncCatcher`, `Chunk getEntities`, `Placeholder Refreshing Thread`, `ERROR`, and
+    BloodMoon warnings. Do not approve this row unless the exact target TAB and PlaceholderAPI
+    versions were used with a connected player.
 
 ## 7. TAB visual validation
 

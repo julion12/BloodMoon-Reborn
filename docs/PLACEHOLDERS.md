@@ -28,3 +28,9 @@ the three already-resolved `%bloodmoon_boss_display_line_1%` through `_line_3%` 
 server-wide historical values. These are deliberately not injected into configured-command
 templates: internal command rendering and public PlaceholderAPI remain separate mechanisms.
 See the complete 41-identifier table and fallbacks in [PLACEHOLDERAPI.md](PLACEHOLDERAPI.md).
+
+Public PlaceholderAPI resolution is deliberately separate from Bukkit state capture. Consumers
+receive an immutable per-player context through an atomic, constant-time UUID lookup. This makes
+the public placeholders safe when a scoreboard or menu plugin refreshes them asynchronously.
+Entity health is captured on the server thread and published; it is never queried by the consumer
+thread.

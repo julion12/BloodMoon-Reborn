@@ -12,6 +12,11 @@ historical snapshot. Persistent aggregates live in `plugins/BloodMoon/statistics
 temporary file and atomic replacement, and corrupt input is preserved before safe defaults are
 restored. No individual player history is stored.
 
+PlaceholderAPI requests are safe for asynchronous consumers. A single synchronous publisher
+captures player, world, session, and live boss health data every 5 ticks and atomically replaces
+immutable per-player contexts. TAB and other consumers perform only a constant-time UUID lookup;
+they never trigger entity, chunk, BossBar, MythicMobs, configuration, or file access.
+
 Ready-to-copy administrative examples are indexed in [`docs/EXAMPLES.md`](EXAMPLES.md). On first
 startup, the self-contained JAR creates `plugins/BloodMoon/README.txt`, `EXAMPLES/`, and `docs/`
 without overwriting existing files. The TAB example's recommended full and compact designs use
