@@ -2,27 +2,19 @@ package org.spectralmemories.bloodmoon.placeholder.papi;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spectralmemories.bloodmoon.Bloodmoon;
 import org.spectralmemories.bloodmoon.placeholder.BloodMoonPlaceholderResolver;
-import org.spectralmemories.bloodmoon.placeholder.PlaceholderStateService;
 
 import java.util.function.Function;
+import java.util.UUID;
 
 public final class BloodMoonPlaceholderExpansion extends PlaceholderExpansion {
     private final String version;
-    private final Function<Player, org.spectralmemories.bloodmoon.placeholder.PlaceholderContext> snapshots;
-
-    public BloodMoonPlaceholderExpansion(Bloodmoon plugin) {
-        PlaceholderStateService state = new PlaceholderStateService(plugin);
-        this.version = plugin.getDescription().getVersion();
-        this.snapshots = state::snapshot;
-    }
+    private final Function<UUID, org.spectralmemories.bloodmoon.placeholder.PlaceholderContext> snapshots;
 
     BloodMoonPlaceholderExpansion(String version,
-                                  Function<Player, org.spectralmemories.bloodmoon.placeholder.PlaceholderContext> snapshots) {
+                                  Function<UUID, org.spectralmemories.bloodmoon.placeholder.PlaceholderContext> snapshots) {
         this.version = version;
         this.snapshots = snapshots;
     }
@@ -34,7 +26,7 @@ public final class BloodMoonPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(@Nullable OfflinePlayer offlinePlayer, @NotNull String params) {
-        Player player = offlinePlayer != null && offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;
-        return BloodMoonPlaceholderResolver.resolve(snapshots.apply(player), params);
+        UUID playerId = offlinePlayer == null ? null : offlinePlayer.getUniqueId();
+        return BloodMoonPlaceholderResolver.resolve(snapshots.apply(playerId), params);
     }
 }

@@ -23,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -39,6 +40,7 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.entity.AnimalTamer;
 import org.spectralmemories.bloodmoon.command.CommandExecutionMode;
 import org.spectralmemories.bloodmoon.session.BloodMoonSession;
+import org.spectralmemories.bloodmoon.session.BossSessionState;
 import org.spectralmemories.bloodmoon.boss.BossModeResolver;
 import org.spectralmemories.bloodmoon.boss.BossNameResolver;
 import org.spectralmemories.bloodmoon.boss.BossRewardPolicy;
@@ -46,12 +48,13 @@ import org.spectralmemories.bloodmoon.boss.ConfiguredBossSpawner;
 import org.spectralmemories.bloodmoon.boss.SpawnedBossResult;
 import org.spectralmemories.bloodmoon.boss.VanillaBossBarValues;
 import org.spectralmemories.bloodmoon.integration.SpawnedMythicMob;
-import org.spectralmemories.bloodmoon.placeholder.BossPlaceholderState;
+import org.spectralmemories.bloodmoon.placeholder.BossPlaceholderSnapshot;
 import org.bukkit.util.Vector;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This is the class that handles most interaction during a BloodMoon
@@ -92,6 +95,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     private final Map<UUID, String> mythicBosses = new LinkedHashMap<>();
     private final Map<UUID, TrackedPlaceholderBoss> placeholderBosses = new LinkedHashMap<>();
     private UUID currentPlaceholderBossId;
+    private final AtomicReference<BossPlaceholderSnapshot> bossPlaceholderSnapshot =
+            new AtomicReference<>(BossPlaceholderSnapshot.none());
 
     private void AddActuator (BloodmoonActuator instance)
     {
@@ -139,6 +144,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         if (inProgress) return;
         inProgress = true;
         session = Bloodmoon.GetInstance().getSessionCoordinator().start(world);
+        bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.notSpawned());
         RunPreCommand();
 
         ShowNightBar();
@@ -187,6 +193,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         session = finished;
         if (complete) RunPostCommand();
         session = null;
+        bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.none());
     }
 
     public void KillBosses ()
@@ -206,6 +213,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     public void KillBosses (boolean giveRewards, boolean effects, boolean respawn)
     {
+        BossPlaceholderSnapshot beforeRemoval = bossPlaceholderSnapshot.get();
         Set<UUID> removedBossIds = new LinkedHashSet<>();
         for (IBoss boss : bosses) removedBossIds.add(boss.GetHost().getUniqueId());
         removedBossIds.addAll(mythicBosses.keySet());
@@ -226,6 +234,10 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         placeholderBosses.clear();
         currentPlaceholderBossId = null;
         if (session != null) removedBossIds.forEach(session::bossRemoved);
+        if (beforeRemoval.state() == BossSessionState.ALIVE) {
+            bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.defeated(
+                    beforeRemoval.boss().name(), beforeRemoval.boss().type()));
+        }
     }
 
     public void SpawnHorde ()
@@ -687,18 +699,36 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         return inProgress || reader.GetPermanentBloodMoonConfig();
     }
 
-    public BossPlaceholderState GetBossPlaceholderState() {
-        if (currentPlaceholderBossId == null) return BossPlaceholderState.none();
+    public BossPlaceholderSnapshot getBossPlaceholderSnapshot() {
+        return bossPlaceholderSnapshot.get();
+    }
+
+    public static void refreshAllBossPlaceholderSnapshotsOnMainThread() {
+        if (actuators == null) return;
+        for (BloodmoonActuator actuator : actuators.values()) {
+            actuator.refreshBossPlaceholderSnapshotOnMainThread();
+        }
+    }
+
+    public void refreshBossPlaceholderSnapshotOnMainThread() {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("Boss placeholder snapshots must be refreshed on the primary thread");
+        }
+        if (currentPlaceholderBossId == null) return;
         TrackedPlaceholderBoss tracked = placeholderBosses.get(currentPlaceholderBossId);
-        if (tracked == null) return BossPlaceholderState.none();
-        Entity raw = Bukkit.getEntity(currentPlaceholderBossId);
-        if (!(raw instanceof LivingEntity entity) || !entity.isValid() || entity.isDead()) {
-            return BossPlaceholderState.none();
+        if (tracked == null) return;
+        LivingEntity entity = tracked.entity();
+        if (!entity.isValid() || entity.isDead() || entity.getHealth() <= 0) {
+            if (session != null) session.bossRemoved(currentPlaceholderBossId);
+            untrackPlaceholderBoss(currentPlaceholderBossId);
+            return;
         }
         double current = Math.max(0, entity.getHealth())
                 + (tracked.includeAbsorption() ? Math.max(0, entity.getAbsorptionAmount()) : 0);
-        double maximum = tracked.includeAbsorption() ? tracked.maximumHealth() : entityMaximumHealth(entity);
-        return new BossPlaceholderState(true, tracked.name(), tracked.type(), current, maximum);
+        double maximum = entityMaximumHealth(entity)
+                + (tracked.includeAbsorption() ? Math.max(0, entity.getAbsorptionAmount()) : 0);
+        bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.alive(
+                tracked.name(), tracked.type(), current, maximum));
     }
 
     private void trackPlaceholderBoss(LivingEntity entity, String name, String type, boolean includeAbsorption) {
@@ -706,14 +736,26 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 + (includeAbsorption ? Math.max(0, entity.getAbsorptionAmount()) : 0);
         currentPlaceholderBossId = entity.getUniqueId();
         placeholderBosses.put(currentPlaceholderBossId,
-                new TrackedPlaceholderBoss(name, type, Math.max(0, maximum), includeAbsorption));
+                new TrackedPlaceholderBoss(entity, name, type, includeAbsorption));
+        double current = Math.max(0, entity.getHealth())
+                + (includeAbsorption ? Math.max(0, entity.getAbsorptionAmount()) : 0);
+        bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.alive(
+                name, type, current, Math.max(0, maximum)));
     }
 
     private void untrackPlaceholderBoss(UUID entityId) {
-        placeholderBosses.remove(entityId);
+        TrackedPlaceholderBoss removed = placeholderBosses.remove(entityId);
         if (!entityId.equals(currentPlaceholderBossId)) return;
         currentPlaceholderBossId = null;
         for (UUID remaining : placeholderBosses.keySet()) currentPlaceholderBossId = remaining;
+        if (currentPlaceholderBossId != null) {
+            refreshBossPlaceholderSnapshotOnMainThread();
+            return;
+        }
+        BossPlaceholderSnapshot current = bossPlaceholderSnapshot.get();
+        String name = removed == null ? current.boss().name() : removed.name();
+        String type = removed == null ? current.boss().type() : removed.type();
+        bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.defeated(name, type));
     }
 
     private static double entityMaximumHealth(LivingEntity entity) {
@@ -721,7 +763,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
                 ? Math.max(entity.getHealth(), 1.0) : entity.getAttribute(Attribute.MAX_HEALTH).getValue();
     }
 
-    private record TrackedPlaceholderBoss(String name, String type, double maximumHealth,
+    private record TrackedPlaceholderBoss(LivingEntity entity, String name, String type,
                                           boolean includeAbsorption) { }
 
 
@@ -1009,12 +1051,28 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBossDamage(EntityDamageEvent event) {
         if (event.getEntity().getWorld() != world) return;
+        boolean tracked = placeholderBosses.containsKey(event.getEntity().getUniqueId());
         for (IBoss boss : bosses) {
             if (boss.GetHost() == event.getEntity()) {
-                Bloodmoon.GetInstance().GetScheduler().runTaskLater(Bloodmoon.GetInstance(), boss::RefreshDisplay, 1L);
+                Bloodmoon.GetInstance().GetScheduler().runTaskLater(Bloodmoon.GetInstance(), () -> {
+                    boss.RefreshDisplay();
+                    refreshBossPlaceholderSnapshotOnMainThread();
+                }, 1L);
                 return;
             }
         }
+        if (tracked) {
+            Bloodmoon.GetInstance().GetScheduler().runTaskLater(Bloodmoon.GetInstance(),
+                    this::refreshBossPlaceholderSnapshotOnMainThread, 1L);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBossRegainHealth(EntityRegainHealthEvent event) {
+        if (event.getEntity().getWorld() != world
+                || !placeholderBosses.containsKey(event.getEntity().getUniqueId())) return;
+        Bloodmoon.GetInstance().GetScheduler().runTaskLater(Bloodmoon.GetInstance(),
+                this::refreshBossPlaceholderSnapshotOnMainThread, 1L);
     }
 
     /**
