@@ -20,6 +20,7 @@ import org.spectralmemories.bloodmoon.placeholder.PlaceholderIntegration;
 import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
 import org.spectralmemories.bloodmoon.statistics.HistoricalStatisticsService;
 import org.spectralmemories.bloodmoon.distribution.AdministratorGuideInstaller;
+import org.spectralmemories.bloodmoon.lifecycle.AbortedNightStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +66,7 @@ public final class Bloodmoon extends JavaPlugin
     private static WorldManager worldManager;
     private SessionCoordinator sessionCoordinator;
     private HistoricalStatisticsService statisticsService;
+    private AbortedNightStore abortedNightStore;
     private MythicMobsBridge mythicMobs = new NoMythicMobsBridge();
     private PlaceholderIntegration placeholderIntegration = new NoPlaceholderIntegration();
 
@@ -248,6 +250,7 @@ public final class Bloodmoon extends JavaPlugin
 
     public SessionCoordinator getSessionCoordinator() { return sessionCoordinator; }
     public HistoricalStatisticsService getStatisticsService() { return statisticsService; }
+    public AbortedNightStore getAbortedNightStore() { return abortedNightStore; }
     public NamespacedKey getBossKey() { return new NamespacedKey(this, "bloodmoon_boss"); }
     public MythicMobsBridge getMythicMobs() { return mythicMobs; }
     public PlaceholderIntegration getPlaceholderIntegration() { return placeholderIntegration; }
@@ -359,6 +362,8 @@ public final class Bloodmoon extends JavaPlugin
 
         statisticsService = new HistoricalStatisticsService(
                 new File(getDataFolder(), "statistics.yml").toPath(), getLogger());
+        abortedNightStore = new AbortedNightStore(
+                new File(getDataFolder(), "aborted-nights.yml").toPath(), getLogger());
         sessionCoordinator = new SessionCoordinator(this);
 
         if (getServer().getPluginManager().isPluginEnabled("MythicMobs")) {
@@ -441,6 +446,11 @@ public final class Bloodmoon extends JavaPlugin
             getServer().getPluginManager().registerEvents(nightCheck, this);
             nightChecks.add(nightCheck);
             LoadCache(world);
+            Long recoveredCycle = sessionCoordinator.consumeRecoveredIncompleteWorld(world.getUID());
+            if (recoveredCycle != null) {
+                nightCheck.RecoverIncompleteSession(recoveredCycle);
+            }
+            nightCheck.RestoreRestartSuppression();
         }
 
         bloodmoonWorlds.add(world);
@@ -471,6 +481,7 @@ public final class Bloodmoon extends JavaPlugin
     {
         for (PeriodicNightCheck nightCheck : nightChecks)
         {
+            nightCheck.PrepareAbortedShutdown("server-shutdown");
             nightCheck.UpdateCacheDatabase();
         }
 

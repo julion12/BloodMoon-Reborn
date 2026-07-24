@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.spectralmemories.sqlaccess.FieldType;
 import org.spectralmemories.sqlaccess.SQLAccess;
 import org.spectralmemories.sqlaccess.SQLField;
+import org.spectralmemories.bloodmoon.lifecycle.AutomaticStartPolicy;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ public class PeriodicNightCheck implements Runnable, Listener
 
     private long checkupAfter;
     private int daysBeforeBloodMoon;
+    private boolean manualStartRequested;
+    private boolean recoveryLogged;
 
     private World world;
     private BloodmoonActuator actuator;
@@ -95,6 +98,45 @@ public class PeriodicNightCheck implements Runnable, Listener
         return checkupAfter;
     }
 
+    public void RequestManualStart ()
+    {
+        manualStartRequested = true;
+    }
+
+    public void ClearRestartSuppression ()
+    {
+        Bloodmoon.GetInstance().getAbortedNightStore().clear(world.getUID());
+        recoveryLogged = false;
+    }
+
+    public boolean PrepareAbortedShutdown (String cause)
+    {
+        if (!actuator.isInProgress()) return false;
+        Bloodmoon.GetInstance().getAbortedNightStore().mark(
+                world.getUID(), world.getName(), world.getFullTime(), cause);
+        ResetScheduleAfterConsumedNight();
+        return true;
+    }
+
+    public void RecoverIncompleteSession (long recordedCycle)
+    {
+        long cycle = recordedCycle >= 0 ? recordedCycle
+                : org.spectralmemories.bloodmoon.lifecycle.NightCycle.identity(world.getFullTime());
+        Bloodmoon.GetInstance().getAbortedNightStore().markCycle(
+                world.getUID(), world.getName(), cycle, "unexpected-stop");
+        ResetScheduleAfterConsumedNight();
+    }
+
+    public boolean RestoreRestartSuppression ()
+    {
+        boolean suppressed = Bloodmoon.GetInstance().getAbortedNightStore().suppresses(
+                world.getUID(), world.getFullTime(), world.getTime());
+        if (!suppressed) return false;
+        ResetScheduleAfterConsumedNight();
+        LogRestartSuppression();
+        return true;
+    }
+
     public void UpdateCacheDatabase ()
     {
 
@@ -116,8 +158,8 @@ public class PeriodicNightCheck implements Runnable, Listener
         }
 
         String sql;
-        int days = (actuator.isInProgress()) ? -1 : daysBeforeBloodMoon;
-        long checkAt = (actuator.isInProgress()) ? 0 : checkupAfter;
+        int days = daysBeforeBloodMoon;
+        long checkAt = checkupAfter;
         if (exists)
         {
             sql = "UPDATE " + tableName + " SET days = " + (days + 1) + ", checkAt = " + checkAt;
@@ -155,8 +197,11 @@ public class PeriodicNightCheck implements Runnable, Listener
 
         but, it works, so for this alpha version, this is fine
 
-         */
+        */
 
+        // Also expires a consumed-night marker as soon as the world's full-time cycle advances.
+        Bloodmoon.GetInstance().getAbortedNightStore().suppresses(
+                world.getUID(), world.getFullTime(), world.getTime());
         Check11();
         Check13();
         CheckDay();
@@ -191,16 +236,28 @@ public class PeriodicNightCheck implements Runnable, Listener
     }
     private void Check13 ()
     {
-        LocaleReader localeReader = Bloodmoon.GetInstance().getLocaleReader();
-        ConfigReader configReader = Bloodmoon.GetInstance().getConfigReader(world);
         //Check if its Blood Moon night, then time is over 13000, and if its the day after the day 0 warning
-        if (world.getFullTime() >= checkupAfter && world.getTime() >= 12000 && daysBeforeBloodMoon == 0)
+        boolean eligible = world.getFullTime() >= checkupAfter
+                && world.getTime() >= 12000 && daysBeforeBloodMoon == 0;
+        if (eligible)
         {
+            boolean suppressed = Bloodmoon.GetInstance().getAbortedNightStore().suppresses(
+                    world.getUID(), world.getFullTime(), world.getTime());
+            if (!AutomaticStartPolicy.mayStart(true, manualStartRequested, suppressed))
+            {
+                ResetScheduleAfterConsumedNight();
+                LogRestartSuppression();
+                return;
+            }
+            if (manualStartRequested)
+            {
+                manualStartRequested = false;
+                ClearRestartSuppression();
+            }
 
             actuator.StartBloodMoon();
 
-            checkupAfter = getNextEvening();
-            daysBeforeBloodMoon = (configReader.GetIntervalConfig() - 1);
+            ResetScheduleAfterConsumedNight();
         }
     }
     private void CheckDay ()
@@ -241,6 +298,23 @@ public class PeriodicNightCheck implements Runnable, Listener
         long remaining = currentTime % DAY;
 
         return (currentTime - remaining);
+    }
+
+    private void ResetScheduleAfterConsumedNight ()
+    {
+        checkupAfter = getNextEvening();
+        daysBeforeBloodMoon = Math.max(0,
+                Bloodmoon.GetInstance().getConfigReader(world).GetIntervalConfig() - 1);
+    }
+
+    private void LogRestartSuppression ()
+    {
+        if (recoveryLogged) return;
+        recoveryLogged = true;
+        Bloodmoon.GetInstance().getLogger().warning(
+                "Previous active Blood Moon in world " + world.getName() + " was aborted after restart.");
+        Bloodmoon.GetInstance().getLogger().warning(
+                "Automatic restart is suppressed for the remainder of this night.");
     }
 
 

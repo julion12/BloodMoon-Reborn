@@ -228,6 +228,7 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
             LocaleReader.MessageLocale("NoBloodMoonInWorld", null, null, sender);
             return true;
         }
+        nightCheck.RequestManualStart();
         nightCheck.SetCheckAfter(0);
         nightCheck.SetDaysRemaining(0);
         world.setTime(12001);
@@ -255,6 +256,7 @@ public class BloodmoonCommandExecutor implements CommandExecutor, TabCompleter
             return true;
         }
 
+        nightCheck.ClearRestartSuppression();
         nightCheck.SetCheckAfter(0);
         nightCheck.SetDaysRemaining(nightCheck.GetBloodMoonInterval() - 1);
         world.setTime(0);

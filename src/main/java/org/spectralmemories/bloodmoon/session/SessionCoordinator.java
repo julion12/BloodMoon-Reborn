@@ -21,19 +21,21 @@ public final class SessionCoordinator {
     private final Bloodmoon plugin;
     private final CommandRunner commandRunner;
     private final SessionStore store;
+    private final Map<UUID, Long> recoveredIncompleteWorlds;
     private final Map<UUID, BloodMoonSession> active = new LinkedHashMap<>();
 
     public SessionCoordinator(Bloodmoon plugin) {
         this.plugin = plugin;
         this.commandRunner = new CommandRunner(plugin);
         this.store = new SessionStore(plugin);
-        store.discardIncompleteOnStartup();
+        this.recoveredIncompleteWorlds = new LinkedHashMap<>(store.discardIncompleteOnStartup());
     }
 
     public BloodMoonSession start(World world) {
         BloodMoonSession existing = active.get(world.getUID());
         if (existing != null) return existing;
-        BloodMoonSession session = new BloodMoonSession(world.getUID(), world.getName(), Instant.now());
+        BloodMoonSession session = new BloodMoonSession(world.getUID(), world.getName(), Instant.now(),
+                org.spectralmemories.bloodmoon.lifecycle.NightCycle.identity(world.getFullTime()));
         world.getPlayers().forEach(player -> session.join(player.getUniqueId(), Instant.now()));
         active.put(world.getUID(), session);
         store.save(active.values());
@@ -133,5 +135,8 @@ public final class SessionCoordinator {
 
     public CommandRunner commandRunner() { return commandRunner; }
     public Collection<BloodMoonSession> activeSessions() { return List.copyOf(active.values()); }
+    public Long consumeRecoveredIncompleteWorld(UUID worldId) {
+        return recoveredIncompleteWorlds.remove(worldId);
+    }
     public void abortAll() { active.clear(); store.save(active.values()); }
 }

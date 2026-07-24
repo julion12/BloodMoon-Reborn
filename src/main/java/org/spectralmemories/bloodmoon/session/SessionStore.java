@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 /** Crash marker store. Incomplete sessions are deliberately discarded without rewards. */
@@ -19,9 +22,17 @@ public final class SessionStore {
         this.file = new File(plugin.getDataFolder(), "sessions.yml");
     }
 
-    public void discardIncompleteOnStartup() {
-        if (!file.isFile()) return;
+    public Map<UUID, Long> discardIncompleteOnStartup() {
+        Map<UUID, Long> worlds = new LinkedHashMap<>();
+        if (!file.isFile()) return worlds;
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+        for (String key : yaml.getKeys(false)) {
+            try {
+                worlds.put(UUID.fromString(key), yaml.getLong(key + ".night-cycle", -1));
+            } catch (IllegalArgumentException exception) {
+                plugin.getLogger().warning("Ignoring invalid world identity in incomplete session marker");
+            }
+        }
         if (!yaml.getKeys(false).isEmpty()) {
             File discarded = new File(file.getParentFile(), "sessions.discarded-" + Instant.now().toEpochMilli() + ".yml");
             try {
@@ -31,6 +42,7 @@ public final class SessionStore {
                 plugin.getLogger().log(Level.SEVERE, "Could not archive incomplete session state; rewards remain disabled for it", exception);
             }
         }
+        return worlds;
     }
 
     public void save(Collection<BloodMoonSession> sessions) {
@@ -40,6 +52,7 @@ public final class SessionStore {
             yaml.set(root + ".session", session.sessionId().toString());
             yaml.set(root + ".world", session.worldName());
             yaml.set(root + ".started", session.startedAt().toString());
+            yaml.set(root + ".night-cycle", session.nightCycle());
         }
         try {
             yaml.save(file);

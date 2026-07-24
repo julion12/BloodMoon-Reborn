@@ -16,6 +16,7 @@ public final class BloodMoonSession {
     private final UUID worldId;
     private final String worldName;
     private final Instant startedAt;
+    private final long nightCycle;
     private Instant endedAt;
     private UUID bossId;
     private volatile BossSessionState bossState = BossSessionState.NOT_SPAWNED;
@@ -31,14 +32,23 @@ public final class BloodMoonSession {
     private volatile int currentSurvivors;
 
     public BloodMoonSession(UUID worldId, String worldName, Instant startedAt) {
-        this(UUID.randomUUID(), worldId, worldName, startedAt);
+        this(UUID.randomUUID(), worldId, worldName, startedAt, -1);
     }
 
     public BloodMoonSession(UUID sessionId, UUID worldId, String worldName, Instant startedAt) {
+        this(sessionId, worldId, worldName, startedAt, -1);
+    }
+
+    public BloodMoonSession(UUID worldId, String worldName, Instant startedAt, long nightCycle) {
+        this(UUID.randomUUID(), worldId, worldName, startedAt, nightCycle);
+    }
+
+    public BloodMoonSession(UUID sessionId, UUID worldId, String worldName, Instant startedAt, long nightCycle) {
         this.sessionId = sessionId;
         this.worldId = worldId;
         this.worldName = worldName == null ? "" : worldName;
         this.startedAt = startedAt;
+        this.nightCycle = nightCycle;
     }
 
     public Participant join(UUID playerId, Instant when) {
@@ -116,6 +126,7 @@ public final class BloodMoonSession {
     public UUID worldId() { return worldId; }
     public String worldName() { return worldName; }
     public Instant startedAt() { return startedAt; }
+    public long nightCycle() { return nightCycle; }
     public Optional<Instant> endedAt() { return Optional.ofNullable(endedAt); }
     public Optional<UUID> bossId() { return Optional.ofNullable(bossId); }
     public BossSessionState bossState() { return bossState; }

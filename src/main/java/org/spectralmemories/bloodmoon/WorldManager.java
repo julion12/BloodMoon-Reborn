@@ -18,6 +18,11 @@ public class WorldManager implements Listener
     public void onWorldUnload(WorldUnloadEvent event) {
         BloodmoonActuator actuator = BloodmoonActuator.GetActuator(event.getWorld());
         if (actuator != null) {
+            PeriodicNightCheck nightCheck = PeriodicNightCheck.GetPeriodicNightCheck(event.getWorld());
+            if (nightCheck != null) {
+                nightCheck.PrepareAbortedShutdown("world-unload");
+                nightCheck.UpdateCacheDatabase();
+            }
             actuator.AbortBloodMoon();
             actuator.close();
         }
