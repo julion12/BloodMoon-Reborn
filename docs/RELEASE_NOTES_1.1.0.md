@@ -10,7 +10,8 @@ The optional PlaceholderAPI expansion now exposes 41 O(1) identifiers, including
 world/session counters, `boss_state`, three localized direct boss display lines, and the immutable
 historical snapshot. Persistent aggregates live in `plugins/BloodMoon/statistics.yml`; writes use a
 temporary file and atomic replacement, and corrupt input is preserved before safe defaults are
-restored. No individual player history is stored.
+restored. No individual player history is stored. Incomplete-session crash markers contain event
+metadata only and never player UUID, death, or reward lists.
 
 PlaceholderAPI requests are safe for asynchronous consumers. A single synchronous publisher
 captures player, world, session, and live boss health data every 5 ticks and atomically replaces
@@ -24,4 +25,14 @@ GitHub repository; the plugin does not create, update, or delete `plugins/BloodM
 The TAB English and Spanish variants use direct dynamic boss lines and require no global TAB
 condition definitions.
 
-Known release gate: **NOT READY for publication.** Player-driven survivor/boss rewards and an actual Mythic boss death still require live manual execution. MythicMobs 5.12.1 enables with Paper 1.21.8, but fails inside its own server-version/NMS initialization on the tested Paper 26.2 build; BloodMoon core remains operational without it. Complete `docs/MANUAL_TEST_CHECKLIST.md` before publishing.
+The final audit upgraded the shaded YAML reader to SnakeYAML 2.6 with safe construction, removed
+the internal test command from production, added required license texts, bounded completed boss
+lifecycle tracking, and redacted administrator command arguments from failure logs.
+
+Known release gate: **NOT READY FOR RELEASE CANDIDATE.** Player-driven survivor/boss rewards,
+completed-event history, graphical TAB rendering, and a real 1.0.1 administrative migration still
+require manual execution. MythicMobs 5.12.1 enables with Paper 1.21.8, but fails inside its own
+server-version/NMS initialization on the tested Paper 26.2 build; BloodMoon core remains
+operational without it. The inherited `libs/SQLAccess.jar` also contains no separate license
+metadata, so its distribution status needs confirmation from the rights holder before an RC is
+declared.

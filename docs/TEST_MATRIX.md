@@ -1,14 +1,14 @@
 # Test matrix
 
-Validation date: 2026-07-23. `PASSED` means the automated check was executed in this workspace or, for the server rows, in the previously documented isolated server. `MANUAL REQUIRED` means the check needs a real connected player or an administrative legacy configuration that was not available. Server downloads came from the official Paper, Purpur, Adoptium, and Lumine endpoints.
+Validation date: 2026-07-24. `PASSED` means the automated check was executed in this workspace or, for the server rows, in the documented isolated server. `MANUAL REQUIRED` means the check needs a real connected player, graphical client, or administrative legacy configuration that was not available. Server downloads came from the official Paper, Purpur, Adoptium, and Lumine endpoints.
 
 ## Automated regression
 
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 122 tests, 0 failures, retaining all 117 tests from the async-safe baseline |
-| Local artifact build | PASSED | JDK 21 artifact is 543,559 bytes; SHA-256 `07915ad5ba0b7da377ff249a62efb728283ec428cbaaddd3a769cf35e6007f25`; two clean builds were byte-identical |
+| JUnit suite | PASSED | 130 tests, 0 failures, including final YAML safety, JAR contents, crash-marker privacy, boss lifecycle cleanup, and command-log redaction checks |
+| Local artifact build | PASSED | JDK 21 artifact is 559,077 bytes; SHA-256 `576f0807753ecbf8e42e1a7ed6630e01f47ade68e4274d659712e77132f491f5`; final reproducibility rerun is recorded in the RC audit |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
@@ -121,4 +121,19 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 
 ## Release gate
 
-**READY for the async-placeholder correction; NOT READY for publication.** The reported TAB/PlaceholderAPI crash path is fixed and covered by concurrent automated tests plus real connected-client vanilla and Mythic smoke tests. Publication remains blocked by the broader release checklist: player reward delivery and completed-event historical-statistics validation are still manual, and MythicMobs 5.12.1 remains upstream-incompatible with Paper 26.2.
+### Final pre-RC audit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| YAML deserialization | PASSED | SnakeYAML 2.6, `SafeConstructor`, duplicate-key rejection, and arbitrary Java-tag rejection |
+| Release descriptor | PASSED | One public command, complete permissions, website/description/usage/load metadata, no `testsuite` |
+| JAR inventory | PASSED | 421 unique entries; no tests, Java sources, JetBrains annotations, `docs/`, local paths, secrets, logs, worlds, or smoke files |
+| Licenses in JAR | PASSED WITH BLOCKER | Project zlib license, SnakeYAML Apache 2.0 text, and notices included; inherited SQLAccess binary has no separate license metadata |
+| Clean Paper 1.21.8 installation | PASSED | Two starts with only BloodMoon; 18 distributed files remained byte-identical, no `docs/`/Markdown, clean reload/status/shutdown |
+| Optional integrations | PASSED | BloodMoon + PlaceholderAPI 2.12.3 + MythicMobs 5.12.1 + TAB 5.3.2 loaded, reloaded, and stopped with zero selected error signatures |
+| Manual reward/history/migration/visual gate | MANUAL REQUIRED | Exact procedures remain in `MANUAL_TEST_CHECKLIST.md` |
+
+**NOT READY FOR RELEASE CANDIDATE.** Automated, packaging, startup, and integration gates pass.
+RC promotion remains blocked by the unconfirmed SQLAccess licensing metadata and by the real
+player/manual checks that the project checklist explicitly requires before changing `NOT READY`.
+MythicMobs 5.12.1 also remains upstream-incompatible with the tested Paper 26.2 build.

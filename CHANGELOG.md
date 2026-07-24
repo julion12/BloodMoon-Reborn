@@ -48,5 +48,10 @@
 - Administrative boss spawning bypassing `Boss.Mode` and creating vanilla announcements/BossBars before a Mythic spawn.
 - `killbosses` leaving tracked Mythic boss entities and session state behind.
 - Placeholder consumers needing to infer whether a missing boss had not spawned or had already been defeated.
+- Unsafe YAML construction and acceptance of duplicate keys in plugin-managed YAML readers.
+- Release packaging of the internal `testsuite` command and unnecessary JetBrains annotation classes.
+- Completed and administratively removed bosses retaining lifecycle UUIDs; plugin shutdown now also removes Mythic-only tracked bosses.
+- Crash markers storing player UUID lists; they now retain only session ID, world name, and start time.
+- Failed configured commands exposing their full administrator-supplied arguments in logs.
 
 No existing configuration key or vanilla boss default was removed or renamed.

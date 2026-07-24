@@ -26,5 +26,8 @@ Build facts:
 - 26.2 smoke-test JDK: Eclipse Temurin 25.0.3+9 LTS (portable, checksum verified)
 - Paper compile API: 1.21.4-R0.1-SNAPSHOT
 - MythicMobs compile-only API: Mythic-Dist 5.12.1
+- PlaceholderAPI compile-only API: 2.12.3
+- TAB: no direct dependency; 5.3.2 was used for the connected-client validation
+- Shaded YAML runtime: SnakeYAML 2.6 with `SafeConstructor`
 - Declared Bukkit `api-version`: 1.21
 - Artifact count: one

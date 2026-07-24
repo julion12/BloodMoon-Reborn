@@ -114,3 +114,24 @@ sections. Neither variant requires `%condition:*%` placeholders.
 ## Sign-off
 
 Release status may change from `NOT READY` only after the real player tests above pass, the deployment server/Mythic combination enables, and the collected logs show no duplicate reward, cross-world leakage, unsafe crash payout, class-link error, or shutdown exception.
+
+## Exact pending release-candidate matrix
+
+Every row below is still pending unless signed evidence is attached. “PASS” requires the expected
+result and all requested evidence; any missing evidence, duplicate action, exception, leakage, or
+different result is “FAIL”.
+
+| Test | Preparation | Steps | Expected result | Required evidence | PASS / FAIL |
+| --- | --- | --- | --- | --- | --- |
+| Real survivor reward | Two real players; harmless unique reward marker; rewards enabled | Start event; keep A eligible past minimum; complete normally | A receives exactly one marker | Config, session UUID, chat/console output, complete log | PASS only once for A; FAIL for zero/multiple |
+| Dead-player exclusion | Same event with player B | Kill B; respawn; complete event | B remains ineligible and receives nothing | Death line, survivor status before end, reward log | PASS only with no B reward; otherwise FAIL |
+| Vanilla boss reward | `Boss.Mode: VANILLA`; unique reward command | Spawn, damage, kill with credited player | One vanilla boss/bar and one killer reward | Config, boss UUID, before/after screenshots, log | PASS exactly once; duplicate/missing/wrong player is FAIL |
+| MythicMobs boss reward | Paper 1.21.8 + supported Mythic 5.12.1; documented mob | Spawn and kill with each reward-isolation policy | Mythic and BloodMoon rewards follow their independent flags exactly once | Exact plugin hashes, mob/config YAML, log, inventory/command marker | PASS only with correct isolation; otherwise FAIL |
+| Duplicate prevention | Enable unique markers; reuse each preceding flow | Reload during session; repeat damage/death/end triggers | No session or boss UUID produces a second reward | Full unfiltered log plus marker counts | PASS at count 1; any count >1 is FAIL |
+| Completed-event history | Clean `statistics.yml`; one controlled event | Record baseline; complete event; inspect file/placeholders | Totals and last-event snapshot increment exactly once | Before/after file hashes/content and PAPI parses | PASS exact delta 1; otherwise FAIL |
+| History after restart | Continue previous test | Stop cleanly; restart; parse history again | Same completed aggregates survive with no extra increment | Shutdown/startup log, file, PAPI output | PASS identical values; loss/duplication is FAIL |
+| TAB graphical review | Real graphical client; exact EN or ES example | Reload TAB; observe no boss, alive, damaged, defeated states | Correct lines, ≤15 visible, no stale health/`NONE`, acceptable transitions | Screenshots/video and complete log | PASS only visual and log criteria; otherwise FAIL |
+| English language | `Language: en`; fresh and migrated copies | Exercise lifecycle, warnings, boss, survivor, PAPI states | Natural English, resolved tokens, valid colors | Screenshots/chat export and log | PASS with no unresolved/missing text; otherwise FAIL |
+| Spanish language | `Language: es`; fresh and migrated copies | Repeat English sequence | Correct accents/punctuation, resolved tokens, valid colors | Screenshots/chat export and UTF-8 log | PASS with no mojibake/unresolved text; otherwise FAIL |
+| Paper/Purpur 26.2 deployment | Disposable exact deployment builds; Java 25 | Start, reload/status, event lifecycle, stop; test supported integrations only | Core loads and stops cleanly; unsupported Mythic 5.12.1 is not claimed | Exact builds/hashes and complete logs | PASS per platform only with clean core lifecycle; otherwise FAIL |
+| Real 1.0.1 migration | Unmodified user-owned 1.0.1 data and backup | Hash input; start once; restart twice; reload | One backup, preserved values, one 1.1 section, idempotent later starts | Original and backup hashes, before/after config, all logs | PASS only if all preservation/idempotency checks pass; otherwise FAIL |

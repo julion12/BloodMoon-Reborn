@@ -23,10 +23,11 @@ Modernization and maintenance: **JulioN12**
 - Atomic server-wide historical statistics in `statistics.yml`, without personal player history.
 - Timestamped, idempotent per-world configuration migration from 1.0.1.
 - Crash markers discard incomplete sessions without granting uncertain rewards.
+- YAML input is parsed with SnakeYAML's safe constructor; duplicate and arbitrary Java type tags are rejected.
 
 All new rewards default to disabled. PlaceholderAPI, MythicMobs, WorldGuard, and Multiverse-Core are soft dependencies. TAB is not a dependency.
 
-Active Blood Moon sessions expose total deaths, unique dead-player UUIDs, registered participants, and current survivors through `%bloodmoon_death_count%`, `%bloodmoon_unique_deaths%`, `%bloodmoon_participants_current%`, and `%bloodmoon_survivors_current%`. These counters are isolated per world, reset with each event, and are not persisted as history.
+Active Blood Moon sessions expose total deaths, unique dead-player UUIDs, registered participants, and current survivors through `%bloodmoon_death_count%`, `%bloodmoon_unique_deaths%`, `%bloodmoon_participants_current%`, and `%bloodmoon_survivors_current%`. These counters are isolated per world, reset with each event, and are not persisted as history. Crash markers contain only event metadata, never player UUIDs or reward/death lists.
 
 Completed events contribute aggregate server history and a last-event snapshot. Boss state and history are available through the same optional `%bloodmoon_*%` expansion without disk access on placeholder requests.
 
@@ -75,8 +76,9 @@ Console commands require a world argument except `reload`. Tab completion is inc
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Test matrix](docs/TEST_MATRIX.md)
 - [Manual release checklist](docs/MANUAL_TEST_CHECKLIST.md)
+- [Final pre-RC audit](docs/RELEASE_CANDIDATE_AUDIT_1.1.0.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
 
-The original license and attribution are preserved in [LICENSE](LICENSE).
+The original license and attribution are preserved in [LICENSE](LICENSE). The release JAR includes that license plus third-party notices and the Apache 2.0 text required by SnakeYAML.
