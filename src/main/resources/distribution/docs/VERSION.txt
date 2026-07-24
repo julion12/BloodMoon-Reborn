@@ -1,0 +1,3 @@
+BloodMoon-Reborn administrator documentation
+DocumentationVersion: 1
+PluginVersion: 1.1.0

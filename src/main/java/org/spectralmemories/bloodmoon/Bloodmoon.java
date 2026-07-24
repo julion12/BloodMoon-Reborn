@@ -18,6 +18,7 @@ import org.spectralmemories.bloodmoon.placeholder.NoPlaceholderIntegration;
 import org.spectralmemories.bloodmoon.placeholder.PlaceholderIntegration;
 import org.spectralmemories.bloodmoon.locale.LocaleMigrator;
 import org.spectralmemories.bloodmoon.statistics.HistoricalStatisticsService;
+import org.spectralmemories.bloodmoon.distribution.AdministratorGuideInstaller;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -344,6 +345,18 @@ public final class Bloodmoon extends JavaPlugin
         instance = this;
 
         CreateFolder();
+        var guides = new AdministratorGuideInstaller(
+                getDataFolder().toPath(), getClass().getClassLoader(), getLogger()).installMissing();
+        if (guides.readmeCreated()) {
+            getLogger().info("Administrator guides were created in: "
+                    + new File(getDataFolder(), "docs").getPath());
+            getLogger().info("Ready-to-copy examples were created in: "
+                    + new File(getDataFolder(), "EXAMPLES").getPath());
+            getLogger().info("Start with " + new File(getDataFolder(), "README.txt").getPath());
+        } else if (guides.createdCount() > 0) {
+            getLogger().info("Created " + guides.createdCount()
+                    + " missing administrator documentation file(s) without overwriting existing files");
+        }
 
         statisticsService = new HistoricalStatisticsService(
                 new File(getDataFolder(), "statistics.yml").toPath(), getLogger());

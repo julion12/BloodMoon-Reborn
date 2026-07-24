@@ -34,6 +34,21 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+processResources {
+    from('docs/examples') {
+        include 'TAB-scoreboards.yml', 'CommandsOnStart.yml', 'CommandsOnEnd.yml',
+                'SurvivorRewards.yml', 'BossRewards.yml', 'PlaceholderAPI-examples.txt',
+                'MythicMobs-BloodMoonBoss.yml'
+        into 'distribution/EXAMPLES'
+    }
+    from('docs') {
+        include 'COMPATIBILITY.md', 'CONFIGURATION.md', 'EXAMPLES.md',
+                'MANUAL_TEST_CHECKLIST.md', 'MIGRATION.md', 'MYTHICMOBS.md',
+                'PLACEHOLDERAPI.md', 'PLACEHOLDERS.md', 'SURVIVOR_REWARDS.md'
+        into 'distribution/docs'
+    }
+}
+
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
 
@@ -73,6 +88,7 @@ jar {
 
 test {
     useJUnitPlatform()
+    dependsOn jar
 }
 
 tasks.register('jarContentsReport') {
