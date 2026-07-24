@@ -7,8 +7,8 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Gradle clean compile | PASSED | Eclipse Temurin 21.0.8+9, Gradle 9.3.0 |
-| JUnit suite | PASSED | 117 tests, 0 failures, including the original 100 |
-| Local artifact build | PASSED | JDK 21 artifact is 558,384 bytes; SHA-256 `6203f1abac11308346925147698faa376a158dcfcffae42794723a5d3074cebe`; two clean builds were byte-identical |
+| JUnit suite | PASSED | 122 tests, 0 failures, retaining all 117 tests from the async-safe baseline |
+| Local artifact build | PASSED | JDK 21 artifact is 543,559 bytes; SHA-256 `07915ad5ba0b7da377ff249a62efb728283ec428cbaaddd3a769cf35e6007f25`; two clean builds were byte-identical |
 | Legacy config and idempotent migration | PASSED | Unit tests |
 | Command parsing, placeholders, and null handling | PASSED | Unit tests |
 | Survival, death, reconnect, late join, minimum time, once-only reward, session reset, and two-world isolation | PASSED | Unit tests |
@@ -17,7 +17,7 @@ Validation date: 2026-07-23. `PASSED` means the automated check was executed in 
 | Contextual vanilla/Mythic boss names and `$b`/modern placeholders | PASSED | Unit tests cover display order, InternalName fallback, nulls, legacy and modern tokens |
 | Vanilla BossBar lifecycle and health values | PASSED | Unit tests cover creation policy, Mythic exclusion, reload idempotency, cleanup state, health rendering, and 0.0–1.0 clamping |
 | English, Spanish, fallback, legacy override, and locale migration | PASSED | Complete YAML catalogs parsed; backup, custom `ZombieBossName`, missing-key merge, and idempotency tested |
-| Documented YAML examples | PASSED | All six `docs/examples/*.yml` files and migrated config sections parse with SnakeYAML |
+| Documented YAML examples | PASSED | All 16 `docs/examples/*.yml` files parse with SnakeYAML; five comments-only bilingual indexes and 10 EN/ES functional variants are distinguished explicitly |
 
 ## Real server startup and command smoke tests
 
@@ -98,11 +98,11 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | Resolver identifiers and fallbacks | PASSED | Unit tests cover all 41 public identifiers, dynamic boss lines, unknown identifiers, null/offline player, localized fallbacks, boolean stability, time formatting, and safe absent state |
 | World/event/player context | PASSED | Unit tests cover active/inactive world snapshots, participation, eligibility, disqualification, non-participation, late-join policy, and reload ownership |
 | Real-time session statistics | PASSED | First/repeated/second-player deaths, unique UUIDs, unregistered-player death, reset, world isolation, participant count, survivor updates, non-negative clamp, inactive zeros, and all four public placeholders |
-| Bundled administrator resources | PASSED | Real JAR manifest, closed extraction list, first/second start, preserve/restore, paths with spaces, UTF-8, YAML, failure isolation, and traversal rejection |
+| Bundled administrator resources | PASSED | The closed 18-resource manifest contains only bilingual `README.txt` plus 17 `EXAMPLES/` files. Tests reject every `distribution/docs/` and Markdown entry and cover first install, legacy docs preservation, paths with spaces, UTF-8, failure isolation, and traversal rejection |
 | Direct boss display lines | PASSED | NONE, NOT_SPAWNED, VANILLA/MYTHIC ALIVE health updates, DEFEATED identity, localization, overrides, null/offline PAPI, and no unresolved tokens |
 | Narrative boss state | PASSED | New session, vanilla/Mythic successful spawn, natural death, identity retention, technical/localized values, coherence with alive/name/type/health, idempotency, and reset |
 | Historical statistics | PASSED | Completed/aborted event policy, death/unique totals, boss success/defeat policy, last-event replacement, non-negative duration, versioned create/load, atomic save/reload, idempotency, and corrupt-file recovery |
-| Integration examples | PASSED | Required TAB file exists and parses; normal/full/compact/history designs, display condition, boss state, live counters, history, and all public PAPI examples are asserted |
+| Integration examples | PASSED | Five comments-only bilingual indexes name their EN/ES variants; functional TAB variants parse, use identical placeholder sets/direct boss lines, and contain no `%condition:*%`; all 41 public PAPI identifiers remain documented |
 | Boss state | PASSED | Unit tests cover vanilla/Mythic names and types, real health values, no-boss values, rounding, and 0–100 clamping |
 | Lifecycle architecture | PASSED | Tests verify optional `softdepend`, one registration site, no registration during BloodMoon reload, `persist() = true`, and explicit close |
 | Request-path performance | PASSED | Source-boundary test excludes file/YAML access, global entity traversal, schedulers, and command dispatch; all four session counters are direct O(1) field/set/map-size reads |
@@ -113,7 +113,7 @@ The 2026-07-19 follow-up routes the historical command and automatic/permanent r
 | PlaceholderAPI reload ownership | PASSED | The expansion and single 5-tick synchronous publisher remain owned by plugin enable/disable; Blood Moon reload neither loses nor duplicates the active session snapshot |
 | Existing bundled locale catalogs | PASSED | Real smoke added only the seven missing keys to existing English/Spanish catalogs, created backups, preserved existing values, and returned localized parses |
 | Server without PlaceholderAPI | PASSED | Exact final 551,306-byte JAR was the sole external plugin, reached `Done` on Paper 1.21.8, extracted guides, and stopped cleanly without missing-class errors |
-| Final JAR guide extraction smoke | PASSED | Clean extraction created all 18 manifest files; restart from a path with spaces preserved an edited README; one deleted example alone was restored; a blocked docs parent logged 10 warnings while the plugin still reached `Done` and disabled cleanly |
+| Paper 1.21.8 administrative extraction smoke | PASSED | Clean server with only the final-hash BloodMoon JAR created `README.txt` and exactly 17 examples, no `docs/` and no Markdown. The log printed the exact EXAMPLES/GitHub four-line banner. Restart preserved an edited EN file and a legacy `docs/custom-guide.md`, restored only the removed ES file byte-identically, repeated no first-start banner, and disabled cleanly with no BloodMoon warning/error |
 | Connected-player event/boss/world/TAB behavior | PASSED WITH LIMITATION | A connected headless Minecraft protocol client exercised live vanilla and Mythic entities while TAB 5.3.2 performed async refreshes. Placeholder values and server logs were verified; pixel-level visual rendering in a graphical client was not claimed |
 | Statistics create/restart/corruption | PASSED | Exact JAR created version 1 defaults, reloaded them after restart, preserved invalid YAML as `statistics.corrupt-*.yml`, logged a clear warning, restored defaults, kept PAPI responsive, and stopped cleanly |
 | Live boss state | PASSED | VANILLA and MYTHICMOBS ALIVE → DEFEATED transitions and live health publication were observed with a connected client |
