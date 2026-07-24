@@ -11,6 +11,11 @@ Afterward, only the packaged SQLAccess notice/documentation changed. The final r
 559,407 bytes, SHA-256 `208060c36f395fea76a58ac8fa046bee9d221a610a84e5a837d604bda86ba38e`;
 it passed all 131 automated tests. No functional bytecode changed between those two artifacts.
 
+Phase 2.1 used the corrected final bytecode on Paper 1.21.8 build 60 with Java Temurin 21.0.11 and
+PlaceholderAPI 2.12.3. Its JAR is 568,928 bytes with SHA-256
+`08984085dddd33b3d86704c4303780501918b994af3dc8f1449c48051b64646d`; final reproducibility is
+recorded in the RC audit. Ignored evidence is under `exes/rc-blocker-*`.
+
 ## Executed scenarios
 
 | Scenario | Result | Evidence |
@@ -21,7 +26,7 @@ it passed all 131 automated tests. No functional bytecode changed between those 
 | Disconnect/reconnect | PASS | Reconnected registered player received one |
 | Other world / offline at end | PASS | Each ineligible player received zero |
 | Active-event shutdown | PASS | No reward was delivered and the incomplete marker was discarded |
-| Fresh event immediately after nighttime restart | FAIL | Startup automatically opened a new zero-participant session before clients joined; `IncludeLateJoiners: false` kept them ineligible |
+| Fresh event immediately after nighttime restart | FAIL before fix; PASS after Phase 2.1 | Pre-fix evidence preserves the empty session; corrected runs suppress it for both late-joiner values |
 | Configurable reward message colors | FAIL then fixed | Live chat exposed literal `&a`; commit `2cd68c1` translates legacy colors; automated regression passes |
 | Vanilla boss lifecycle and rewards | PASS | One server execution line, exactly three emeralds to credited killer, zero to second attacker; administrative removal and live-at-end produced zero |
 | MythicMobs 5.12.1 English lifecycle | PASS | NOT_SPAWNED → ALIVE → DEFEATED, health/damage/heal updates, exactly three Mythic-owned diamonds, no BloodMoon command, no vanilla fallback, next event clean |
@@ -83,6 +88,24 @@ shared vanilla/Mythic scoreboard behavior.
 
 SQLAccess is classified **A. REDISTRIBUTION CONFIRMED**. The candidate is nevertheless
 **NOT READY FOR RELEASE CANDIDATE** because the separate EN/ES locale review and the full 26.2
-Phase-2 walkthrough remain unexecuted, and the automatic same-night post-restart session behavior
-remains a functional FAIL requiring an explicit product decision or fix. Owner-verified scoreboard,
-final-reward, end-command, and normal-close behavior is recorded as PASS with evidence pending.
+Phase-2 walkthrough remain unexecuted. The automatic same-night post-restart functional blocker is
+fixed and validated. Owner-verified scoreboard, final-reward, end-command, and normal-close
+behavior remains PASS with evidence pending.
+
+## Phase-2.1 restart recovery evidence
+
+The pre-fix run preserved configuration, complete logs, both session markers, caches, statistics,
+timestamps, world UUID, world time, and assertions. It proved that `PeriodicNightCheck` restored
+`days=0/checkAt=0`, then opened a different empty session before the player returned.
+
+Corrected `IncludeLateJoiners: false` evidence contains nine state snapshots over three boots. All
+14 assertions pass: no empty same-night session, repeated suppression, manual override, zero abort
+payout, one next-cycle completion/reward, one history increment, marker expiry, and one recovery
+message per boot. The equivalent true configuration passes all 11 assessed assertions. No player
+UUID or reward state is stored in `aborted-nights.yml`.
+
+The additional Mythic-enabled recovery smoke confirmed suppression before and after a manually
+aborted event, no completed-history increment, no reward command, and no residual boss state. Its
+fixture fell back to vanilla because the copied Mythic definition was not resolved in that isolated
+copy, so it is not represented as a new Mythic spawn PASS; the earlier real Mythic lifecycle PASS
+and the automated Mythic cleanup regressions remain the applicable evidence.

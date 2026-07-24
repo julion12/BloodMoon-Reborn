@@ -54,5 +54,10 @@
 - Crash markers storing player UUID lists; they now retain only session ID, world name, and start time.
 - Failed configured commands exposing their full administrator-supplied arguments in logs.
 - Configurable survivor reward messages showing legacy `&` color codes literally.
+- Active Blood Moons interrupted by shutdown, restart, or recoverable crash are now definitively
+  aborted without rewards or resume. Automatic starts are suppressed for the remainder of that
+  world/night cycle, while an explicit administrative start remains available.
+- Aborted vanilla boss cleanup no longer schedules delayed effects after Bukkit has disabled the
+  plugin; vanilla and Mythic boss state is removed synchronously without reward or respawn.
 
 No existing configuration key or vanilla boss default was removed or renamed.

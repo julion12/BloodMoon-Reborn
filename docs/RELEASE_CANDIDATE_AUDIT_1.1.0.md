@@ -378,3 +378,37 @@ Status remains **NOT READY FOR RELEASE CANDIDATE**. Same-night restart creates a
 before reconnecting players can register when late joiners are disabled. Separate English and
 Spanish review and the full Phase-2 26.2 lifecycle are also NOT RUN. The owner-verified shared
 scoreboard and normal-completion behavior is not classified as NOT RUN.
+
+## Phase-2.1 addendum — restart blocker correction
+
+The historical Phase-2 restart FAIL above is superseded. Before modification, the exact defect was
+reproduced on Paper 1.21.8 build 60: clean shutdown aborted the active event, persisted an
+immediately eligible scheduler state, and startup created another session before reconnect.
+
+The correction persists a minimal, atomic `aborted-nights.yml` keyed by world UUID and exact
+full-time night cycle. Clean shutdown writes the marker before abort; crash recovery derives it
+from metadata-only `sessions.yml`. The scheduler suppresses only automatic starts in that same
+world/cycle. Repeated restarts do not extend it, a later cycle expires it, and `/bloodmoon start`
+explicitly clears it to create a fresh session. No participant, reward, boss, or player UUID data
+is resumed or stored.
+
+Paper 1.21.8 protocol-client runs pass with `IncludeLateJoiners: false` and true. The false run
+covered two suppressed restarts, no-player scheduler waits, reconnect, manual override, next-cycle
+automatic start, exactly one reward, exactly one completed-history increment, and marker expiry.
+The true run passed the equivalent assertions. An additional shutdown smoke exposed and fixed
+delayed vanilla boss effects being scheduled after plugin disable; abort cleanup is now immediate,
+rewardless, and non-respawning. The earlier real MythicMobs lifecycle PASS remains valid, while
+automated recovery tests cover removal of Mythic tracking and pending rewards.
+
+The final suite contains 148 tests with zero failures. Two clean JDK 21 builds are byte-identical.
+The JAR has 426 entries, no test classes, local paths, runtime worlds, logs, or persisted
+`aborted-nights.yml`.
+
+Final artifact: `build/libs/BloodMoon-Reborn-1.1.0.jar`, 568,928 bytes, SHA-256
+`08984085dddd33b3d86704c4303780501918b994af3dc8f1449c48051b64646d`.
+
+The functional restart blocker is **CLOSED**. Overall status remains
+**NOT READY FOR RELEASE CANDIDATE** solely because the separate English and Spanish graphical
+language reviews and the full Paper/Purpur 26.2 Phase-2 lifecycle remain NOT RUN. The owner's
+verified shared scoreboard, boss-state, reward, end-command, and normal-close behavior remains
+`PASS — owner verified, evidence pending`.

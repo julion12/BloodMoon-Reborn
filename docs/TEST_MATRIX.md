@@ -164,6 +164,26 @@ Phase-1 snapshot.
 | Full Paper/Purpur 26.2 Phase-2 lifecycle | NOT RUN | Earlier core smoke is not counted as this full walkthrough |
 
 **Phase-2 status: NOT READY FOR RELEASE CANDIDATE.** SQLAccess is no longer a blocker. The
-same-night restart failure and unexecuted language-specific/26.2 rows remain release gates.
+same-night restart result in this historical snapshot is superseded by Phase 2.1 below; the
+unexecuted language-specific/26.2 rows remain release gates.
 Shared vanilla/Mythic scoreboard behavior, final rewards, configured end commands, and normal event
 closure are PASS by owner verification; only their documentary evidence remains pending.
+
+## Phase-2.1 restart-blocker correction — 2026-07-24
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Pre-fix same-night reproduction | PASS (defect reproduced) | Paper 1.21.8 build 60 created a different zero-participant session before reconnect; ignored `rc-blocker-reproduction-before/evidence/` |
+| `IncludeLateJoiners: false` | PASS | Two same-night restarts suppressed, manual fresh start allowed, next cycle completed once |
+| `IncludeLateJoiners: true` | PASS | Same suppression and next-cycle behavior; configuration remained true |
+| Abort rewards/history | PASS | Zero aborted survivor/boss rewards; only the normally completed next-cycle event incremented `Events` |
+| Vanilla boss abort | PASS | Boss/reference/bar cleanup with no pending reward; synchronous abort avoids disabled-plugin task scheduling |
+| Mythic lifecycle safety | PASS | Existing live Mythic lifecycle remains valid; automated recovery covers Mythic reference removal and no pending payout |
+| Per-world/repeated-restart persistence | PASS | Versioned atomic marker is keyed by world UUID and exact full-time cycle; two-world and repeated-load tests pass |
+| Automated regression | PASS | 148 tests, 0 failures, including async, rewards, statistics, vanilla/Mythic lifecycle, migration, and 17 restart-specific additions |
+| Reproducible artifact | PASS | Two clean builds are byte-identical; 426 JAR entries, no tests/local state/paths |
+
+The functional RC blocker is closed. Overall status remains **NOT READY FOR RELEASE CANDIDATE**
+because the separate English and Spanish language/layout reviews and the full Paper/Purpur 26.2
+Phase-2 lifecycle remain NOT RUN. Owner-verified shared scoreboard and normal-completion rows
+remain PASS — owner verified, evidence pending.

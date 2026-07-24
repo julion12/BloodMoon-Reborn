@@ -130,6 +130,7 @@ different result is “FAIL”.
 | Duplicate prevention | Enable unique markers; reuse each preceding flow | Reload during session; repeat damage/death/end triggers | No session or boss UUID produces a second reward | Full unfiltered log plus marker counts | PASS at count 1; any count >1 is FAIL |
 | Completed-event history | Clean `statistics.yml`; one controlled event | Record baseline; complete event; inspect file/placeholders | Totals and last-event snapshot increment exactly once | Before/after file hashes/content and PAPI parses | PASS exact delta 1; otherwise FAIL |
 | History after restart | Continue previous test | Stop cleanly; restart; parse history again | Same completed aggregates survive with no extra increment | Shutdown/startup log, file, PAPI output | PASS identical values; loss/duplication is FAIL |
+| Abort during active night | Automatic event with a participant; test both late-joiner values | Stop while active; restart twice in the same night; reconnect; advance one cycle | No same-night automatic session or reward; manual override works; next eligible night starts normally | Config, all boot logs, session/statistics/marker snapshots, PAPI output | PASS in Phase 2.1 on Paper 1.21.8 build 60 |
 | TAB graphical review | Real graphical client; exact EN or ES example | Reload TAB; observe no boss, alive, damaged, defeated states | Correct lines, ≤15 visible, no stale health/`NONE`, acceptable transitions | Screenshots/video and complete log | PASS only visual and log criteria; otherwise FAIL |
 | English language | `Language: en`; fresh and migrated copies | Exercise lifecycle, warnings, boss, survivor, PAPI states | Natural English, resolved tokens, valid colors | Screenshots/chat export and log | PASS with no unresolved/missing text; otherwise FAIL |
 | Spanish language | `Language: es`; fresh and migrated copies | Repeat English sequence | Correct accents/punctuation, resolved tokens, valid colors | Screenshots/chat export and UTF-8 log | PASS with no mojibake/unresolved text; otherwise FAIL |
@@ -148,8 +149,9 @@ ignored evidence paths are indexed in `RELEASE_VALIDATION_EVIDENCE_1.1.0.md`.
 - PASS — owner verified, evidence pending: in-game vanilla boss scoreboard, MythicMobs boss
   scoreboard, visible boss states/updates, final event rewards, configured end commands, and normal
   event closure. No version, language, capture, log, hash, or exact configuration is inferred.
-- FAIL: restart during an active nighttime event is safely aborted, but startup immediately creates
-  a new zero-participant event; with `IncludeLateJoiners: false`, reconnecting players cannot join.
+- PASS: restart during an active nighttime event aborts without payout, suppresses same-night
+  automatic restart across repeated boots, permits an explicit fresh administrative start, and
+  unlocks at the next eligible cycle. Verified with `IncludeLateJoiners` false and true.
 - NOT RUN: separate TAB/locale English review, separate TAB/locale Spanish review, full Spanish
   lifecycle, and full Phase-2 Paper/Purpur 26.2 lifecycle.
 - NOT APPLICABLE: native Vault/economy balance tests; 1.1.0 exposes command rewards, not a Vault API.

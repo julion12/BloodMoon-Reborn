@@ -34,9 +34,15 @@ rewards, consecutive history, shutdown handling, and a tag-built 1.0.1 migration
 redistribution was confirmed from the original exact-binary source archive, its zlib license, and
 the author's public resource instructions. One reward-message color bug was fixed.
 
-Known release gate: **NOT READY FOR RELEASE CANDIDATE.** A same-night restart automatically starts
-a new zero-participant session before players reconnect; with late joiners disabled, that session
-cannot reward them. The project owner separately verified real in-game vanilla/Mythic scoreboards,
-boss-state updates, final rewards, end commands, and normal event closure; formal evidence is still
-pending. Separate English/Spanish review and the full 26.2 Phase-2 lifecycle remain unexecuted.
+Restart policy is now explicit: an active Blood Moon interrupted by shutdown, restart, or a
+recoverable crash is definitively aborted. It is not resumed and pays no survivor or pending boss
+reward. A small internal per-world/night marker prevents another automatic event during that same
+night; it expires at the next cycle. An administrator may still use `/bloodmoon start` to create a
+fresh normal session.
+
+The reproduced same-night restart blocker is closed on Paper 1.21.8 build 60 with both
+`IncludeLateJoiners` values. The project owner separately verified real in-game vanilla/Mythic
+scoreboards, boss-state updates, final rewards, end commands, and normal event closure; formal
+evidence is still pending. Release-candidate promotion remains **NOT READY** only because the
+separate English/Spanish review and full Paper/Purpur 26.2 Phase-2 lifecycle are still NOT RUN.
 MythicMobs 5.12.1 remains unsupported on 26.2.
