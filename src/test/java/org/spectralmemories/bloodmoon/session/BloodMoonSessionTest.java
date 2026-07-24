@@ -190,5 +190,12 @@ class BloodMoonSessionTest {
                 () -> assertEquals("NONE", second.lastBossType()));
     }
 
+    @Test void crashMarkerCycleRepresentsTheExactWorldNightWithoutPlayerData() {
+        BloodMoonSession session = new BloodMoonSession(
+                UUID.randomUUID(), "world", START, 42L);
+        assertEquals(42L, session.nightCycle());
+        assertTrue(session.participants().isEmpty());
+    }
+
     private BloodMoonSession session() { return new BloodMoonSession(UUID.randomUUID(), "world", START); }
 }
