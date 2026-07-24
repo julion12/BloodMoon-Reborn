@@ -59,8 +59,19 @@ class RestartSuppressionArchitectureTest {
         String body = actuator.substring(stop, actuator.indexOf("public void KillBosses", stop));
         assertAll(() -> assertTrue(body.contains("HideNightBar()")),
                 () -> assertTrue(body.contains("actuatorPeriodic.close()")),
-                () -> assertTrue(body.contains("KillBosses()")),
+                () -> assertTrue(body.contains("if (complete)")),
+                () -> assertTrue(body.contains("KillBosses(false, false, false)")),
                 () -> assertTrue(body.contains("bossPlaceholderSnapshot.set(BossPlaceholderSnapshot.none())")));
+    }
+
+    @Test void shutdownAbortCannotScheduleDelayedVanillaBossEffects() throws IOException {
+        String actuator = read("src/main/java/org/spectralmemories/bloodmoon/BloodmoonActuator.java");
+        int stop = actuator.indexOf("private void stopBloodMoon(boolean complete)");
+        String body = actuator.substring(stop, actuator.indexOf("public void KillBosses", stop));
+        assertAll(
+                () -> assertTrue(body.contains("KillBosses(false, false, false)")),
+                () -> assertTrue(body.indexOf("if (complete)") < body.indexOf("KillBosses()")),
+                () -> assertTrue(body.indexOf("} else {") < body.indexOf("KillBosses(false, false, false)")));
     }
 
     @Test void lateJoinerSemanticsRemainOwnedOnlyByExistingConfiguration() throws IOException {

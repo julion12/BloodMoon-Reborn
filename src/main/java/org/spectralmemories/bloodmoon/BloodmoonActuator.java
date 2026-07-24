@@ -187,7 +187,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
         if (actuatorPeriodic != null) actuatorPeriodic.close();
         actuatorPeriodic = null;
         blacklistedMobs.clear();
-        KillBosses();
+        if (complete) {
+            KillBosses();
+        } else {
+            // Plugin disable happens after Bukkit has stopped accepting new tasks. An abort must
+            // remove bosses immediately, without delayed lightning, rewards, or permanent respawn.
+            KillBosses(false, false, false);
+        }
         world.setMonsterSpawnLimit(originalMaxSpawn);
         BloodMoonSession finished = Bloodmoon.GetInstance().getSessionCoordinator().finish(world, complete);
         session = finished;
