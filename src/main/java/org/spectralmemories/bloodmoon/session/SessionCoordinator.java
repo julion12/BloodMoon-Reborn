@@ -73,7 +73,7 @@ public final class SessionCoordinator {
         for (Player player : eligible) {
             org.spectralmemories.bloodmoon.LocaleReader.MessageLocale("SurvivorRewardReceived", null, null, player);
             for (String message : config.GetSurvivorMessages()) {
-                player.sendMessage(CommandRunner.render(message, world, session, player, extras));
+                player.sendMessage(CommandRunner.renderMessage(message, world, session, player, extras));
             }
             commandRunner.run(config.GetSurvivorCommands(), CommandExecutionMode.SERVER_FOR_EACH_PLAYER,
                     world, session, List.of(player), extras);

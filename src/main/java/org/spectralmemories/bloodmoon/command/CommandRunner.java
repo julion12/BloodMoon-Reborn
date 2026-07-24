@@ -1,6 +1,7 @@
 package org.spectralmemories.bloodmoon.command;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.spectralmemories.bloodmoon.Bloodmoon;
@@ -99,5 +100,10 @@ public final class CommandRunner {
         if (extras != null) values.putAll(extras);
         String rendered = PlaceholderEngine.replace(template, values);
         return PlaceholderEngine.replaceLegacy(rendered, values);
+    }
+
+    public static String renderMessage(String template, World world, BloodMoonSession session,
+                                       Player player, Map<String, ?> extras) {
+        return ChatColor.translateAlternateColorCodes('&', render(template, world, session, player, extras));
     }
 }

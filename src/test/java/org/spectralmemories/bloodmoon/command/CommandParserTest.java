@@ -38,4 +38,8 @@ class CommandParserTest {
         assertEquals("say Crimson King", PlaceholderEngine.replaceLegacy("say $b", values));
         assertEquals("MYTHICMOBS:Crimson King", PlaceholderEngine.replace("%boss_type%:%boss_name%", values));
     }
+
+    @Test void survivorMessagesRenderLegacyColorCodes() {
+        assertEquals("\u00a7aReward granted", CommandRunner.renderMessage("&aReward granted", null, null, null, Map.of()));
+    }
 }
