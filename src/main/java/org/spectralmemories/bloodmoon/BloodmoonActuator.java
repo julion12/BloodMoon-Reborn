@@ -9,6 +9,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -854,13 +855,13 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
         if (configReader.GetLightningEffectConfig()) world.strikeLightningEffect(deadplayer.getLocation());
 
-        String deathMessage = event.getDeathMessage();
-
-        if (deathMessage != null && !deathMessage.contains(localeReader.GetLocaleString("DeathSuffix")))
+        Component deathMessage = event.deathMessage();
+        if (deathMessage != null)
         {
-            deathMessage += " " + localeReader.GetLocaleString("DeathSuffix");
-
-            event.setDeathMessage(deathMessage);
+            // Preserve Minecraft's translatable death component so each client renders the vanilla
+            // cause in its own language; converting it to a legacy String forces the server locale.
+            event.deathMessage(deathMessage.append(
+                    Component.text(" " + localeReader.GetLocalePlainString("DeathSuffix"))));
         }
 
         if (configReader.GetExperienceLossConfig())
