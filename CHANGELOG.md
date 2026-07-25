@@ -43,6 +43,8 @@
 - Unsafe legacy command parsing when a suffix was missing or a command was empty.
 - Concurrent modification while removing a defeated boss.
 - Null death-message handling.
+- Player death messages now retain Minecraft's translatable cause component before appending the
+  configured Blood Moon suffix, so each client renders the vanilla cause in its own language.
 - Misspelled `Multiverse-Core` soft dependency.
 - Mythic arrival/death text incorrectly reusing the vanilla `ZombieBossName`.
 - Administrative boss spawning bypassing `Boss.Mode` and creating vanilla announcements/BossBars before a Mythic spawn.

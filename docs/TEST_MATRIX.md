@@ -1,5 +1,34 @@
 # Test matrix
 
+## Phase-2.2 final EN/ES and 26.2 addendum — 2026-07-24/25
+
+This addendum supersedes the remaining `NOT RUN` language/26.2 rows later in this historical
+matrix.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| English functional lifecycle | PASS | Paper 1.21.8 build 60, Java 21.0.11, PAPI 2.12.3, TAB 5.3.2; 21/21 live assertions; final JAR SHA-256 `d28628a57257494c904a73943cadf0f1b170a8dea9cd6940b58a855724b33c05` |
+| Spanish functional lifecycle | PASS | Same isolated stack; 21/21 live assertions; UTF-8 locale, death, boss, reward, command, close and restart paths |
+| Translatable death cause | PASS | Raw Spanish system-chat packet contains `death.attack.genericKill` plus ` durante una Luna de Sangre.` |
+| English graphical language/layout | BLOCKED | Protocol delivery passed, but no exact EN graphical capture was supplied |
+| Spanish graphical language/layout | BLOCKED | Protocol delivery passed, but no exact ES graphical capture was supplied |
+| Shared vanilla/Mythic scoreboard behavior | PASS — owner verified, evidence pending | Earlier real in-game owner verification; language/version/captures not inferred |
+| Purpur 26.2 full vanilla lifecycle | TESTED / PASS | Purpur 26.2 build 2613, Java 25.0.3+9, 23/23 live assertions across three boots |
+| Purpur 26.2 rewards/statistics/history | PASS | One boss reward, two survivor rewards over two completed events, abort paid zero, history remained exactly 2 |
+| Purpur 26.2 restart/suppression | PASS | Active event aborted; same-night automatic restart suppressed; next cycle eligible; marker expired |
+| PAPI/TAB on Purpur 26.2 | PASS | PAPI 2.12.3 registered BloodMoon; TAB 6.1.0 loaded its `paper_26_2` implementation |
+| MythicMobs 5.12.1 on 26.2 | NOT APPLICABLE / NOT SUPPORTED | Expressly excluded and not installed; no compatibility claim |
+| Vault/economy on 26.2 | NOT APPLICABLE | BloodMoon 1.1.0 provides command rewards and no native Vault economy API |
+| Paper 26.2 full lifecycle | PARTIALLY TESTED | Earlier build 62 beta startup/command/shutdown smoke only; full Phase 2.2 lifecycle ran on Purpur |
+| Automated suite | PASS | Two clean executions: 149 tests, 0 failures each |
+| Related regression subset | PASS | 65 death-localization, boss, reward/session and restart tests, 0 failures |
+| Reproducible artifact | PASS | Two clean JDK 21 builds byte-identical; 568,988 bytes; 426 entries; no tests or local paths |
+
+Current gate: **NOT READY FOR RELEASE CANDIDATE**. No functional failure is known and no scenario
+remains `NOT RUN`; the only remaining gate is the exact English and Spanish graphical evidence
+listed in `MANUAL_TEST_CHECKLIST.md`. The broader owner-verified behavior remains a valid manual
+PASS but does not identify either language-specific layout.
+
 Validation date: 2026-07-24. `PASSED` means the automated check was executed in this workspace or, for the server rows, in the documented isolated server. `MANUAL REQUIRED` means the check needs a real connected player, graphical client, or administrative legacy configuration that was not available. Server downloads came from the official Paper, Purpur, Adoptium, and Lumine endpoints.
 
 ## Automated regression

@@ -109,3 +109,75 @@ aborted event, no completed-history increment, no reward command, and no residua
 fixture fell back to vanilla because the copied Mythic definition was not resolved in that isolated
 copy, so it is not represented as a new Mythic spawn PASS; the earlier real Mythic lifecycle PASS
 and the automated Mythic cleanup regressions remain the applicable evidence.
+
+## Phase-2.2 final evidence — 2026-07-24/25
+
+All runtime artifacts below are ignored local evidence under `exes/final-validation-1.1.0/`; none
+is included in Git or the release JAR.
+
+### English and Spanish
+
+Both isolated environments used Paper 1.21.8 build 60
+(`8de7c52c3b02403503d16fac58003f1efef7dd7a0256786843927fa92ee57f1e`),
+Temurin 21.0.11, PlaceholderAPI 2.12.3
+(`fde03259f5af6938f3c33eeb4d814000a1adabf1d2304ce14970be81f609a437`) and TAB 5.3.2
+(`29801e2ce709971271a64ca26fb19fd3808ae709104fd5d22e421828f28fe251`).
+MythicMobs was not installed in these final language fixtures; the already completed 5.12.1
+integration validation remains separate.
+
+`english/evidence/functional-result.json` and `spanish/evidence/functional-result.json` each record
+21/21 assertions. They cover inactive/active/closed state, automatic locale text, registered and
+late nonparticipant players, death/disqualification, vanilla boss NOT_SPAWNED/ALIVE/partial/
+DEFEATED, TAB scoreboard packets, bossbar updates, exactly-once rewards, end commands, history and
+normal restart. Public placeholders resolved without selected console errors.
+
+The Spanish run exposed a real language defect: use of legacy string death messages flattened the
+vanilla translatable cause through the server locale. The correction preserves
+`PlayerDeathEvent.deathMessage()` as an Adventure component and appends only the localized suffix.
+`spanish/evidence/system-chat-packets.json` then retained `death.attack.genericKill` plus the
+Spanish suffix. `DeathMessageLocalizationTest` prevents regression. The corrected final JAR was
+used again in both full language runs.
+
+The headless protocol client proves delivery and values, not graphical layout. English and Spanish
+visual rows are therefore BLOCKED pending the exact six owner captures indexed in
+`MANUAL_TEST_CHECKLIST.md`. Prior owner verification is retained as manual PASS for the shared
+scoreboard/boss/reward/closure behavior, with documentary evidence pending.
+
+### Purpur 26.2
+
+`paper-or-purpur-26.2/evidence/functional-assessment.json` records TESTED and 23/23 assertions:
+
+- Purpur 26.2 build 2613, commit `21a4154`, 64,623,978 bytes, SHA-256
+  `7c08ad3194762b9063ae8796c664474498ef28e7cb67c5ff914310b6ebbb25f0`.
+- Eclipse Temurin 25.0.3+9 LTS.
+- PlaceholderAPI 2.12.3 and TAB 6.1.0 (SHA-256
+  `14fe9601ce09f2efe8a395ef2359dbf109a3572aa1b0b140b99c04b1b391d397`).
+- ViaVersion and ViaBackwards 5.11.0 were used only as official protocol bridges for the 1.21.8
+  automated client. Their SHA-256 values are
+  `89db76c8e3e674238f5eee2bb7a9e9a2beeba0760bbd1b86494778e8a5a52f70`
+  and `41085a59d784c9a0d14917fe7487ef5e201a9da7825fd047f08d328ff33eecdc`.
+- MythicMobs 5.12.1 was not installed; Vault/economy was not applicable.
+
+The three-boot run covered clean distribution generation, status/reload, active participant,
+vanilla boss health/death, exactly three boss emeralds, exactly one survivor diamond per completed
+event, configured end commands, two completed historical events, active-event abort with no
+payout, same-night suppression, next-cycle automatic eligibility, marker expiry, PAPI/TAB and
+clean shutdowns. The sole initial false assertion was an evidence-harness wording mismatch for
+status/reload; both commands were present in the log and the corrected assessment passes without
+replaying or modifying product state.
+
+Paper 26.2 remains PARTIALLY TESTED: the earlier real build 62 beta startup/commands/shutdown smoke
+is valid, while this full Phase-2.2 lifecycle deliberately selected the available Purpur 26.2
+binary.
+
+### Final regression and artifact
+
+Two clean Temurin 21 builds each passed 149 tests with zero failures. A separate 65-test subset for
+death localization, bosses, rewards/session and restart also passed. Both release JARs are
+byte-identical: 568,988 bytes, SHA-256
+`d28628a57257494c904a73943cadf0f1b170a8dea9cd6940b58a855724b33c05`.
+The JAR contains 426 entries, zero test classes and zero local paths.
+
+Final conclusion: **NOT READY FOR RELEASE CANDIDATE** only because exact EN and ES graphical
+language/layout captures remain BLOCKED. There are no known functional failures and no remaining
+`NOT RUN` row.

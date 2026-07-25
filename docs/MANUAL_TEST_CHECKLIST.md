@@ -159,3 +159,43 @@ ignored evidence paths are indexed in `RELEASE_VALIDATION_EVIDENCE_1.1.0.md`.
 The owner verification covers only the behavior named above. It does not replace the formal
 dead-player exclusion, duplicate-delivery, history-after-restart, 1.0.1 migration, separate
 English/Spanish, or 26.2 rows.
+
+## Phase 2.2 execution record — 2026-07-24/25
+
+The isolated functional runs are complete:
+
+- English: PASS, 21/21 assertions on Paper 1.21.8 build 60, Java 21.0.11,
+  PlaceholderAPI 2.12.3 and TAB 5.3.2 using `TAB-scoreboards-en.yml`.
+- Spanish: PASS, 21/21 assertions on the same server/integrations using
+  `TAB-scoreboards-es.yml`. Raw chat packets retain the Minecraft translatable death cause and
+  append the Spanish Blood Moon suffix.
+- Purpur 26.2: TESTED, 23/23 assertions on build 2613 and Java 25.0.3+9. The full vanilla core
+  lifecycle used PlaceholderAPI 2.12.3 and TAB 6.1.0. ViaVersion/ViaBackwards 5.11.0 were isolated
+  test-client bridges. MythicMobs 5.12.1 was not installed. Vault/economy is NOT APPLICABLE.
+- Paper 26.2: PARTIALLY TESTED. The earlier build 62 beta startup/commands/shutdown smoke remains
+  valid, but the Phase 2.2 full lifecycle was executed on Purpur, not Paper.
+
+Functional language validation includes event start/end, participant and excluded late joiner,
+death/disqualification, vanilla boss states and health, TAB protocol delivery, bossbar updates,
+exactly-once boss/final rewards, end commands, inactive placeholders and post-close restart.
+
+### Remaining graphical captures
+
+The prior owner verification remains `PASS — owner verified, evidence pending` for shared vanilla
+and Mythic scoreboards, visible boss-state updates, final rewards, end commands and normal closure.
+It did not identify a language or the exact TAB file, so it cannot be reused as either
+language-specific graphical PASS.
+
+Six captures from a real graphical client remain BLOCKED pending owner input:
+
+| # | Language | Event/boss state | Boss | TAB file | Expected public state |
+| ---: | --- | --- | --- | --- | --- |
+| 1 | English | Active, boss alive | VANILLA | `TAB-scoreboards-en.yml` | active/participant; `ALIVE`, name/type and readable live health |
+| 2 | English | Active, boss defeated | VANILLA | `TAB-scoreboards-en.yml` | `DEFEATED`, retained name/type, no stale health line |
+| 3 | English | Normal close/final reward | VANILLA | `TAB-scoreboards-en.yml` | localized close/reward, inactive state, no unresolved placeholder |
+| 4 | Spanish | Active, boss alive | VANILLA | `TAB-scoreboards-es.yml` | activo/participante; `ALIVE`, nombre/tipo y salud legible |
+| 5 | Spanish | Active, boss defeated | VANILLA | `TAB-scoreboards-es.yml` | `DEFEATED`, identidad retenida, sin línea de salud obsoleta |
+| 6 | Spanish | Normal close/final reward | VANILLA | `TAB-scoreboards-es.yml` | cierre/recompensa localizados, estado inactivo, sin placeholder visible |
+
+Review each capture for clipping, alignment, flicker, colors, empty lines, unresolved placeholders,
+stale values, mojibake and mixed languages. Vanilla/Mythic bossbar captures remain optional.

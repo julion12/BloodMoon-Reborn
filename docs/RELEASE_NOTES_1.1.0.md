@@ -41,8 +41,15 @@ night; it expires at the next cycle. An administrator may still use `/bloodmoon 
 fresh normal session.
 
 The reproduced same-night restart blocker is closed on Paper 1.21.8 build 60 with both
-`IncludeLateJoiners` values. The project owner separately verified real in-game vanilla/Mythic
-scoreboards, boss-state updates, final rewards, end commands, and normal event closure; formal
-evidence is still pending. Release-candidate promotion remains **NOT READY** only because the
-separate English/Spanish review and full Paper/Purpur 26.2 Phase-2 lifecycle are still NOT RUN.
-MythicMobs 5.12.1 remains unsupported on 26.2.
+`IncludeLateJoiners` values. Final functional English and Spanish lifecycles pass independently,
+and Purpur 26.2 build 2613 passes the full available vanilla core lifecycle on Java 25.0.3+9.
+Paper 26.2 remains partially tested from its earlier startup/command/shutdown smoke.
+
+The final language pass also corrected mixed-language death output by preserving Minecraft's
+translatable death component and appending only the configured Blood Moon suffix. The project
+owner separately verified real in-game vanilla/Mythic scoreboards, boss-state updates, final
+rewards, end commands, and normal event closure; formal evidence is still pending.
+
+Release-candidate promotion remains **NOT READY** only because the exact English and Spanish
+graphical language/layout captures are BLOCKED pending owner input. No functional or `NOT RUN`
+gate remains. MythicMobs 5.12.1 remains unsupported on 26.2.

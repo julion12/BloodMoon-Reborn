@@ -9,7 +9,7 @@ BloodMoon-Reborn 1.1.0 ships as one Java 21 artifact compiled against `paper-api
 | Paper 1.21.11 build 132 | 21 | PASSED | Real load/command/shutdown |
 | Paper 26.2 build 62 beta | 25 | PASSED (core) | Real load/command/shutdown with portable Temurin 25.0.3+9 |
 | Purpur 1.21.8 build 2497 | 21 | PASSED | Real load/command/shutdown |
-| Purpur 26.2 build 2610 | 25 | PASSED (core) | Real load/command/shutdown with portable Temurin 25.0.3+9 |
+| Purpur 26.2 build 2613 | 25 | TESTED (core) | Full vanilla lifecycle, rewards, statistics/history, restart/suppression and clean shutdown with Temurin 25.0.3+9 |
 
 Paper's official requirements list Java 21 for 1.20 through 1.21.11 and Java 25 for 26.1 and later. See <https://docs.papermc.io/paper/getting-started/> and <https://docs.papermc.io/paper/dev/project-setup/>.
 
@@ -36,3 +36,11 @@ Phase-2 functional validation on 2026-07-24 re-confirmed Paper 1.21.8 build 60 w
 PlaceholderAPI 2.12.3, and MythicMobs 5.12.1 using real protocol clients. The separate complete
 Paper/Purpur 26.2 functional walkthrough was not rerun and remains NOT RUN; the earlier core
 load/command/shutdown rows above are not being promoted into a broader functional claim.
+
+The Phase-2.2 addendum supersedes that historical statement. It completed the full vanilla core
+walkthrough on Purpur 26.2 build 2613 with Java 25.0.3+9, PlaceholderAPI 2.12.3 and TAB 6.1.0.
+Status is TESTED for that exact Purpur combination. ViaVersion/ViaBackwards 5.11.0 were used only
+to bridge the automated 1.21.8 protocol client and are not BloodMoon dependencies. Paper 26.2
+remains PARTIALLY TESTED because its earlier build 62 beta evidence covers
+startup/commands/shutdown, not this full lifecycle. MythicMobs 5.12.1 remains unsupported and
+excluded on all tested 26.2 combinations.

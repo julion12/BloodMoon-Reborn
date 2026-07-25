@@ -1,5 +1,36 @@
 # BloodMoon-Reborn 1.1.0 final pre-RC audit
 
+## Phase-2.2 final audit — 2026-07-24/25
+
+Phase 2.2 supersedes the remaining language and 26.2 `NOT RUN` classifications later in this
+historical audit.
+
+- English functional lifecycle: PASS, 21/21 live assertions.
+- Spanish functional lifecycle: PASS, 21/21 live assertions.
+- Purpur 26.2 core: TESTED, 23/23 live assertions across three boots on build 2613 and Java
+  25.0.3+9.
+- Paper 26.2: PARTIALLY TESTED; earlier build 62 beta smoke only.
+- Automated regression: 149 tests, 0 failures in each of two clean builds; 65/65 related tests.
+- Final artifact: `build/libs/BloodMoon-Reborn-1.1.0.jar`, 568,988 bytes, SHA-256
+  `d28628a57257494c904a73943cadf0f1b170a8dea9cd6940b58a855724b33c05`.
+- Reproducibility: two clean artifacts byte-identical; 426 entries; no tests or local paths.
+
+One real defect was found and fixed. Legacy string death-message access forced Minecraft's
+translatable cause through the server language, producing mixed Spanish/English output. The
+Adventure component is now retained and only the localized Blood Moon suffix is appended. A new
+architecture regression test and full live EN/ES repetitions pass.
+
+MythicMobs 5.12.1 remains explicitly unsupported on 26.2 and was not installed there. PAPI 2.12.3
+and TAB 6.1.0 passed on Purpur 26.2. ViaVersion/ViaBackwards 5.11.0 were test-client protocol
+bridges, not BloodMoon runtime requirements. Native Vault/economy remains NOT APPLICABLE.
+
+No functional failure or `NOT RUN` scenario remains. The final status is nevertheless
+**NOT READY FOR RELEASE CANDIDATE** because the exact English and Spanish graphical scoreboard/
+reward states remain BLOCKED pending six real-client captures. The earlier owner confirmation
+continues as `PASS — owner verified, evidence pending` for shared vanilla/Mythic scoreboard,
+boss-state, reward, end-command and normal-close behavior, but it supplied no language/TAB-file
+identity and therefore cannot sign either exact language-specific visual row.
+
 Audit date: 2026-07-24  
 Scope: Phase 1 only; no push, merge, tag, release, publication, stable-branch change, rebase, or squash.
 
