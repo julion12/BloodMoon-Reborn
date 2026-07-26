@@ -50,6 +50,14 @@ translatable death component and appending only the configured Blood Moon suffix
 owner separately verified real in-game vanilla/Mythic scoreboards, boss-state updates, final
 rewards, end commands, and normal event closure; formal evidence is still pending.
 
-Release-candidate promotion remains **NOT READY** only because the exact English and Spanish
-graphical language/layout captures are BLOCKED pending owner input. No functional or `NOT RUN`
-gate remains. MythicMobs 5.12.1 remains unsupported on 26.2.
+The owner supplied and Codex reviewed the exact English and Spanish graphical sets using the
+documented TAB examples. Active vanilla boss, defeated boss, final reward and normal close are
+readable and correctly localized in both languages, with no unresolved placeholders, visible
+locale keys, literal color codes, clipped scoreboard lines or stale boss health.
+
+BloodMoon-Reborn 1.1.0 is **READY FOR FINAL RELEASE**. “Release Candidate” was the name of the
+internal validation gate only; the owner has chosen not to publish an RC version. No functional,
+visual, `BLOCKED`, or `NOT RUN` release gate remains. MythicMobs 5.12.1 remains unsupported on
+26.2; localization of external MythicMobs/economy reward messages remains outside BloodMoon.
+Creation of tag `v1.1.0`, GitHub Release 1.1.0 and the stable Spigot update remains pending a
+separate explicit publication order.

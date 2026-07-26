@@ -24,12 +24,19 @@ MythicMobs 5.12.1 remains explicitly unsupported on 26.2 and was not installed t
 and TAB 6.1.0 passed on Purpur 26.2. ViaVersion/ViaBackwards 5.11.0 were test-client protocol
 bridges, not BloodMoon runtime requirements. Native Vault/economy remains NOT APPLICABLE.
 
-No functional failure or `NOT RUN` scenario remains. The final status is nevertheless
-**NOT READY FOR RELEASE CANDIDATE** because the exact English and Spanish graphical scoreboard/
-reward states remain BLOCKED pending six real-client captures. The earlier owner confirmation
-continues as `PASS — owner verified, evidence pending` for shared vanilla/Mythic scoreboard,
-boss-state, reward, end-command and normal-close behavior, but it supplied no language/TAB-file
-identity and therefore cannot sign either exact language-specific visual row.
+No functional failure or `NOT RUN` scenario remains. On 2026-07-26 the owner supplied the exact
+English and Spanish graphical sets using the documented TAB files. All six required captures pass:
+active vanilla boss, defeated boss, and final reward/normal close in each language.
+
+The visual review found no unresolved placeholder, locale key, literal `&` code, clipped
+scoreboard line, stale health, mojibake, or BloodMoon-owned language mixing. English currency text
+visible in supplementary Spanish MythicMobs evidence belongs to that external reward/economy
+integration and is not a BloodMoon release blocker.
+
+Final status: **READY FOR FINAL RELEASE**. The release-candidate wording in this audit names an
+internal validation gate only. The owner has definitively chosen not to create `v1.1.0-rc.1`, a
+release branch, GitHub pre-release, public RC artifact or Spigot RC publication. No real release
+gate remains; direct final publication still requires a separate explicit order.
 
 Audit date: 2026-07-24  
 Scope: Phase 1 only; no push, merge, tag, release, publication, stable-branch change, rebase, or squash.

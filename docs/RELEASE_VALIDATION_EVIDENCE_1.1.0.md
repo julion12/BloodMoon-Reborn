@@ -138,10 +138,20 @@ vanilla translatable cause through the server locale. The correction preserves
 Spanish suffix. `DeathMessageLocalizationTest` prevents regression. The corrected final JAR was
 used again in both full language runs.
 
-The headless protocol client proves delivery and values, not graphical layout. English and Spanish
-visual rows are therefore BLOCKED pending the exact six owner captures indexed in
-`MANUAL_TEST_CHECKLIST.md`. Prior owner verification is retained as manual PASS for the shared
-scoreboard/boss/reward/closure behavior, with documentary evidence pending.
+The headless protocol client proves delivery and values. The owner subsequently supplied the six
+required graphical captures, reviewed on 2026-07-26, so both language-specific visual rows are
+PASS. The detailed file mapping is retained in `MANUAL_TEST_CHECKLIST.md`.
+
+The English set visibly covers active vanilla boss health, DEFEATED with retained identity, final
+survivor reward and normal close. The Spanish set covers the equivalent `El Duro` ALIVE/DEFEATED
+states plus localized survivor reward and close. Across those six captures, BloodMoon shows no
+unresolved placeholder, locale key, literal `&` code, clipped scoreboard text, stale health,
+mojibake, or accidental BloodMoon-language mixing.
+
+Additional MythicMobs captures show its long configured display fitting the scoreboard and
+ALIVE/DEFEATED updates. An English currency-reward line appears in the Spanish Mythic evidence.
+The owner identifies it as MythicMobs/economy output, not BloodMoon output; it is recorded as a
+non-blocking external localization observation.
 
 ### Purpur 26.2
 
@@ -178,6 +188,8 @@ byte-identical: 568,988 bytes, SHA-256
 `d28628a57257494c904a73943cadf0f1b170a8dea9cd6940b58a855724b33c05`.
 The JAR contains 426 entries, zero test classes and zero local paths.
 
-Final conclusion: **NOT READY FOR RELEASE CANDIDATE** only because exact EN and ES graphical
-language/layout captures remain BLOCKED. There are no known functional failures and no remaining
-`NOT RUN` row.
+Final conclusion: **READY FOR FINAL RELEASE**. The internal release-candidate validation gate is
+closed, but the owner has definitively chosen not to publish an RC. The exact EN and ES graphical
+language/layout captures pass, there are no known BloodMoon functional failures, and no `BLOCKED`
+or `NOT RUN` release gate remains. Direct `v1.1.0` publication is not authorized by this
+classification and awaits a separate explicit order.

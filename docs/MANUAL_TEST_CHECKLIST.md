@@ -179,23 +179,32 @@ Functional language validation includes event start/end, participant and exclude
 death/disqualification, vanilla boss states and health, TAB protocol delivery, bossbar updates,
 exactly-once boss/final rewards, end commands, inactive placeholders and post-close restart.
 
-### Remaining graphical captures
+### Completed graphical review — 2026-07-26
 
-The prior owner verification remains `PASS — owner verified, evidence pending` for shared vanilla
-and Mythic scoreboards, visible boss-state updates, final rewards, end commands and normal closure.
-It did not identify a language or the exact TAB file, so it cannot be reused as either
-language-specific graphical PASS.
+The owner supplied real graphical-client captures made with `TAB-scoreboards-en.yml` and
+`TAB-scoreboards-es.yml`. All six required states pass. The earlier owner verification remains
+useful supplementary evidence for shared vanilla/Mythic behavior, but the exact language-specific
+gate is now supported directly.
 
-Six captures from a real graphical client remain BLOCKED pending owner input:
+| # | Language/state | Evidence file | Result |
+| ---: | --- | --- | --- |
+| 1 | English, active vanilla boss alive | `codex-clipboard-f4b4636f-8612-4b8a-880e-98c7c1b74b06.png` | PASS |
+| 2 | English, vanilla boss defeated | `codex-clipboard-e79dd978-7055-481c-9f52-a6b9261582e6.png` | PASS |
+| 3 | English, final reward and normal close | `codex-clipboard-43eed647-3c62-460e-9c2a-51c279cc6c8c.png` | PASS |
+| 4 | Spanish, active vanilla boss alive | `codex-clipboard-0d13700f-da91-4900-8401-81d6c6a638a0.png` | PASS |
+| 5 | Spanish, vanilla boss defeated | `codex-clipboard-4396948c-cfe5-4da7-b628-eeab39e1ff1f.png` | PASS |
+| 6 | Spanish, final reward and normal close | `codex-clipboard-b803acef-647e-4334-8b72-2424c70ae930.png` | PASS |
 
-| # | Language | Event/boss state | Boss | TAB file | Expected public state |
-| ---: | --- | --- | --- | --- | --- |
-| 1 | English | Active, boss alive | VANILLA | `TAB-scoreboards-en.yml` | active/participant; `ALIVE`, name/type and readable live health |
-| 2 | English | Active, boss defeated | VANILLA | `TAB-scoreboards-en.yml` | `DEFEATED`, retained name/type, no stale health line |
-| 3 | English | Normal close/final reward | VANILLA | `TAB-scoreboards-en.yml` | localized close/reward, inactive state, no unresolved placeholder |
-| 4 | Spanish | Active, boss alive | VANILLA | `TAB-scoreboards-es.yml` | activo/participante; `ALIVE`, nombre/tipo y salud legible |
-| 5 | Spanish | Active, boss defeated | VANILLA | `TAB-scoreboards-es.yml` | `DEFEATED`, identidad retenida, sin línea de salud obsoleta |
-| 6 | Spanish | Normal close/final reward | VANILLA | `TAB-scoreboards-es.yml` | cierre/recompensa localizados, estado inactivo, sin placeholder visible |
+Observed BloodMoon output has the intended language, readable colors and alignment, no clipped
+scoreboard line, no unresolved placeholder, no visible locale key, no literal `&` code, no stale
+health after defeat, and no disruptive empty line. Normal chat wrapping is acceptable, and the
+overall presentation is suitable for publication.
 
-Review each capture for clipping, alignment, flicker, colors, empty lines, unresolved placeholders,
-stale values, mojibake and mixed languages. Vanilla/Mythic bossbar captures remain optional.
+Supplementary MythicMobs captures also show ALIVE/DEFEATED updates. Their English currency-reward
+line in the Spanish client is external MythicMobs/economy output, as confirmed by the owner; it is
+not emitted by BloodMoon and does not block this gate.
+
+The internal release-candidate validation gate is closed. Per the owner's definitive publication
+decision, no public RC version, branch, tag, pre-release, artifact or Spigot publication will be
+created. Current project status is **READY FOR FINAL RELEASE**; publication of `v1.1.0` remains
+pending a separate explicit order.
