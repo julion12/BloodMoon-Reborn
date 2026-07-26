@@ -18,7 +18,7 @@ captures player, world, session, and live boss health data every 5 ticks and ato
 immutable per-player contexts. TAB and other consumers perform only a constant-time UUID lookup;
 they never trigger entity, chunk, BossBar, MythicMobs, configuration, or file access.
 
-Ready-to-copy administrative examples are indexed in [`docs/EXAMPLES.md`](EXAMPLES.md). On first
+Ready-to-copy administrative examples are indexed in [`EXAMPLES.md`](EXAMPLES.md). On first
 startup, the self-contained JAR creates only `plugins/BloodMoon/README.txt` and the 17 files in
 `EXAMPLES/`, without overwriting existing files. Complete documentation stays in the official
 GitHub repository; the plugin does not create, update, or delete `plugins/BloodMoon/docs/`.

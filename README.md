@@ -76,7 +76,8 @@ Console commands require a world argument except `reload`. Tab completion is inc
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Test matrix](docs/TEST_MATRIX.md)
 - [Manual release checklist](docs/MANUAL_TEST_CHECKLIST.md)
-- [Final pre-RC audit](docs/RELEASE_CANDIDATE_AUDIT_1.1.0.md)
+- [Final release validation audit](docs/RELEASE_CANDIDATE_AUDIT_1.1.0.md)
+- [Final publication package](docs/FINAL_RELEASE_PUBLICATION_1.1.0.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
