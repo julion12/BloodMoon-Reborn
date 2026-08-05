@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.1.1 - 2026-08-05
+
+### Fixed
+
+- Prevented the main-thread PlaceholderAPI snapshot refresh from failing when an online player is
+  in a world whose per-world `ConfigReader` is temporarily unavailable.
+- Added safe inactive per-player snapshots so one invalid world no longer blocks updates for every
+  other online player.
+- Made late-loaded and reloaded normal worlds resolve their per-world configuration safely.
+- Keyed the internal world configuration registry by UUID so Bukkit world instance replacement does
+  not leave lookups pointing at stale objects.
+- Deduplicated snapshot configuration warnings by world and cause, with retry throttling and
+  automatic clearing after recovery.
+- Stopped and detached world-specific night checks when a world unloads, and canceled snapshot
+  publication before shutdown cleanup begins.
+- Detached unloaded-world actuators from Bukkit events and made their final scheduled state check
+  tolerate a configuration that has already been removed.
+
+### Compatibility
+
+- No placeholder identifiers or output semantics changed.
+- Existing 1.1.0 per-world configurations remain compatible and are reused unchanged.
+- PlaceholderAPI requests remain constant-time snapshot reads with no Bukkit or filesystem access.
+
 ## 1.1.0 - 2026-07-19
 
 ### Added

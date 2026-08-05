@@ -1,5 +1,22 @@
 # Test matrix
 
+## 1.1.1 placeholder snapshot hotfix — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Automated suite | PASS | 167 tests, 0 failures, 0 skipped |
+| Paper production-build smoke | PASS | Paper 1.21.11 build 69, Java 21.0.11 |
+| PlaceholderAPI/TAB updates | PASS | PlaceholderAPI 2.12.3 and TAB 6.1.1; inactive and active values resolved with no raw placeholders |
+| Late Multiverse world | PASS | Multiverse-Core 5.7.3 created a normal flat fixture after startup; BloodMoon registered its configuration |
+| Reload and rapid world changes | PASS | Active contextual snapshots remained available after reload and repeated teleports |
+| World unload/reload | PASS | Runtime state detached cleanly and configuration was registered again on reload |
+| Multi-plugin compatibility smoke | PASS | MythicMobs 5.12.1 also enabled in the isolated server |
+| Thread and scheduler safety | PASS | No `NullPointerException`, AsyncCatcher report, scheduler exception or repeated snapshot warning |
+| Shutdown | PASS | BloodMoon and the server stopped cleanly |
+
+Hotfix status: **READY FOR 1.1.1**. This validation does not publish the branch, tag, artifact,
+GitHub Release or Spigot update.
+
 ## Phase-2.2 final EN/ES and 26.2 addendum — 2026-07-24/25
 
 This addendum supersedes the remaining `NOT RUN` language/26.2 rows later in this historical

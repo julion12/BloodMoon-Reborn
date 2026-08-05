@@ -1,12 +1,15 @@
 # BloodMoon-Reborn
 
-BloodMoon-Reborn is a conservative continuation of SpectralMemories' BloodMoon plugin. It keeps the existing per-world events, enhanced mobs, hordes, vanilla zombie boss, WorldGuard support, commands, and configuration model while adding optional 1.1.0 reward features.
+BloodMoon-Reborn is a conservative continuation of SpectralMemories' BloodMoon plugin. It keeps the existing per-world events, enhanced mobs, hordes, vanilla zombie boss, WorldGuard support, commands, and configuration model while retaining the optional reward features introduced in 1.1.0.
 
 Original author: **SpectralMemories**
 
 Modernization and maintenance: **JulioN12**
 
-## Version 1.1.0
+## Version 1.1.1
+
+Version 1.1.1 is a compatibility hotfix for PlaceholderAPI snapshot updates in late-loaded,
+reloaded, or temporarily unconfigured worlds. It does not add placeholders or change their values.
 
 - One Java 21 JAR targeting Paper/Purpur 1.21.4 through 26.2.
 - Existing `CommandsOnStart` and `CommandsOnEnd` now support safe parsing and internal placeholders.
@@ -34,7 +37,7 @@ Completed events contribute aggregate server history and a last-event snapshot. 
 ## Installation and update
 
 1. Stop the server and back up `plugins/BloodMoon/` and the worlds.
-2. Replace the old JAR with `BloodMoon-Reborn-1.1.0.jar`.
+2. Replace the old JAR with `BloodMoon-Reborn-1.1.1.jar`.
 3. Use Java 21 for Minecraft 1.21.x or Java 25 for Minecraft 26.1+.
 4. Start the server. Existing per-world `config.yml` files receive only missing 1.1 sections; a timestamped backup is created first.
 5. Leave rewards disabled until their commands have been reviewed.
@@ -78,6 +81,7 @@ Console commands require a world argument except `reload`. Tab completion is inc
 - [Manual release checklist](docs/MANUAL_TEST_CHECKLIST.md)
 - [Final release validation audit](docs/RELEASE_CANDIDATE_AUDIT_1.1.0.md)
 - [Final publication package](docs/FINAL_RELEASE_PUBLICATION_1.1.0.md)
+- [1.1.1 hotfix release notes](docs/RELEASE_NOTES_1.1.1.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
