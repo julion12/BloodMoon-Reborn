@@ -21,6 +21,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -78,7 +79,7 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
 
     private int originalMaxSpawn = 0;
 
-    private static Map<World, BloodmoonActuator> actuators;
+    private static Map<UUID, BloodmoonActuator> actuators;
 
     private World world;
     private boolean inProgress;
@@ -103,14 +104,14 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     {
         if (actuators == null) actuators = new HashMap<>();
 
-        actuators.put(instance.world, instance);
+        actuators.put(instance.world.getUID(), instance);
     }
 
     public static BloodmoonActuator GetActuator (World world)
     {
         try
         {
-            return actuators.get(world);
+            return world == null ? null : actuators.get(world.getUID());
         } catch (Exception ignored)
         {
         }
@@ -706,7 +707,12 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     public boolean isInProgress ()
     {
         ConfigReader reader = Bloodmoon.GetInstance().getConfigReader(world);
-        return inProgress || reader.GetPermanentBloodMoonConfig();
+        return inProgress || (reader != null && reader.GetPermanentBloodMoonConfig());
+    }
+
+    public World GetWorld ()
+    {
+        return world;
     }
 
     public BossPlaceholderSnapshot getBossPlaceholderSnapshot() {
@@ -1105,6 +1111,8 @@ public class BloodmoonActuator implements Listener, Runnable, Closeable
     @Override
     public void close ()
     {
+        HandlerList.unregisterAll(this);
+        if (actuators != null && world != null) actuators.remove(world.getUID(), this);
         if (bosses.isEmpty() && mythicBosses.isEmpty()) return; //Nothing to do
 
         KillBosses(false, false);

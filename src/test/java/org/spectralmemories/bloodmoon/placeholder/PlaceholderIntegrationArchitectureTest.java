@@ -67,6 +67,30 @@ class PlaceholderIntegrationArchitectureTest {
                 () -> assertTrue(actuator.contains("if (session != null) session.bossRemoved(currentPlaceholderBossId)")));
     }
 
+    @Test void missingWorldConfigFallsBackPerPlayerWithoutAbortingTheBatch() throws IOException {
+        String publisher = read("src/main/java/org/spectralmemories/bloodmoon/snapshot/PlaceholderSnapshotPublisher.java");
+        int batch = publisher.indexOf("Map<UUID, PlaceholderContext> capturePlayers");
+        int player = publisher.indexOf("PlaceholderContext capturePlayer", batch);
+        String batchBody = publisher.substring(batch, player);
+        assertAll(() -> assertTrue(batchBody.contains("for (Player player : onlinePlayers)")),
+                () -> assertTrue(batchBody.contains("catch (RuntimeException exception)")),
+                () -> assertTrue(batchBody.contains("players.put(playerId, inactive)")),
+                () -> assertTrue(publisher.contains("if (config == null) return PlaceholderContext.inactive")),
+                () -> assertTrue(publisher.indexOf("ConfigReader config = resolveConfig(world)")
+                        < publisher.indexOf("BloodmoonActuator actuator =")));
+    }
+
+    @Test void worldResolutionAndWarningsStayOnTheMainThreadPublisherPath() throws IOException {
+        String publisher = read("src/main/java/org/spectralmemories/bloodmoon/snapshot/PlaceholderSnapshotPublisher.java");
+        String expansion = read("src/main/java/org/spectralmemories/bloodmoon/placeholder/papi/BloodMoonPlaceholderExpansion.java");
+        assertAll(() -> assertTrue(publisher.contains("plugin.resolveConfigReader(world)")),
+                () -> assertTrue(publisher.contains("SnapshotWorldFailureTracker")),
+                () -> assertTrue(publisher.contains("recordFailure")),
+                () -> assertFalse(expansion.contains("resolveConfigReader")),
+                () -> assertFalse(expansion.contains("ConfigReader")),
+                () -> assertFalse(expansion.contains("java.io")));
+    }
+
     private String read(String path) throws IOException { return Files.readString(root.resolve(path)); }
     private static int occurrences(String source, String needle) {
         int count = 0;

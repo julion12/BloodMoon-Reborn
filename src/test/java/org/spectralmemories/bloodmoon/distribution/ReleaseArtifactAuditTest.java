@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ReleaseArtifactAuditTest {
     private final Path jar = Path.of(System.getProperty("user.dir"), "build", "libs",
-            "BloodMoon-Reborn-1.1.0.jar");
+            "BloodMoon-Reborn-1.1.1.jar");
 
     @Test void releaseJarContainsRequiredLicensesAndNoDevelopmentClasses() throws IOException {
         assertTrue(Files.isRegularFile(jar), "Gradle must build the release JAR before tests");
@@ -32,7 +32,7 @@ class ReleaseArtifactAuditTest {
         try (var zip = FileSystems.newFileSystem(jar, Map.of())) {
             String descriptor = Files.readString(zip.getPath("/plugin.yml"));
             assertAll(
-                    () -> assertTrue(descriptor.contains("version: 1.1.0")),
+                    () -> assertTrue(descriptor.contains("version: 1.1.1")),
                     () -> assertTrue(descriptor.contains("website: https://github.com/julion12/BloodMoon-Reborn")),
                     () -> assertTrue(descriptor.contains("  bloodmoon:")),
                     () -> assertFalse(descriptor.contains("testsuite")));

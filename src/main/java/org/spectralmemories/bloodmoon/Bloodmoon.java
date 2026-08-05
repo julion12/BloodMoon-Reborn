@@ -1,5 +1,6 @@
 package org.spectralmemories.bloodmoon;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
@@ -12,6 +13,7 @@ import org.spectralmemories.sqlaccess.SQLField;
 import org.spectralmemories.sqlaccess.SQLTable;
 import org.spectralmemories.bloodmoon.config.ConfigMigrator;
 import org.spectralmemories.bloodmoon.config.SafeYaml;
+import org.spectralmemories.bloodmoon.config.WorldConfigRegistry;
 import org.spectralmemories.bloodmoon.session.SessionCoordinator;
 import org.spectralmemories.bloodmoon.integration.MythicMobsBridge;
 import org.spectralmemories.bloodmoon.integration.NoMythicMobsBridge;
@@ -29,9 +31,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.time.Clock;
 
@@ -60,8 +63,8 @@ public final class Bloodmoon extends JavaPlugin
     private static List<PeriodicNightCheck> nightChecks;
     private static List<BloodmoonActuator> actuators;
     private static List<World> bloodmoonWorlds;
-    private static Map<World, ConfigReader> configReaders;
-    private static List<ConfigReader> allConfigReaders;
+    private static WorldConfigRegistry configReaders;
+    private static Set<String> configLoadWarnings;
 
     private static WorldManager worldManager;
     private SessionCoordinator sessionCoordinator;
@@ -154,15 +157,25 @@ public final class Bloodmoon extends JavaPlugin
      */
     public ConfigReader getConfigReader (World world)
     {
-        try
-        {
-            return configReaders.get(world);
+        return configReaders == null ? null : configReaders.get(world);
+    }
+
+    /**
+     * Resolves a missing world configuration on the primary thread. This method may initialize a
+     * newly loaded normal world, so it must never be called from PlaceholderAPI request threads.
+     */
+    public ConfigReader resolveConfigReader(World world)
+    {
+        ConfigReader existing = getConfigReader(world);
+        if (existing != null || world == null) return existing;
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("World configurations can only be resolved on the primary thread");
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
+        if (world.getEnvironment() != World.Environment.NORMAL) return null;
+        World loaded = getServer().getWorld(world.getUID());
+        if (loaded == null) return null;
+        LoadWorld(loaded);
+        return getConfigReader(loaded);
     }
 
     /**
@@ -171,7 +184,8 @@ public final class Bloodmoon extends JavaPlugin
      */
     public ConfigReader[] getAllConfigReaders ()
     {
-        return allConfigReaders.toArray(new ConfigReader[allConfigReaders.size()]);
+        if (configReaders == null) return new ConfigReader[0];
+        return configReaders.values().toArray(ConfigReader[]::new);
     }
 
     /**
@@ -306,7 +320,8 @@ public final class Bloodmoon extends JavaPlugin
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                logConfigLoadWarningOnce(world, "create-file",
+                        "Could not create the per-world BloodMoon configuration", e);
                 return null;
             }
         }
@@ -331,8 +346,14 @@ public final class Bloodmoon extends JavaPlugin
             }
         }
         reader.ReadAllSettings();
-        configReaders.put(world, reader);
-        allConfigReaders.add(reader);
+        ConfigReader previous = configReaders.put(world, reader);
+        if (previous != null && previous != reader) {
+            try {
+                previous.close();
+            } catch (IOException ignored) {
+            }
+        }
+        clearConfigLoadWarnings(world);
         return reader;
     }
 
@@ -385,8 +406,8 @@ public final class Bloodmoon extends JavaPlugin
         actuators = new ArrayList<>();
 
         BlackListedWorlds = new ArrayList<>();
-        configReaders = new HashMap<>();
-        allConfigReaders = new ArrayList<>();
+        configReaders = new WorldConfigRegistry();
+        configLoadWarnings = new HashSet<>();
         bloodmoonWorlds = new ArrayList<>();
 
         for (World world : getServer().getWorlds())
@@ -421,12 +442,14 @@ public final class Bloodmoon extends JavaPlugin
      */
     public void LoadWorld (World world)
     {
+        if (world == null || getConfigReader(world) != null) return;
         if (world.getEnvironment() != World.Environment.NORMAL)
         {
             return;
         }
 
         ConfigReader configReader = CreateSingleConfigReader(world);
+        if (configReader == null) return;
         if (configReader.GetIsBlacklistedConfig())
         {
             BlackListedWorlds.add(world);
@@ -456,6 +479,40 @@ public final class Bloodmoon extends JavaPlugin
         bloodmoonWorlds.add(world);
     }
 
+    /** Removes registry state for an unloaded world so a later Bukkit World instance is fresh. */
+    public void UnloadWorld(World world)
+    {
+        if (world == null) return;
+        ConfigReader reader = configReaders == null ? null : configReaders.remove(world);
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException exception) {
+                getLogger().log(Level.WARNING, "Could not close a world configuration", exception);
+            }
+        }
+        if (bloodmoonWorlds != null) bloodmoonWorlds.removeIf(candidate -> candidate.getUID().equals(world.getUID()));
+        if (BlackListedWorlds != null) BlackListedWorlds.removeIf(candidate -> candidate.getUID().equals(world.getUID()));
+        if (nightChecks != null) nightChecks.removeIf(check -> check.GetWorld().getUID().equals(world.getUID()));
+        if (actuators != null) actuators.removeIf(actuator -> actuator.GetWorld().getUID().equals(world.getUID()));
+        clearConfigLoadWarnings(world);
+    }
+
+    private void logConfigLoadWarningOnce(World world, String cause, String message, Exception exception)
+    {
+        if (world == null || configLoadWarnings == null) return;
+        String key = world.getUID() + ":" + cause;
+        if (configLoadWarnings.add(key)) getLogger().log(Level.WARNING,
+                message + " for world '" + world.getName() + "'", exception);
+    }
+
+    private void clearConfigLoadWarnings(World world)
+    {
+        if (world == null || configLoadWarnings == null) return;
+        String prefix = world.getUID() + ":";
+        configLoadWarnings.removeIf(key -> key.startsWith(prefix));
+    }
+
 
     /**
      * Removes all boss remaining from a world
@@ -479,10 +536,13 @@ public final class Bloodmoon extends JavaPlugin
     @Override
     public void onDisable()
     {
+        placeholderIntegration.close();
+
         for (PeriodicNightCheck nightCheck : nightChecks)
         {
             nightCheck.PrepareAbortedShutdown("server-shutdown");
             nightCheck.UpdateCacheDatabase();
+            nightCheck.close();
         }
 
         for (BloodmoonActuator actuator : actuators)
@@ -494,9 +554,8 @@ public final class Bloodmoon extends JavaPlugin
         if (sqlAccess != null) sqlAccess.close();
         if (sessionCoordinator != null) sessionCoordinator.abortAll();
         if (statisticsService != null) statisticsService.saveIfDirty();
-        placeholderIntegration.close();
         mythicMobs.close();
-        for (ConfigReader configReader : allConfigReaders)
+        for (ConfigReader configReader : getAllConfigReaders())
         {
             if (configReader != null)
             {
@@ -511,6 +570,7 @@ public final class Bloodmoon extends JavaPlugin
                 }
             }
         }
+        if (configReaders != null) configReaders.clear();
         try
         {
             localeReader.close();

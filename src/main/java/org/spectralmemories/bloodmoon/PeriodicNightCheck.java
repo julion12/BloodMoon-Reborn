@@ -4,6 +4,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.spectralmemories.sqlaccess.FieldType;
@@ -16,17 +17,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class PeriodicNightCheck implements Runnable, Listener
+public class PeriodicNightCheck implements Runnable, Listener, AutoCloseable
 {
 
     public static final int DAY = 24000;
 
-    private static Map<World, PeriodicNightCheck> nightChecks;
+    private static Map<java.util.UUID, PeriodicNightCheck> nightChecks;
 
     private long checkupAfter;
     private int daysBeforeBloodMoon;
     private boolean manualStartRequested;
     private boolean recoveryLogged;
+    private boolean closed;
 
     private World world;
     private BloodmoonActuator actuator;
@@ -46,12 +48,12 @@ public class PeriodicNightCheck implements Runnable, Listener
     {
         if (nightChecks == null) nightChecks = new HashMap<>();
 
-        nightChecks.put(instance.GetWorld(), instance);
+        nightChecks.put(instance.GetWorld().getUID(), instance);
     }
 
     public static int GetDaysRemaining (World world)
     {
-        PeriodicNightCheck instance = nightChecks.get(world);
+        PeriodicNightCheck instance = world == null || nightChecks == null ? null : nightChecks.get(world.getUID());
 
         if (instance != null) return (instance.GetRemainingDays() + 1);
 
@@ -67,7 +69,7 @@ public class PeriodicNightCheck implements Runnable, Listener
     {
         try
         {
-            return nightChecks.get(world);
+            return world == null ? null : nightChecks.get(world.getUID());
         }
         catch (Exception ignored){}
         return null;
@@ -189,6 +191,7 @@ public class PeriodicNightCheck implements Runnable, Listener
     @Override
     public void run()
     {
+        if (closed) return;
         Bloodmoon.GetInstance().GetScheduler().runTaskLater(Bloodmoon.GetInstance(), this, Bloodmoon.NIGHT_CHECK_DELAY);
 
         /*
@@ -205,6 +208,14 @@ public class PeriodicNightCheck implements Runnable, Listener
         Check11();
         Check13();
         CheckDay();
+    }
+
+    @Override
+    public void close()
+    {
+        closed = true;
+        HandlerList.unregisterAll(this);
+        if (nightChecks != null && world != null) nightChecks.remove(world.getUID(), this);
     }
 
     private void Check11 ()

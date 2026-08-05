@@ -24,7 +24,7 @@ class AdministratorGuideInstallerTest {
     private static final Logger LOGGER = Logger.getLogger("guide-installer-test");
 
     @Test void finalJarContainsOnlyTheClosedAdministratorManifest() throws Exception {
-        Path jar = Path.of("build/libs/BloodMoon-Reborn-1.1.0.jar");
+        Path jar = Path.of("build/libs/BloodMoon-Reborn-1.1.1.jar");
         assertTrue(Files.isRegularFile(jar));
         try (ZipFile zip = new ZipFile(jar.toFile())) {
             assertEquals(18, AdministratorGuideInstaller.manifest().size());

@@ -19,18 +19,27 @@ import org.spectralmemories.bloodmoon.session.BloodMoonSession;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /** Captures Bukkit state on the primary thread and atomically publishes immutable contexts. */
 public final class PlaceholderSnapshotPublisher {
     private final Bloodmoon plugin;
     private final PlaceholderStateService snapshots;
+    private final SnapshotWorldFailureTracker failures;
 
     public PlaceholderSnapshotPublisher(Bloodmoon plugin, PlaceholderStateService snapshots) {
+        this(plugin, snapshots, new SnapshotWorldFailureTracker(System::currentTimeMillis));
+    }
+
+    PlaceholderSnapshotPublisher(Bloodmoon plugin, PlaceholderStateService snapshots,
+                                 SnapshotWorldFailureTracker failures) {
         this.plugin = plugin;
         this.snapshots = snapshots;
+        this.failures = failures;
     }
 
     public static PlaceholderContext initialInactive(Bloodmoon plugin) {
@@ -48,19 +57,36 @@ public final class PlaceholderSnapshotPublisher {
         HistoricalPlaceholderState history = HistoricalPlaceholderState.from(
                 plugin.getStatisticsService().snapshot());
         PlaceholderContext inactive = PlaceholderContext.inactive(labels, history);
-        Map<UUID, PlaceholderContext> players = new LinkedHashMap<>();
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            players.put(player.getUniqueId(), capturePlayer(player, labels, history));
-        }
+        Map<UUID, PlaceholderContext> players = capturePlayers(
+                plugin.getServer().getOnlinePlayers(), labels, history, inactive);
         snapshots.publishFromMainThread(players, inactive);
     }
 
-    private PlaceholderContext capturePlayer(Player player, PlaceholderLabels labels,
-                                             HistoricalPlaceholderState history) {
+    Map<UUID, PlaceholderContext> capturePlayers(Collection<? extends Player> onlinePlayers,
+                                                 PlaceholderLabels labels,
+                                                 HistoricalPlaceholderState history,
+                                                 PlaceholderContext inactive) {
+        Map<UUID, PlaceholderContext> players = new LinkedHashMap<>();
+        for (Player player : onlinePlayers) {
+            UUID playerId = player.getUniqueId();
+            try {
+                players.put(playerId, capturePlayer(player, labels, history));
+            } catch (RuntimeException exception) {
+                World world = safeWorld(player);
+                warnOnce(world, "capture-failed", exception);
+                players.put(playerId, inactive);
+            }
+        }
+        return players;
+    }
+
+    PlaceholderContext capturePlayer(Player player, PlaceholderLabels labels,
+                                     HistoricalPlaceholderState history) {
         World world = player.getWorld();
+        ConfigReader config = resolveConfig(world);
+        if (config == null) return PlaceholderContext.inactive(labels, history);
         BloodmoonActuator actuator = BloodmoonActuator.GetActuator(world);
         boolean active = actuator != null && actuator.isInProgress();
-        ConfigReader config = plugin.getConfigReader(world);
         long remaining = BloodMoonPlaceholderResolver.remainingSeconds(active,
                 config.GetPermanentBloodMoonConfig(), world.getTime());
         BossPlaceholderSnapshot boss = active && actuator != null
@@ -69,8 +95,58 @@ public final class PlaceholderSnapshotPublisher {
         PlayerPlaceholderState participant = playerState(player, world, config, current);
         SessionPlaceholderState session = active && current.isPresent()
                 ? sessionState(current.get()) : SessionPlaceholderState.none();
-        return new PlaceholderContext(active, world.getName(), remaining, boss.boss(), boss.state(),
+        PlaceholderContext captured = new PlaceholderContext(active, world.getName(), remaining, boss.boss(), boss.state(),
                 participant, session, history, labels);
+        failures.clearWarning(world.getUID(), "capture-failed");
+        return captured;
+    }
+
+    private ConfigReader resolveConfig(World world) {
+        if (world == null) return null;
+        UUID worldId = world.getUID();
+        ConfigReader config = plugin.getConfigReader(world);
+        if (config != null) {
+            failures.resolutionSucceeded(worldId);
+            return config;
+        }
+        if (!failures.mayAttemptResolution(worldId)) return null;
+        try {
+            config = plugin.resolveConfigReader(world);
+        } catch (RuntimeException exception) {
+            warnFailure(world, "configuration-resolution-failed", exception);
+            return null;
+        }
+        if (config == null) {
+            warnFailure(world, "configuration-unavailable", null);
+            return null;
+        }
+        failures.resolutionSucceeded(worldId);
+        return config;
+    }
+
+    private void warnFailure(World world, String cause, RuntimeException exception) {
+        if (world == null || !failures.recordFailure(world.getUID(), cause)) return;
+        logWarning(world, cause, exception);
+    }
+
+    private void warnOnce(World world, String cause, RuntimeException exception) {
+        if (world == null || !failures.warnOnce(world.getUID(), cause)) return;
+        logWarning(world, cause, exception);
+    }
+
+    private void logWarning(World world, String cause, RuntimeException exception) {
+        String message = "Placeholder snapshots for world '" + world.getName()
+                + "' are using safe inactive values (" + cause + ")";
+        if (exception == null) plugin.getLogger().warning(message);
+        else plugin.getLogger().log(Level.WARNING, message, exception);
+    }
+
+    private static World safeWorld(Player player) {
+        try {
+            return player.getWorld();
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 
     private PlayerPlaceholderState playerState(Player player, World world, ConfigReader config,

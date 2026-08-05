@@ -82,6 +82,34 @@ class RestartSuppressionArchitectureTest {
                 () -> assertFalse(recovery.contains("IncludeLateJoiners")));
     }
 
+    @Test void unloadAndDisableStopSnapshotAndWorldSchedulersCleanly() throws IOException {
+        String plugin = read("src/main/java/org/spectralmemories/bloodmoon/Bloodmoon.java");
+        String manager = read("src/main/java/org/spectralmemories/bloodmoon/WorldManager.java");
+        String night = read("src/main/java/org/spectralmemories/bloodmoon/PeriodicNightCheck.java");
+        String actuator = read("src/main/java/org/spectralmemories/bloodmoon/BloodmoonActuator.java");
+        int disable = plugin.indexOf("public void onDisable()");
+        String disableBody = plugin.substring(disable);
+        assertAll(() -> assertTrue(disableBody.contains("placeholderIntegration.close()")),
+                () -> assertTrue(disableBody.contains("nightCheck.close()")),
+                () -> assertTrue(manager.contains("nightCheck.close()")),
+                () -> assertTrue(manager.contains("UnloadWorld(event.getWorld())")),
+                () -> assertTrue(night.contains("if (closed) return;")),
+                () -> assertTrue(night.contains("HandlerList.unregisterAll(this)")),
+                () -> assertTrue(night.contains("nightChecks.remove(world.getUID(), this)")),
+                () -> assertTrue(actuator.contains("HandlerList.unregisterAll(this)")),
+                () -> assertTrue(actuator.contains("reader != null && reader.GetPermanentBloodMoonConfig()")));
+    }
+
+    @Test void configRegistryUsesWorldUuidAndIsClearedOnUnload() throws IOException {
+        String plugin = read("src/main/java/org/spectralmemories/bloodmoon/Bloodmoon.java");
+        String registry = read("src/main/java/org/spectralmemories/bloodmoon/config/WorldConfigRegistry.java");
+        assertAll(() -> assertTrue(plugin.contains("new WorldConfigRegistry()")),
+                () -> assertTrue(plugin.contains("configReaders.remove(world)")),
+                () -> assertTrue(plugin.contains("resolveConfigReader(World world)")),
+                () -> assertTrue(registry.contains("ConcurrentMap<UUID, ConfigReader>")),
+                () -> assertTrue(registry.contains("world.getUID()")));
+    }
+
     private String read(String relative) throws IOException {
         return Files.readString(root.resolve(relative));
     }

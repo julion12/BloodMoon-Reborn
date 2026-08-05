@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 group = 'org.spectralmemories'
-version = '1.1.0'
+version = '1.1.1'
 
 repositories {
     mavenCentral()
@@ -62,6 +62,7 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.18.0'
     testImplementation 'me.clip:placeholderapi:2.12.3'
     testImplementation 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
