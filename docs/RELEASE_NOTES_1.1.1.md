@@ -45,13 +45,21 @@ PlaceholderAPI consumers such as TAB.
 5. If Multiverse is installed, enter or load each additional world and confirm the scoreboard keeps
    updating without repeated warnings.
 
+## Release artifact
+
+- File: `BloodMoon-Reborn-1.1.1.jar`
+- Size: 576,455 bytes
+- SHA-256: `02A2AE77FC8136B44C09245093806BD4D1667B88F902AEEDC41DEC3246F33B48`
+- Reproducibility: two clean builds and an additional no-daemon JDK 21 build were byte-identical.
+
 ## GitHub release text
 
 BloodMoon-Reborn 1.1.1 is a focused compatibility hotfix for PlaceholderAPI/TAB snapshot updates.
 It prevents missing per-world configuration state from producing repeated scheduler exceptions,
 keeps other players updating when one world is unavailable, safely resolves late-loaded normal
 worlds, and cleans up world tasks on unload. Existing 1.1.0 configurations and all 41 placeholders
-remain compatible.
+remain compatible. The release JAR is built reproducibly; verify its SHA-256 against the artifact
+section above after downloading.
 
 ## Spigot update text
 
@@ -59,3 +67,4 @@ Version 1.1.1 fixes repeated PlaceholderAPI snapshot errors that could occur whe
 late-loaded, reloaded, or temporarily unconfigured world. Affected players now receive safe inactive
 values while all other scoreboards continue updating. Multiverse world registration, unload cleanup
 and warning deduplication were hardened without changing configuration keys or placeholder output.
+Before uploading the JAR, verify its filename, 576,455-byte size and SHA-256 listed above.

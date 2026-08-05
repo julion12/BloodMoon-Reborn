@@ -24,6 +24,13 @@
 - Existing 1.1.0 per-world configurations remain compatible and are reused unchanged.
 - PlaceholderAPI requests remain constant-time snapshot reads with no Bukkit or filesystem access.
 
+### Build
+
+- Added a repository-wide line-ending policy so release resources are normalized consistently on
+  Windows and Unix-like systems.
+- Confirmed clean JDK 21 release builds are byte-identical with deterministic timestamps and entry
+  order.
+
 ## 1.1.0 - 2026-07-19
 
 ### Added
