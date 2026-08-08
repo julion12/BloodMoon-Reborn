@@ -44,6 +44,24 @@ Completed events contribute aggregate server history and a last-event snapshot. 
 
 Select `Language: en` or `Language: es` in `plugins/BloodMoon/locales.yml`. See [migration](docs/MIGRATION.md), [configuration](docs/CONFIGURATION.md), and [compatibility](docs/COMPATIBILITY.md).
 
+## Compatibility
+
+| Minecraft | Platform | Java | Status |
+| --- | --- | --- | --- |
+| 1.21.x | Paper / Purpur | Java 21 | Supported |
+| 26.2 | Paper / Purpur | Java 25 | Supported |
+
+### Optional integrations
+
+- PlaceholderAPI
+- TAB
+- Multiverse-Core
+- WorldGuard
+- MythicMobs
+
+For Minecraft 26.2, use a MythicMobs release that explicitly supports 26.2. MythicMobs 5.13.0
+has been validated with BloodMoon-Reborn 1.1.1.
+
 On startup, only missing administrative files are copied from the JAR to
 `plugins/BloodMoon/README.txt` and `plugins/BloodMoon/EXAMPLES/`. Existing files are never
 overwritten; upgrades add only newly introduced or manually deleted examples. The complete

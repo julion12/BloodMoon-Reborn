@@ -26,6 +26,13 @@ PlaceholderAPI consumers such as TAB.
 - Existing BloodMoon 1.1.0 configuration files remain compatible; no new key is required.
 - Paper and Purpur versions supported by 1.1.0 remain in scope.
 
+### Minecraft 26.2
+
+BloodMoon-Reborn 1.1.1 supports Paper and Purpur 26.2 with Java 25. PlaceholderAPI, TAB,
+Multiverse-Core, WorldGuard, and a compatible MythicMobs release can be used as optional
+integrations. MythicMobs 5.13.0 has been validated on Minecraft 26.2; always use a MythicMobs
+release that explicitly supports the target Minecraft version.
+
 ## Validation
 
 - 167 automated tests passed with no failures or skipped tests.

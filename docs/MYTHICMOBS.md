@@ -6,7 +6,10 @@ Boss identity remains UUID-based. The visible name is display-only and resolves 
 
 Every successful Mythic spawn changes the active session's narrative state to `ALIVE`. A natural Mythic death changes it to `DEFEATED`, retains the resolved display and `MYTHICMOBS` type with zero health, and increments the global defeated-boss total exactly once. A later successful spawn becomes the new narrative subject. Administrative `killbosses` closes the narrative but intentionally does not count as a historical victory.
 
-Live validation on 2026-07-19 confirmed that MythicMobs 5.12.1 and the BloodMoon bridge enable on Paper 1.21.8. The same MythicMobs build fails during its own NMS/server-version initialization on Paper 26.2 build 62, before BloodMoon can activate the bridge. BloodMoon core continues safely without it. Treat 26.2 + MythicMobs 5.12.1 as unsupported and test a future 26.2-compatible MythicMobs build before deployment.
+MythicMobs 5.12.1 and the BloodMoon bridge were validated on Paper 1.21.8, but that MythicMobs
+release was not compatible with the previously tested Minecraft 26.2 server line. MythicMobs
+5.13.0 has since been validated with BloodMoon-Reborn 1.1.1 on Minecraft 26.2. Always install a
+MythicMobs release that explicitly declares support for the target Minecraft version.
 
 ```yaml
 Boss:
